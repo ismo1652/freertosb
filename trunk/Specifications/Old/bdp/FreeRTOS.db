@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<db_xml>
+    <atelierb version="3_7_ubuntu-cvs" />
+    <project decomp_dir="/home/atelierb/Projetos/FreeRTOS/bdp/expand_src" old_decomp_dir="/home/atelierb/Projetos/FreeRTOS/bdp/src">
+        <!-- Definition directory list -->
+        <!-- Component file list -->
+        <component_file path="/home/atelierb/Projetos/FreeRTOS/src" name="FreeRTOSConfig" suffix="mch" user="atelierb">
+            <component name="FreeRTOSConfig" type="specification" />
+        </component_file>
+        <component_file path="/home/atelierb/Projetos/FreeRTOS/src" name="Memory" suffix="mch" user="atelierb">
+            <component name="Memory" type="specification" />
+        </component_file>
+        <component_file path="/home/atelierb/Projetos/FreeRTOS/src" name="Task" suffix="mch" user="atelierb">
+            <component name="Task" type="specification" />
+        </component_file>
+        <component_file path="/home/atelierb/Projetos/FreeRTOS" name="Task_Concern" suffix="mch" user="atelierb">
+            <component name="Task_Concern" type="specification" />
+        </component_file>
+        <component_file path="/home/atelierb/Projetos/FreeRTOS/src" name="Types" suffix="mch" user="atelierb">
+            <component name="Types" type="specification" />
+        </component_file>
+    </project>
+</db_xml>
