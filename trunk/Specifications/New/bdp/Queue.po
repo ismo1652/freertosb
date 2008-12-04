@@ -1,0 +1,29 @@
+THEORY ProofList IS
+  _f(1) & _f(2) & _f(3) & xQueueSend.4,(_f(8) & _f(9) => _f(11));
+  _f(1) & _f(2) & _f(3) & xQueueSend.3,(_f(8) & _f(9) => _f(10));
+  _f(1) & _f(2) & _f(3) & xQueueSend.2,(_f(4) & _f(5) => _f(7));
+  _f(1) & _f(2) & _f(3) & xQueueSend.1,(_f(4) & _f(5) => _f(6))
+END
+&
+THEORY Formulas IS
+  ("`Seen and used machines properties'" & BIT = {0}\/{1} & ERROR_DEFINITION = { -5}\/{ -4}\/{ -2}\/{ -1} & pdTRUE: BIT & pdTRUE = 0 & pdFALSE: BIT & pdFALSE = 1 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: INTEGER & 0<=MAX_DELAY & NULL_PARAMETER: PARAMETER & POINTER: FIN(INTEGER) & not(POINTER = {}) & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}));
+  ("`Included,imported and extended machines properties'" & QUEUE_NULL: QUEUE & QUEUE_ISFULL: QUEUE*(QUEUE +-> POW(ITEM))*(QUEUE +-> NAT) +-> BOOL & dom(QUEUE_ISFULL) = QUEUE*(QUEUE +-> POW(ITEM))*(QUEUE +-> NAT) & QUEUE_ISFULL = %(queue,q_it,q_vl).(queue: QUEUE & q_it: QUEUE +-> POW(ITEM) & q_vl: QUEUE +-> NAT & queue: dom(q_vl) & queue: dom(q_it) | bool(q_vl(queue)<=card(q_it(queue)))) & QUEUE_ISEMPTY: QUEUE*(QUEUE +-> POW(ITEM)) +-> BOOL & dom(QUEUE_ISEMPTY) = QUEUE*(QUEUE +-> POW(ITEM)) & QUEUE_ISEMPTY = %(queue,q_it).(queue: QUEUE & q_it: QUEUE +-> POW(ITEM) & queue: dom(q_it) | bool(q_it(queue) = {})) & QUEUES_WITH_TASK: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK))*(QUEUE +-> POW(TASK)) +-> POW(QUEUE) & dom(QUEUES_WITH_TASK) = TASK*POW(QUEUE)*(QUEUE +-> POW(TASK))*(QUEUE +-> POW(TASK)) & QUEUES_WITH_TASK = %(tk,ques,q_tkR,q_tkS).(tk: TASK & ques: POW(QUEUE) & q_tkR: QUEUE +-> POW(TASK) & q_tkS: QUEUE +-> POW(TASK) & ques = dom(q_tkR) & ques = dom(q_tkS) | SET(que).(que: ques & (tk: q_tkR(que) or tk: q_tkS(que)))) & REMOVE_EVENT: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK))*(QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK))*(QUEUE +-> POW(TASK)) & dom(REMOVE_EVENT) = TASK*POW(QUEUE)*(QUEUE +-> POW(TASK))*(QUEUE +-> POW(TASK)) & REMOVE_EVENT = %(tk,ques,q_tkR,q_tkS).(tk: TASK & ques: POW(QUEUE) & q_tkR: QUEUE +-> POW(TASK) & q_tkS: QUEUE +-> POW(TASK) | UNION(que).(que: ques | SET(et).(et = que|->q_tkS(que)-{tk})),UNION(que).(que: ques | SET(et).(et = que|->q_tkR(que)-{tk}))) & ITEM: FIN(INTEGER) & not(ITEM = {}) & COPY_POSITION: FIN(INTEGER) & not(COPY_POSITION = {}) & QUEUE: FIN(INTEGER) & not(QUEUE = {}) & PRIORITY = 0..configMAX_PRIORITIES-1 & TICK = 0..MAX_DELAY & TASK_NULL: TASK & NAME_NULL: NAME & READY_PRIORITIES: (TASK +-> (1..5)*{TASK_STATE})*(TASK +-> PRIORITY) +-> POW(PRIORITY) & dom(READY_PRIORITIES) = (TASK +-> (1..5)*{TASK_STATE})*(TASK +-> PRIORITY) & READY_PRIORITIES = %(tk_state,tk_prt).(tk_state: TASK +-> (1..5)*{TASK_STATE} & tk_prt: TASK +-> PRIORITY | ran(dom(tk_state|>{3|->TASK_STATE})<|tk_prt)) & TICK_INCREMENT: TICK*TICK +-> TICK & dom(TICK_INCREMENT) = TICK*TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & tskIDLE_PRIORITY: PRIORITY & tskIDLE_PRIORITY = 1 & UNBLOCK_TASKS: POW(TASK) +-> (TASK +-> (1..5)*{TASK_STATE}) & dom(UNBLOCK_TASKS) = POW(TASK) & UNBLOCK_TASKS = %bTasks.(bTasks: POW(TASK) | UNION(tk).(tk: bTasks | SET(rTask).(rTask = tk|->(3|->TASK_STATE)))) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & (1..5)*{TASK_STATE}: FIN(NATURAL*{TASK_STATE}) & not((1..5)*{TASK_STATE} = {}) & (1..3)*{SCHEDULER_STATE}: FIN(NATURAL*{SCHEDULER_STATE}) & not((1..3)*{SCHEDULER_STATE} = {}) & "`Included,imported and extended machines invariants'" & queues: POW(QUEUE) & queue_itens: QUEUE +-> POW(ITEM) & queue_tkRecived: QUEUE +-> POW(TASK) & queue_tkSend: QUEUE +-> POW(TASK) & queue_length: QUEUE +-> NAT & queues = dom(queue_itens) & queues = dom(queue_tkRecived) & queues = dom(queue_tkSend) & queues = dom(queue_length) & !queue.(queue: queues => card(queue_itens(queue))<=queue_length(queue)) & tasks: POW(TASK) & task_name: TASK +-> NAME & task_state: TASK +-> (1..5)*{TASK_STATE} & task_priority: TASK +-> PRIORITY & task_value: TASK +-> TICK & tasks = dom(task_priority) & tasks = dom(task_state) & tasks = dom(task_value) & tasks = dom(task_name) & current_task: TASK & current_task: tasks & task_state(current_task) = 1|->TASK_STATE & max_priority: PRIORITY & max_priority = task_priority(current_task) & max(READY_PRIORITIES(task_state,task_priority))<=max_priority & card(task_state|>{1|->TASK_STATE})<=1 & scheduler: (1..3)*{SCHEDULER_STATE} & tickCount: TICK & tickMissed: TICK & "`Seen and used machines assertions'" & ERROR_DEFINITION: POW(INTEGER) & BIT: POW(NATURAL));
+  ("`xQueueSend preconditions in this component'" & pxQueue: queues & pvItemToQueue: ITEM & xTicksToWait: TICK);
+  ("`Local hypotheses'" & 1<=xTicksToWait & QUEUE_ISFULL(pxQueue,queue_itens,queue_length) = TRUE);
+  "`Check preconditions of called operation, or While loop construction, or Assert predicates'";
+  (not(xTicksToWait = 0));
+  (INCLUDE_vTaskDelay = 1);
+  ("`Local hypotheses'" & QUEUE_ISFULL(pxQueue,queue_itens,queue_length) = FALSE & task: tasks & task_state(task) = 2|->TASK_STATE & task: queue_tkRecived(pxQueue) & copy_position: COPY_POSITION);
+  "`Check that the invariant (btrue) is preserved by the operation - ref 3.4'";
+  (task: TASK);
+  (not(task = current_task))
+END
+&
+THEORY EnumerateX IS
+  TASK_STATE == {running,blocked,ready,suspended,deleted};
+  SCHEDULER_STATE == {taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED}
+END
+&
+THEORY Version IS
+  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO, local_op == OK)
+END
