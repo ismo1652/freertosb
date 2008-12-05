@@ -13,7 +13,7 @@
 MACHINE
     Task_Basic
 SEES
-    FreeRTOSConfig, 
+    FreeRTOSConfig,
     Types
 SETS
     /* 
@@ -72,11 +72,11 @@ PROPERTIES
 &	NAME_NULL:NAME
 
 &	READY_PRIORITIES:(TASK +-> TASK_STATE) * (TASK +-> PRIORITY) --> POW(PRIORITY)
-& 	READY_PRIORITIES = %(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) 
-    												& not(ran(dom(tk_st|>{ready})<|tk_prt)={}) |ran(dom(tk_st|>{ready})<|tk_prt))
+& 	READY_PRIORITIES = %(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) & dom(tk_st|>{ready}):POW(dom(tk_prt))
+    						& not(dom(tk_st|>{ready})={})|ran(dom(tk_st|>{ready})<|tk_prt))
                          
-                       \/ %(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) 
-    													& ran(dom(tk_st|>{ready})<|tk_prt)={} |{0})
+                    \/ %(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) & dom(tk_st|>{ready}):POW(dom(tk_prt))
+    						& dom(tk_st|>{ready})={} |{0})
                     	
 
 &	TICK_INCREMENT: TICK * TICK --> TICK
@@ -131,7 +131,7 @@ INVARIANT
 	task_value: TASK+->TICK &
     
     /* toda tarefa deve ter  name,state, priority e value*/
-    tasks = dom(task_priority)  &
+    tasks = dom(task_priority) &
 	tasks = dom(task_state) &
 	tasks = dom(task_value) &
 	tasks = dom(task_name) &
