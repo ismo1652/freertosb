@@ -72,7 +72,12 @@ PROPERTIES
 &	NAME_NULL:NAME
 
 &	READY_PRIORITIES:(TASK +-> TASK_STATE) * (TASK +-> PRIORITY) --> POW(PRIORITY)
-& 	READY_PRIORITIES = %(tk_state,tk_prt).(tk_state:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) |ran(dom(tk_state|>{ready})<|tk_prt))
+& 	READY_PRIORITIES = %(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) & dom(tk_st)=dom(tk_prt)
+    												& not(ran(dom(tk_st|>{ready})<|tk_prt)={}) |ran(dom(tk_st|>{ready})<|tk_prt))
+                         
+                       \/ %(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) & dom(tk_st)=dom(tk_prt)
+    													& ran(dom(tk_st|>{ready})<|tk_prt)={} |{0})
+                    	
 
 &	TICK_INCREMENT: TICK * TICK --> TICK
 & 	TICK_INCREMENT = %(tick,inc).(tick:TICK & inc:TICK | (tick+inc) mod MAX_DELAY)
@@ -82,6 +87,14 @@ PROPERTIES
 &	UNBLOCK_TASKS: POW(TASK) --> (TASK +-> TASK_STATE)
 &	UNBLOCK_TASKS = %(bTasks).(bTasks:POW(TASK)| UNION (tk).(tk:bTasks | {rTask| rTask= tk|->ready } ) )
 
+ASSERTIONS
+    !(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) => ( 
+        							not(ran(dom(tk_st|>{ready})<|tk_prt)={})  => READY_PRIORITIES(tk_st,tk_prt)= ran(dom(tk_st|>{ready})<|tk_prt)
+    							&	ran(dom(tk_st|>{ready})<|tk_prt)={} => READY_PRIORITIES(tk_st,tk_prt)={0})
+                            )&
+                            
+   	!(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) => READY_PRIORITIES(tk_st,tk_prt)/={}) & 			
+   	!(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) => max(READY_PRIORITIES(tk_st,tk_prt))>=0)    																			
 VARIABLES
     /*Set of all system's tasks*/
     tasks,
