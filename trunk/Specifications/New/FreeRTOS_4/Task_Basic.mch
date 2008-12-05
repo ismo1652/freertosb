@@ -72,10 +72,10 @@ PROPERTIES
 &	NAME_NULL:NAME
 
 &	READY_PRIORITIES:(TASK +-> TASK_STATE) * (TASK +-> PRIORITY) --> POW(PRIORITY)
-& 	READY_PRIORITIES = %(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) & dom(tk_st)=dom(tk_prt)
+& 	READY_PRIORITIES = %(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) 
     												& not(ran(dom(tk_st|>{ready})<|tk_prt)={}) |ran(dom(tk_st|>{ready})<|tk_prt))
                          
-                       \/ %(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) & dom(tk_st)=dom(tk_prt)
+                       \/ %(tk_st,tk_prt).(tk_st:(TASK +-> TASK_STATE) & tk_prt:(TASK +-> PRIORITY) 
     													& ran(dom(tk_st|>{ready})<|tk_prt)={} |{0})
                     	
 
@@ -105,7 +105,7 @@ VARIABLES
 	task_state,
 	task_value,
 	
-	/*task running and your priority*/
+	/*task running and its priority*/
 	max_priority,
 	current_task,
 	
@@ -130,11 +130,12 @@ INVARIANT
 	task_priority : TASK +-> PRIORITY & 
 	task_value: TASK+->TICK &
     
-    /* toda tarefa deve ter  state, priority e value*/
+    /* toda tarefa deve ter  name,state, priority e value*/
     tasks = dom(task_priority)  &
 	tasks = dom(task_state) &
 	tasks = dom(task_value) &
 	tasks = dom(task_name) &
+	
 	
 	current_task:TASK &
 	current_task:tasks &
@@ -196,7 +197,7 @@ THEN
         	
         	IF uxPriority > max_priority 
         	THEN
-        	    task_state:=(task_state<+{current_task|->ready}) \/  {task|->running} ||
+        	    task_state:=task_state<+{current_task|->ready,task|->running}||
         	    max_priority:=uxPriority||
         	    current_task:= task
         	ELSE
