@@ -1,206 +1,273 @@
+/* Queue_Basic
 
+ \brief Basic layer of definitions for queue support in FreeRTOS.
  
-/************************************************************************************************************
-This machine implement the concepts of queue of the FreeRTOS. In this abstraction level don't concerns with 
-length of queue's itens and data structs like as list and its ordem. Here all data structs was represent as
-sets, and in next refinements this sets will replaces for its data structs necessary.
-*************************************************************************************************************/
+ This machine defines the concept of a queue in FreeRTOS.
+
+ Queues are modelled as sets, instead as true queues.
+ 
+ Author: Stephenson Galvao, David Deharbe
+ Creation date: Fri Dec 5 2008
+ Universidade Federal do Rio Grande do Norte
+ Departamento de Informatica e Matematica Aplicada
+ Programa de Pos-Graduacao em Sistemas e Computacao
+ Formal Methods and Languages Laboratory
+ */ 
+
 MACHINE
+
     Queue_Basic
+
 SEES
+
     Types,Task_Basic
+
 SETS
-    /*This set represent the universe set of all itens available in the system*/
-    ITEM;
-    
-    /*This set represent the positions of insertion of itens in the queue. It is used in the xQueueGenericSend operation*/
-    COPY_POSITION;/*={queueSEND_TO_BACK,queueSEND_TO_FRONT}*/
-    
-    
-    QUEUE
-    
+    ITEM;			/** queue items */
+    COPY_POSITION;	/** position of insertions in queues = {queueSEND_TO_BACK,queueSEND_TO_FRONT}*/
+    QUEUE 			/** queues */
 
 CONSTANTS
     
 	QUEUE_NULL,
 	ITEM_NULL,
-	
 	QUEUE_ISFULL,
-	
 	QUEUE_ISEMPTY,
-	
-	/*Função que retorna todas as filas que possuem a tarefa passada como argumento em uma de suas listas de eventos */
-	QUEUES_WITH_TASK,
-	
+	QUEUES_WITH_TASK,	/** functions mapping task to queues where such task is present */
     REMOVE_EVENT
-    
-   
-	
-	
 
 PROPERTIES
+
     QUEUE_NULL:QUEUE &
     ITEM_NULL:ITEM &
 	
-	QUEUE_ISFULL : QUEUE*(QUEUE+->POW(ITEM))*(QUEUE+->NAT) --> BOOL & 
-	QUEUE_ISFULL = %(queue,q_it,q_vl).(queue:QUEUE & q_it:(QUEUE+->POW(ITEM)) & q_vl:(QUEUE+->NAT) & queue:dom(q_vl) & queue:dom(q_it)
-	    				| bool(card(q_it(queue))>=q_vl(queue))) &
-                    
-    QUEUE_ISEMPTY : QUEUE*(QUEUE+->POW(ITEM)) -->BOOL &
-    QUEUE_ISEMPTY=%(queue,q_it).(queue:QUEUE & q_it:(QUEUE+->POW(ITEM))  & queue:dom(q_it) |bool(q_it(queue)={})) &
+	/** do we need to have this level of precision? */
+	QUEUE_ISFULL : QUEUE * (QUEUE+->POW(ITEM)) * (QUEUE+->NAT) --> BOOL & 
+	QUEUE_ISFULL =
+		%(queue, contents, capacity).
+			(queue : QUEUE & contents  : QUEUE +-> POW(ITEM) & capacity : QUEUE+->NAT & 
+			 queue : dom(capacity) & queue:dom(contents) |
+	    				bool(card(contents(queue)) = capacity(queue))) &
 
-	QUEUES_WITH_TASK: TASK *POW(QUEUE)*(QUEUE+-> POW(TASK))*(QUEUE+-> POW(TASK)) --> POW(QUEUE) &
-	QUEUES_WITH_TASK=%(tk,ques,q_tkR,q_tkS).(tk:TASK & ques: POW(QUEUE) & q_tkR:(QUEUE+-> POW(TASK)) & q_tkS:(QUEUE+-> POW(TASK))
-	    			& ques= dom(q_tkR) & ques= dom(q_tkS) | {que|que:ques & (tk:q_tkR(que) or tk:q_tkS(que)) }) &
+	/** do we need to have this level of precision? */
+    QUEUE_ISEMPTY : QUEUE * (QUEUE+->POW(ITEM)) --> BOOL &
+    QUEUE_ISEMPTY =
+    	%(queue, contents).
+    		(queue : QUEUE & contents: QUEUE+->POW(ITEM) & queue : dom(contents) |
+    		    		bool(contents(queue) = {})) &
+
+	QUEUES_WITH_TASK : TASK * POW(QUEUE) * (QUEUE+-> POW(TASK)) * (QUEUE+-> POW(TASK)) --> POW(QUEUE) &
+	QUEUES_WITH_TASK =
+		%(task, queues, receiving, sending).
+			(task : TASK & queues: POW(QUEUE) & 
+			 receiving : QUEUE+-> POW(TASK) & sending : QUEUE+-> POW(TASK)	&
+			    queues = dom(receiving) & queues = dom(sending) |
+			    		{queue | queue : queues & (task : receiving(queue) \/ sending(queue)) }) &
     
 	    				
 	
-    REMOVE_EVENT:TASK * POW(QUEUE) * (QUEUE+-> POW(TASK))*(QUEUE+-> POW(TASK)) --> (QUEUE+-> POW(TASK))*(QUEUE+-> POW(TASK)) &
-    REMOVE_EVENT=%(tk,ques,q_tkR,q_tkS).(tk:TASK & ques: POW(QUEUE) & q_tkR:(QUEUE+-> POW(TASK)) & q_tkS:(QUEUE +-> POW(TASK))
-    				| UNION(que).(que:ques|{et| et= que|->(q_tkS(que)-{tk})}),UNION(que).(que:ques|{et| et= que|->(q_tkR(que)-{tk})}))
+    REMOVE_EVENT : TASK * POW(QUEUE) * (QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) &
+    REMOVE_EVENT = 
+    	%(task, queues, pending).
+    		(task : TASK & queues : POW(QUEUE) & pending : QUEUE +-> POW(TASK) |
+    				%(queue).(queue : queues | pending(queue) - {task}))
+                            /*
+    REMOVE_EVENT = 
+    	%(task, queues, pending).
+    		(task : TASK & queues : POW(QUEUE) & pending : QUEUE +-> POW(TASK) |
+    				UNION(queue).(queue : queues | 
+    				    			{mm | mm: (QUEUE * POW(TASK)) & mm = queue |-> (pending(queue) - {task})})) */
+
+ASSERTIONS
     
-    
-	                                 
-	        
+    !(task, queues, pending).
+    	(task : TASK & queues : POW(QUEUE) & pending : QUEUE +-> POW(TASK) => 
+    	    dom(REMOVE_EVENT(task, queues, pending)) = queues)
+    	    
 VARIABLES
-    /*Armazena todas as filhas manipuladas pelo FreeRTOS*/
+
+    /** Different queues in FreeRTOS */
     queues,
-    queue_itens,
-    queue_tkRecived,
-    queue_tkSend,
-    queue_length
-    
-    
-    
-    
-    
-    
+    	
+    /** miscellaneous queue properties */
+    queue_items, /**Set of items of a queue **/
+    queue_receiving, /**Set of tasks waiting to recive one item of queue **/
+    queue_sending,	/**Set of tasks waiting to send one item to queue **/
+    queue_capacity /**Capacity of Queue **/
     
 INVARIANT
-    
-    queues:POW(QUEUE) & 
-    queue_itens: QUEUE +-> POW(ITEM) &
-    queue_tkRecived: QUEUE+-> POW(TASK) &
-    queue_tkSend: QUEUE+-> POW(TASK) &
-    queue_length:QUEUE+->NAT &
-
-	queues=dom(queue_itens) &
-	queues=dom(queue_tkRecived) &
-	queues=dom(queue_tkSend) &
-	queues=dom(queue_length) &
+    queues : POW(QUEUE) & 
+    queue_items : QUEUE +-> POW(ITEM) &
+    queue_receiving : QUEUE+-> POW(TASK) & 
+    queue_sending : QUEUE+-> POW(TASK) &
+    queue_capacity : QUEUE+->NAT &
 	
-	!(queue).(queue:queues => card(queue_itens(queue))<= queue_length(queue)) 
+	/**All queue must have a set of item, a set of tasks waiting to recive, set of task waiting to send and a capacity **/
+	queues = dom(queue_items) &
+	queues = dom(queue_receiving) &
+	queues = dom(queue_sending) &
+	queues = dom(queue_capacity) &
 	
-	/*
-	!(queue).(queue:queues & queue_itens(queue)={} )<= queue_length(queue)) & 
-    
-    &
-    & !(queue).(queue:queues & not(queue'TaskWaitingToRecived={}) => QUEUE_ISFULL(queue)=TRUE)
-    & !(queue).(queue:queues & not(queue'TaskWaitingToSend={}) => QUEUE_ISEMPTY(queue)=TRUE)
-	*/    
+	/**The numbers of items in set of item must be less equals than the capacity of queue **/
+	!(queue).(queue:queues => card(queue_items(queue))<= queue_capacity(queue)) 
+	
+	
     
     
 INITIALISATION
-    queues:={QUEUE_NULL}||
-    queue_itens:={QUEUE_NULL|->{}}||
-    queue_tkRecived:={QUEUE_NULL|->{}}||
-    queue_tkSend:={QUEUE_NULL|->{}}||
-    queue_length:={QUEUE_NULL|->card({})}
-    
-    
+    queues := {QUEUE_NULL}||
+    queue_items := {QUEUE_NULL |-> {}}||
+    queue_receiving := {QUEUE_NULL |-> {}}||
+    queue_sending := {QUEUE_NULL |-> {}}||
+    queue_capacity := {QUEUE_NULL |-> 0}
     
 OPERATIONS
-    
+	/**
+		/brief Create Queue
+		/do
+			Create a new queue that will be manage by FreeRTOS
+			
+		/parameters
+			uxQueueLength - Queue length 
+			uxItemSize - the size of one item of queue
+ 	
+	**/
+	xQueueHandle <-- xQueueCreate(uxQueueLength, uxItemSize) =
+	PRE
+    	uxQueueLength: NAT & uxItemSize:NAT
+	THEN    
+    	CHOICE
+			ANY
+			    queue 
+			WHERE
+			    queue : QUEUE & 
+			    queue /: queues
+			THEN	
+		    	queues := queues \/ {queue}||
+		    	queue_items := queue_items \/ {queue |-> {}} ||
+		    	queue_receiving := queue_receiving \/ {queue |-> {}} ||
+		    	queue_sending := queue_sending \/ {queue |-> {}}||
+		    	queue_capacity := queue_capacity \/ {queue|->uxQueueLength}||
+		    	xQueueHandle := queue
+			END		    
+     	OR
+        	xQueueHandle:=QUEUE_NULL
+     	END
+   	END;
 
+	/**
+		/brief Send Item
+		
+		/do
+			Inserts one item in the queue and remove the task from the set of tasks that are waiting
+			to receive one item. The given task shall be waiting on the given queue.
+			
+		/parameters
+			pxQueue - Queue that will send the item
+			pxItem - Queue that will send to queue
+			task - Task in reciving set that will unblock
+			copy_position - Position that the item will insert in the queue, this can be queueSEND_TO_BACK,queueSEND_TO_FRONT, to insert 
+							a item in front and black respective
+			
+	**/
+	sendItem(pxQueue, pxItem, task, copy_position) =
+	PRE
+    	pxQueue : queues & pxItem:ITEM & task:TASK & copy_position : COPY_POSITION &
+	    QUEUE_ISFULL(pxQueue, queue_items, queue_capacity) = FALSE &
+	    task : queue_receiving(pxQueue)
+	THEN
+    	queue_items(pxQueue) := queue_items(pxQueue) \/ {pxItem}||
+    	queue_receiving(pxQueue) := queue_receiving(pxQueue) - {task}
+	END;
+	
+	/**
+		/brief Insert Task in Waiting to Recive
+		
+		/do
+			Insert a task in the set of tasks waiting to recive a item of passed queue
+			
+		/parameters
+			pxQueue - Queue that the task will be insert in the reciving
+			pxTask - Task that will insert in the set of task waiting to recive (reciving)
+	**/
+	insertTaskWaitingToSend(pxQueue, pxTask) =
+	PRE
+		pxQueue : queues & pxTask : TASK
+	THEN
+    	queue_sending(pxQueue) := queue_sending(pxQueue) \/ {pxTask}
+	END;
 
-xQueueHandle <-- xQueueCreate(uxQueueLength, uxItemSize ) =
-PRE
-    uxQueueLength: NAT & uxItemSize:NAT
-THEN    
-    CHOICE
-		ANY queue 
-		WHERE queue:QUEUE & queue/:queues
-		THEN	
-		    queues:=queues\/{queue}||
-		    queue_itens:=queue_itens\/{queue|->{}}||
-		    queue_tkRecived:=queue_tkRecived\/{queue|->{}}||
-		    queue_tkSend:=queue_tkSend\/{queue|->{}}||
-		    queue_length:=queue_length\/{queue|->uxQueueLength}||
-		    xQueueHandle:=queue
-		END		    
-     OR
-        xQueueHandle:=QUEUE_NULL
-     END
-        
-END
-;
-/*
-Insert one intem in the queue and remove the task from the set of task that are waiting to recived one iten. Then task passed need is in the
-ser of set of task waiting to revived of queue
-*/
-sendItem(pxQueue,pxItem,task,copy_position)=
-PRE
-    pxQueue:queues & QUEUE_ISFULL(pxQueue,queue_itens,queue_length)=FALSE & pxItem:ITEM & task:TASK
-    & task:queue_tkRecived(pxQueue) & copy_position:COPY_POSITION
-THEN
-    queue_itens(pxQueue):=queue_itens(pxQueue)\/{pxItem}||
-    queue_tkRecived(pxQueue):=queue_tkRecived(pxQueue)-{task}
-END
-;
+	/**
+		/brief Insert Task in Waiting to Send
+		
+		/do
+			Insert a task in the set of tasks waiting to send one item to passed queue
+			
+		/parameters
+			pxQueue - Queue that the task will be insert in the sending
+			pxTask - Task that will insert in the set sending
+	**/
+	insertTaskWaitingToRecived(pxQueue, pxTask) =
+	PRE
+    	pxQueue : queues & pxTask : TASK
+	THEN
+    	queue_receiving(pxQueue) := queue_receiving(pxQueue) \/ {pxTask}
+	END	;
+	
+	/**
+		/brief Received Item Recive
+		
+		/do
+			Remove or not one item of indicated queue and remove the passed task from the set of tasks waiting to send. For remove 
+			the intem the parameter justPeeking shall be false, for only read the item in the queue without remove then, the paramenter
+			justPeeking shall be true. 
+									
+		/parameters
+			pxQueue - Queue that the task will be insert in the sending
+			justPeeking - Flag that indicate if the item will reade and remove or only read
+			pxTask - Task that have the item that will be read
+	**/
+	xItem <-- receivedItem(pxQueue, justPeeking, task) =
+	PRE
+    	pxQueue : queues & justPeeking : BIT & task : TASK & 
+    	QUEUE_ISEMPTY(pxQueue,queue_items) = FALSE & task : queue_sending(pxQueue)
+	THEN
+	    ANY
+	        item
+	    WHERE
+	        item : ITEM & item : queue_items(pxQueue)
+    	THEN
+	        IF justPeeking = pdFALSE
+    	    THEN 
+        	    queue_items(pxQueue) := queue_items(pxQueue) - {item}||
+	            queue_sending(pxQueue) := queue_sending(pxQueue) - {task}
+        	END ||
+        	xItem:=item
+	    END
+	END;
+	
+	/**
+		/brief 
+			Remove From Event List Queue
+		/do
+			Remove a task from all events sets (reciving, sending) in all queues of FreeRTOS
 
-insertTaskWaitingToSend(pxQueue,pxTask)=
-PRE
-    pxQueue:queues & pxTask:TASK
-THEN
-    queue_tkSend(pxQueue):=queue_tkSend(pxQueue)\/{pxTask}
-END
-;
-
-insertTaskWaitingToRecived(pxQueue,pxTask)=
-PRE
-    pxQueue:queues & pxTask:TASK
-THEN
-    queue_tkRecived(pxQueue):=queue_tkRecived(pxQueue)\/{pxTask}
-
-END	
-;
-
-
-xItem<--recivedItem(pxQueue,justPeeking,task)=
-PRE
-    pxQueue:queues & QUEUE_ISEMPTY(pxQueue,queue_itens)=FALSE & justPeeking:BIT & task:TASK & task:queue_tkSend(pxQueue)
-THEN
-    
-    ANY item WHERE item:ITEM & item: queue_itens(pxQueue)
-    THEN
-        IF	justPeeking=pdFALSE
-        THEN 
-            queue_itens(pxQueue):=queue_itens(pxQueue) - {item}||
-            queue_tkSend(pxQueue):=queue_tkSend(pxQueue)-{task}
-        END
-        ||xItem:=item
-    END
-END
-
-;
-removeFromEventListQueue(task)=
-PRE
-    task:TASK  
-THEN
-   
-    ANY queuesTask,q_tkRecived,q_tkSend  
-    WHERE
-        queuesTask:POW(QUEUE) & queuesTask = QUEUES_WITH_TASK(task,queues,queue_tkRecived,queue_tkSend)&
-        q_tkRecived:(QUEUE+->POW(TASK)) & q_tkSend:(QUEUE+->POW(TASK)) &
-        q_tkRecived,q_tkSend=REMOVE_EVENT(task,queues,queue_tkRecived,queue_tkSend)
-    THEN
-       queue_tkRecived:=queue_tkRecived <+ q_tkRecived||
-       queue_tkSend:=queue_tkSend<+ q_tkSend
-    END
-    
-        
-END
-
-
-    
+		/parameters
+			task - Task that will be removing
+		
+	**/	
+	removeFromEventListQueue(task) =
+	PRE
+    	task : TASK  
+	THEN
+	    ANY
+	        receiving, sending  
+    	WHERE
+        	receiving = REMOVE_EVENT(task, queues, queue_receiving) &
+        	sending = REMOVE_EVENT(task, queues, queue_sending)
+		THEN
+       		queue_receiving := queue_receiving <+ receiving ||
+       		queue_sending := queue_sending <+ sending
+    	END
+	END
 END

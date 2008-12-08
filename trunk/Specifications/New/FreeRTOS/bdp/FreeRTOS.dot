@@ -1,9 +1,0 @@
-digraph {
-FreeRTOSConfig [ label=" FreeRTOSConfig " shape= box ]
-Queue [ label=" Queue " shape= box ]
-Queue_Basic [ label=" Queue_Basic " shape= box ]
-Task [ label=" Task " shape= box ]
-Task_Basic [ label=" Task_Basic " shape= box ]
-Types [ label=" Types " shape= box ]
-
-}
