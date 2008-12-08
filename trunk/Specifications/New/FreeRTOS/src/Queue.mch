@@ -19,7 +19,9 @@ SEES
     Types    
 INCLUDES
     Queue_Basic,
-    Task_Basic
+    Task_Basic,
+    FreeRTOSConfig
+    
     
 PROMOTES
 	xQueueCreate
@@ -42,22 +44,27 @@ OPERATIONS
 	**/    
 	return <-- xQueueSend(pxQueue, pvItemToQueue, xTicksToWait)=
 	PRE
-    	pxQueue:queues &  pvItemToQueue:ITEM  & xTicksToWait:TICK
+    	pxQueue:queues &  
+    	pvItemToQueue:ITEM  & 
+    	xTicksToWait:TICK
 	THEN
-    SELECT (xTicksToWait>0 & (QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE)) 
+    SELECT xTicksToWait>0 & 
+        	(QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE) &
+        	INCLUDE_vTaskDelay = 1 /** mandatory to call operation vTaskDelay */
+        
     	THEN 
         	insertTaskWaitingToSend(pxQueue,current_task)||
         	vTaskDelay(xTicksToWait)||
         	return:=pdTRUE
         	
-    	WHEN (QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=FALSE) 
+    	WHEN QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=FALSE
         	THEN
     			ANY 
     			    task,copy_position 
     			WHERE 
     			    task:tasks & 
-    			    task_state(task)=blocked & 
-    			    task:queue_receiving(pxQueue) & 
+    			    	task_state(task)=blocked & 
+    			   		task:queue_receiving(pxQueue) & 
     			    copy_position:COPY_POSITION
     			    
         		THEN
@@ -90,11 +97,14 @@ OPERATIONS
 	**/    
 	return <-- xQueueSendToBack(pxQueue, pvItemToQueue, xTicksToWait)=
 	PRE
-    	pxQueue:queues &  pvItemToQueue:ITEM  & xTicksToWait:TICK
+    	pxQueue:queues &  
+    	pvItemToQueue:ITEM  & 
+    	xTicksToWait:TICK
 	THEN
     	SELECT 
     	    xTicksToWait>0 & 
-    	    QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE
+    	    QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE &
+    	    INCLUDE_vTaskDelay = 1 /** mandatory to call operation vTaskDelay */
     	THEN 
         	insertTaskWaitingToSend(pxQueue,current_task)||
        	 	vTaskDelay(xTicksToWait)||
@@ -143,9 +153,13 @@ OPERATIONS
 	**/ 
 	return <-- xQueueSendToFront(pxQueue,pvItemToQueue,xTicksToWait)=
 	PRE
-    	pxQueue:queues &  pvItemToQueue:ITEM  & xTicksToWait:TICK
+    	pxQueue:queues &  
+    	pvItemToQueue:ITEM  & 
+    	xTicksToWait:TICK
 	THEN
-    	SELECT (xTicksToWait>0 & (QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE)) 
+    	SELECT xTicksToWait>0 & 
+    	    	QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE &
+    	    	INCLUDE_vTaskDelay = 1  /** mandatory to call operation vTaskDelay */ 
     	THEN 
         	insertTaskWaitingToSend(pxQueue,current_task)||
         	vTaskDelay(xTicksToWait)||
@@ -159,8 +173,8 @@ OPERATIONS
     		    copy_position 
     		WHERE 
     		    task:tasks & 
-    		    task_state(task)=blocked & 
-    		    task:queue_receiving(pxQueue) & 
+    		    	task_state(task)=blocked & 
+    		    	task:queue_receiving(pxQueue) & 
     		    copy_position:COPY_POSITION
     		    
         	THEN
@@ -200,7 +214,8 @@ OPERATIONS
 	THEN
     	SELECT 
     	    QUEUE_ISEMPTY(xQueue,queue_items) = TRUE & 
-    	    xTicksToWait>0
+    	    xTicksToWait>0 &
+    	    INCLUDE_vTaskDelay = 1  /** mandatory to call operation vTaskDelay */
     	THEN
         	insertTaskWaitingToRecived(xQueue,current_task)||
         	vTaskDelay(xTicksToWait)||
@@ -219,9 +234,9 @@ OPERATIONS
         	    task 
         	WHERE 
         	    task:TASK & 
-        	    task:tasks & 
-        	    task: queue_receiving(xQueue) & 
-        	    task_state(task)=blocked
+        	    	task:tasks & 
+        	    	task: queue_sending(xQueue) & 
+        	    	task_state(task)=blocked
         	THEN         
         		pvBuffer<--receivedItem(xQueue,pdFALSE,task)||
         		removeFromBlockedList(task)
@@ -252,7 +267,8 @@ OPERATIONS
 	THEN
     	SELECT 
     	    QUEUE_ISEMPTY(xQueue,queue_items) = TRUE & 
-    	    xTicksToWait>0
+    	    xTicksToWait>0 &
+    	    INCLUDE_vTaskDelay = 1  /** mandatory to call operation vTaskDelay */
     	THEN
         	insertTaskWaitingToRecived(xQueue,current_task)||
         	vTaskDelay(xTicksToWait)||
@@ -273,7 +289,7 @@ OPERATIONS
         	WHERE 
         	    task:TASK & 
         	    task:tasks & 
-        	    task: queue_receiving(xQueue) & 
+        	    task: queue_sending(xQueue) & 
         	    task_state(task)=blocked
         	    
         	THEN         

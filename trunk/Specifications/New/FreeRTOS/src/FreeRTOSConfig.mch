@@ -1,121 +1,64 @@
-/*
-Suggestion and Ideas:
+/* FreeRTOSConfig
 
-*/
+ \brief Definitions of configurations for FreeRTOS.
+ 
+ FreeRTOS can be configured in several ways to tailor it to a particular application. This machine contains the definitions of all such configuration settings.
+ 
+ Author: Stephenson Galvao, David Deharbe
+ Creation date: Fri Dec 5 2008
+ Universidade Federal do Rio Grande do Norte
+ Departamento de Informatica e Matematica Aplicada
+ Programa de Pos-Graduacao em Sistemas e Computacao
+ Formal Methods and Languages Laboratory
+ */
 MACHINE
-FreeRTOSConfig
+	FreeRTOSConfig
 
 SEES
-Types
+	Types
 
 CONSTANTS
+	configMAX_PRIORITIES, 	/** maximum value for task priorities */
+	configTOTAL_HEAP_SIZE,	/** memory size */
+	configMINIMAL_STACK_SIZE,
 
-/*************************** USED ***************************************************/
- 
-/* 
-Used to defini the ranger of available value to the priority's set
-*/
-configMAX_PRIORITIES,
+	/** The following are flags controlling the availability of parts of the API */
+	INCLUDE_vTaskPrioritySet,	/** TaskPrioritySet */
+	INCLUDE_vTaskSuspend,		/** vTaskSuspend and vTaskResume */
+	INCLUDE_uxTaskPriorityGet,	/** uxTaskPriorityGet */
+	INCLUDE_vTaskDelete,		/** vTaskDelete */
+	INCLUDE_xTaskGetSchedulerState,	/** xTaskGetSchedulerState */
+	INCLUDE_xTaskGetCurrentTaskHandle,	/** xTaskGetCurrentTaskHandle */
+	INCLUDE_vTaskDelay,
+	INCLUDE_vTaskDelayUntil
 
-/*
- Parameter that say the memory length
-*/
-configTOTAL_HEAP_SIZE,
-
-/******************************************************
-Control of use of the FreeRTOS' APIs functions
-*******************************************************/
-
-/* 
-Flag that control the use of TaskPrioritySet function
-*/
-INCLUDE_vTaskPrioritySet,
-
-/*
-Flag that control the use of vTaskSuspend and vTaskResume functions
-*/
-INCLUDE_vTaskSuspend,
-
-/* 
-Flag that control the use of uxTaskPriorityGet function
-*/
-INCLUDE_uxTaskPriorityGet,
-
-/* 
-Flag that control the use of vTaskDelete function
-*/
-INCLUDE_vTaskDelete,
-
-/* 
-Flag that control the use of xTaskGetSchedulerState function
-*/
-INCLUDE_xTaskGetSchedulerState,
-
-/* 
-Flag that control the use of xTaskGetCurrentTaskHandle function
-*/
-INCLUDE_xTaskGetCurrentTaskHandle,
-
-configMINIMAL_STACK_SIZE,
-
-/*************************** NO USED ************************************************/
-
-configUSE_PREEMPTION,
-configUSE_IDLE_HOOK,
-configUSE_TICK_HOOK,
-configCPU_CLOCK_HZ,
-configTICK_RATE_HZ,
-configMAX_TASK_NAME_LEN,
-configUSE_TRACE_FACILITY,
-configUSE_16_BIT_TICKS,
-configIDLE_SHOULD_YIELD,
-configUSE_USE_MUTEXES,
-configUSE_RECURSIVE_MUTEXES,
-configUSE_COUNTING_SEMAPHORES,
-configUSE_ALTERNATIVE_API,
-configCHECK_FOR_STACK_OVERFLOW,
-configQUEUE_REGISTRY_SIZE,
-configUSE_CO_ROUTINES,
-configMAX_CO_ROUTINE_PRIORITIES,
-configKERNEL_INTERRUPT_PRIORITY,
-configMAX_SYSCALL_INTERRUPT_PRIORITY,
-  	
-
-
-INCLUDE_vTaskCleanUpResources,
-INCLUDE_vTaskDelayUntil,
-INCLUDE_vTaskDelay		
-
-
+	/* 
+	configUSE_PREEMPTION, configUSE_IDLE_HOOK, configUSE_TICK_HOOK,
+	configCPU_CLOCK_HZ, configTICK_RATE_HZ, configMAX_TASK_NAME_LEN,
+	configUSE_TRACE_FACILITY, configUSE_16_BIT_TICKS, configIDLE_SHOULD_YIELD,
+	configUSE_USE_MUTEXES, configUSE_RECURSIVE_MUTEXES, configUSE_COUNTING_SEMAPHORES,
+	configUSE_ALTERNATIVE_API, configCHECK_FOR_STACK_OVERFLOW, configQUEUE_REGISTRY_SIZE,
+	configUSE_CO_ROUTINES, configMAX_CO_ROUTINE_PRIORITIES, configKERNEL_INTERRUPT_PRIORITY,
+	configMAX_SYSCALL_INTERRUPT_PRIORITY, INCLUDE_vTaskCleanUpResources,
+	INCLUDE_vTaskDelayUntil, INCLUDE_vTaskDelay	*/
 
 PROPERTIES
 
-
-  configMAX_PRIORITIES : NATURAL
-& configMAX_PRIORITIES >=1
-
-& configTOTAL_HEAP_SIZE : NATURAL
-
-
-& configMINIMAL_STACK_SIZE : NATURAL  
-
-& INCLUDE_uxTaskPriorityGet : BIT
-
-& INCLUDE_vTaskDelete : BIT		
-
-& INCLUDE_vTaskSuspend : BIT		
-
-& INCLUDE_xTaskGetSchedulerState : BIT	
-
-& INCLUDE_vTaskPrioritySet : BIT
-
-& INCLUDE_xTaskGetCurrentTaskHandle : BIT
-
-
-
-
-
-
+	configMAX_PRIORITIES : INTEGER &
+	configMAX_PRIORITIES >=1 &
+	configTOTAL_HEAP_SIZE : INTEGER &
+	configTOTAL_HEAP_SIZE >= 0 &
+	configMINIMAL_STACK_SIZE : INTEGER  &
+	configMINIMAL_STACK_SIZE >= 0 &
+	INCLUDE_uxTaskPriorityGet : BIT &
+	INCLUDE_vTaskDelete : BIT &
+	INCLUDE_vTaskSuspend : BIT &
+	INCLUDE_xTaskGetSchedulerState : BIT &
+	INCLUDE_vTaskPrioritySet : BIT &
+	INCLUDE_xTaskGetCurrentTaskHandle : BIT &
+	INCLUDE_vTaskDelayUntil : BIT &
+	INCLUDE_vTaskDelay : BIT		
+/*
 
 & configUSE_PREEMPTION : BIT
 & configUSE_IDLE_HOOK : BIT
@@ -137,11 +80,7 @@ PROPERTIES
 & configKERNEL_INTERRUPT_PRIORITY : NATURAL
 & configMAX_SYSCALL_INTERRUPT_PRIORITY : NATURAL
 & INCLUDE_vTaskCleanUpResources : BIT
-& INCLUDE_vTaskDelayUntil : BIT	
-& INCLUDE_vTaskDelay : BIT		
-
-
-
+*/
 END
 
 

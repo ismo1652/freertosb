@@ -58,7 +58,7 @@ PROPERTIES
 
 	READY_PRIORITIES : (TASK +-> TASK_STATE) * (TASK +-> PRIORITY) --> POW(PRIORITY) &
 	READY_PRIORITIES = %(state, priority).(state : TASK +-> TASK_STATE & priority : TASK +-> PRIORITY |
-	    {0} \/ (state~; priority) [{ready}]) &
+	    {0} \/ (ran(state >< priority))[{ready}]) &
     
 	TICK_INCREMENT: TICK * TICK --> TICK &
  	TICK_INCREMENT = %(tick, inc).(tick : TICK & inc : TICK | (tick+inc) mod MAX_DELAY) &
@@ -70,20 +70,41 @@ PROPERTIES
 	UNBLOCK_TASKS = %(tasks).(tasks : POW(TASK)| tasks * {ready})
 
 ASSERTIONS
-    !(state,priority).(state:(TASK +-> TASK_STATE) & priority:(TASK +-> PRIORITY) => ( 
+   !(state,priority).(state:(TASK +-> TASK_STATE) & priority:(TASK +-> PRIORITY) => ( 
         					not(ran(dom(state|>{ready})<|priority)={})  => READY_PRIORITIES(state,priority)= ran(dom(state|>{ready})<|priority)
     					&	ran(dom(state|>{ready})<|priority)={} => READY_PRIORITIES(state,priority)={0})
-                   )&
-                            
+                    )&
+    
+     !(task_state, task_priority, task, priority, state).
+    	(task_state : (TASK +-> TASK_STATE) & task_priority : (TASK +-> PRIORITY) & task : TASK & priority : PRIORITY & state : TASK_STATE 
+    	    & state /= ready => (max(READY_PRIORITIES(task_state <+ {task |-> state}, task_priority <+ {task |-> priority})) =
+                max(READY_PRIORITIES(task_state, task_priority)))) &
+     
+     !(task_state, task_priority, task, state).
+    	(task_state : (TASK +-> TASK_STATE) & task_priority : (TASK +-> PRIORITY) & task : TASK & state : TASK_STATE & state /= ready => 
+        	(max(READY_PRIORITIES(task_state <+ {task |-> state}, task_priority)) = max(READY_PRIORITIES(task_state, task_priority)))) &
+        
+    !(task_state, task_priority, task, priority).(task_state : (TASK +-> TASK_STATE) & task_priority : (TASK +-> PRIORITY) & task : TASK &
+        priority : PRIORITY => (max(READY_PRIORITIES(task_state <+ {task |-> ready}, task_priority <+ {task |-> priority})) =
+            max(READY_PRIORITIES(task_state, task_priority) \/ {priority}))) &
+
+             
    	!(state,priority).(state:(TASK +-> TASK_STATE) & priority:(TASK +-> PRIORITY) => READY_PRIORITIES(state,priority) /= {}) & 			
-   	!(state,priority).(state:(TASK +-> TASK_STATE) & priority:(TASK +-> PRIORITY) => max(READY_PRIORITIES(state,priority)) >= 0)    																			
+   	!(state,priority).(state:(TASK +-> TASK_STATE) & priority:(TASK +-> PRIORITY) => max(READY_PRIORITIES(state,priority)) >= 0) &
+   	
+   	!(state,tk1,tk2).(state:(TASK +-> TASK_STATE) & tk1: dom(state) & tk2: dom(state) & not(state(tk1) = state(tk2)) =>
+   	    	not(tk1 = tk2)) &
+        
+   	!(priority,tk1,tk2).(priority:(TASK +-> TASK_STATE) &tk1: dom(priority) & tk2: dom(priority) & not(priority(tk1) =
+   	        priority(tk2)) => not(tk1 = tk2)) 
+   							
 VARIABLES
     tasks,	/** all existing tasks */   
     /** miscellaneous task properties */
     task_priority,
-	task_name,
-	task_state,
-	task_value, /**value used for blocked task **/
+		task_name,
+		task_state,
+		task_value, /**value used for blocked task **/
 		
 	current_task,	/** currently running task */
 	scheduler,		/** state of scheduler*/
@@ -104,9 +125,9 @@ INVARIANT
     
     /**all taskt managed by FreeRTOS must have priority,state,name and value*/
     tasks = dom(task_name) &
-    tasks = dom(task_state) &
-    tasks = dom(task_priority)  &
-    tasks = dom(task_value) &
+    	tasks = dom(task_state) &
+    	tasks = dom(task_priority)  &
+    	tasks = dom(task_value) &
     
     
     
@@ -125,6 +146,7 @@ INVARIANT
 	tickMissed:TICK
 	
 INITIALISATION
+    
     tasks := {TASK_NULL} ||
     task_name := {TASK_NULL|->NAME_NULL} ||
     task_state := {TASK_NULL|->running} ||
@@ -177,7 +199,7 @@ OPERATIONS
 	        	ELSE
     	    	    task_state := task_state <+ {task |-> ready}
         		END ||
-	        	task_priority := task_priority \/ {task |-> uxPriority} ||
+	        	task_priority := task_priority <+ {task |-> uxPriority} ||
     	    	zz, handle := pdPASS, task
     		END 
 		OR
@@ -198,7 +220,8 @@ OPERATIONS
 	**/
 	deleteTask(pxTaskToDelete)=
 	PRE
-   		INCLUDE_vTaskDelete =1 & pxTaskToDelete : tasks 
+   		INCLUDE_vTaskDelete =1 & 
+   		pxTaskToDelete : tasks 
 	THEN
     	tasks:=tasks-{pxTaskToDelete}||
     	task_name:= {pxTaskToDelete} <<|task_name ||
@@ -240,7 +263,8 @@ OPERATIONS
 	**/
 	rr <-- vTaskSuspend(pxTaskToSuspend)=
 	PRE
-    	INCLUDE_vTaskSuspend = 1 & pxTaskToSuspend:tasks
+    	INCLUDE_vTaskSuspend = 1 & 
+    	pxTaskToSuspend:tasks
 	THEN
     	IF not(task_state(pxTaskToSuspend)=suspended)
     	THEN
@@ -282,7 +306,9 @@ OPERATIONS
 	**/
 	vTaskResume(pxTaskToResume) =
 	PRE 
-    	INCLUDE_vTaskSuspend = 1 & pxTaskToResume : tasks & task_state(pxTaskToResume)= suspended
+    	INCLUDE_vTaskSuspend = 1 & 
+    	pxTaskToResume : tasks & 
+    	task_state(pxTaskToResume)= suspended
 	THEN    
     	IF task_priority(pxTaskToResume) > task_priority(current_task)
     	THEN
@@ -378,7 +404,8 @@ OPERATIONS
     	xTicksToDelay : TICK & not(xTicksToDelay=0) & INCLUDE_vTaskDelay = 1 
 	THEN
     	ANY
-    	    mprt, task 
+    	    mprt, 
+    	    task 
     	WHERE
     	    mprt : PRIORITY & 
     	    mprt = max(READY_PRIORITIES(task_state, task_priority)) &        
@@ -406,12 +433,14 @@ OPERATIONS
 	**/
 	vTaskDelayUntil(pxPreviousWakeTime, xTimeIncrement) =
 	PRE
-    	pxPreviousWakeTime : TICK & xTimeIncrement : TICK & 
+    	pxPreviousWakeTime : TICK & 
+    	xTimeIncrement : TICK & 
     	INCLUDE_vTaskDelayUntil = 1
 	THEN
 	    CHOICE
     	    ANY
-        	    mprt, task 
+        	    mprt, 
+        	    task 
     		WHERE
     	    	mprt : PRIORITY & 
     	    	mprt = max(READY_PRIORITIES(task_state, task_priority)) &
@@ -459,9 +488,12 @@ OPERATIONS
 	THEN
 	    CHOICE
     	    ANY
-    	        idle_name, idle_task 
+    	        idle_name, 
+    	        idle_task 
 	        WHERE
-	            idle_name : NAME & idle_task : TASK & idle_task /: tasks
+	            idle_name : NAME & 
+	            idle_task : TASK & 
+	            idle_task /: tasks
     	    THEN
 	            tasks := tasks \/ {idle_task} ||
     	        task_name := task_name \/ {idle_task |-> idle_name} ||
@@ -525,7 +557,9 @@ OPERATIONS
     	scheduler := taskSCHEDULER_RUNNING ||
     	tickCount := TICK_INCREMENT(tickCount,tickMissed)||
     	ANY
-    	    blockedTasks, mprt, task
+    	    blockedTasks, 
+    	    mprt, 
+    	    task
     	WHERE
     	    blockedTasks = {task | task : tasks & task_state(task) = blocked &
     	        					tickCount <= task_value(task) &	task_value(task) <= TICK_INCREMENT(tickCount,tickMissed)} &
@@ -554,11 +588,15 @@ OPERATIONS
 	incrementTick =
 	BEGIN
     	IF scheduler = taskSCHEDULER_RUNNING
-    	THEN tickCount := TICK_INCREMENT(tickCount, 1)
-    	ELSE tickMissed := TICK_INCREMENT(tickCount, 1)
+    	THEN 
+    	    tickCount := TICK_INCREMENT(tickCount, 1)
+    	ELSE 
+    	    tickMissed := TICK_INCREMENT(tickCount, 1)
     	END ||
 	    ANY
-	        blockedTasks, mprt, task
+	        blockedTasks, 
+	        mprt, 
+	        task
 	    WHERE
 	        blockedTasks <: tasks &
 	        blockedTasks = {task | task : tasks & task_state(task) = blocked & task_value(task) = TICK_INCREMENT(tickCount,1) } &
@@ -588,7 +626,8 @@ OPERATIONS
 	removeFromBlockedList(task)=
 	PRE
 		task : tasks &
-		task_state (task) = blocked & task /= current_task
+		task_state (task) = blocked & 
+		task /= current_task
 	THEN
 		IF task_priority(task) > task_priority(current_task)
 		THEN
