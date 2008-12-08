@@ -115,7 +115,7 @@ VARIABLES
     
    
 INVARIANT
-   tasks : POW(TASK) &
+   tasks : FIN(TASK) &
     
     
 	task_name: TASK +-> NAME &
