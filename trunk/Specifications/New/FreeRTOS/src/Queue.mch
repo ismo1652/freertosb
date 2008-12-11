@@ -21,6 +21,8 @@ INCLUDES
     Queue_Basic,
     Task_Basic,
     FreeRTOSConfig
+SEES
+    Task_Core
     
     
 PROMOTES
@@ -60,7 +62,7 @@ OPERATIONS
     	WHEN QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=FALSE
         	THEN
     			ANY 
-    			    task,copy_position 
+    			    task,copy_positrunningion 
     			WHERE 
     			    task:tasks & 
     			    	task_state(task)=blocked & 
