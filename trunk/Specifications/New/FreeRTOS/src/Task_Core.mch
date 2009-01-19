@@ -2,12 +2,17 @@
 
  \brief Core definitions for task support in FreeRTOS.
  
+ Nessa especificação inicial nos implementamos, de uma forma abstrata, como é feita a troca de estado das tarefas no FreeRTOS. Nela nos abstraímos 
+ as prioridades das tarefas, ficando essa característica para ser tratada em futuros refinamentos.
+ 
+ 
  Author: Stephenson Galvao, David Deharbe
  Creation date: Fri Dec 5 2008
  Universidade Federal do Rio Grande do Norte
  Departamento de Informatica e Matematica Aplicada
  Programa de Pos-Graduacao em Sistemas e Computacao
  Formal Methods and Languages Laboratory
+ 
 */
 MACHINE
     Task_Core
@@ -18,29 +23,30 @@ SEES
 
 SETS
     TASK;		/** tasks */	    
-    SCHEDULER_STATE = {taskSCHEDULER_NOT_STARTED, taskSCHEDULER_RUNNING, taskSCHEDULER_SUSPENDED}; /** states of the scheduler */
-    TASK_CODE;	/** code executed by tasks */
-	STACK    
+	STACK;
+	TASK_CODE
     
 CONSTANTS 
     PRIORITY,	/** task priorities */
-	TICK, 		/** os ticks */
 
-	TASK_NULL,	/** special NULL task */
-	NAME_NULL,	/** special NULL name */
+	TASK_NULL,	/** special NULL task. It is used in the initialisation for ensure the invariant tasks/={} */
 	
-	TICK_INCREMENT  /** function used to update the tick counter */	
+	TICK,
+	
+	TICK_INCREMENT /** function used to update the tick counter */	
+	
+	
 		
 PROPERTIES
     
     PRIORITY : POW(NATURAL) & 
-    PRIORITY = 0..(configMAX_PRIORITIES-1) &
+   
     
     TICK : POW (NATURAL) &
 	TICK = 0..MAX_DELAY &
 	
- 	TASK_NULL : TASK &
-	NAME_NULL : NAME &
+ 	TASK_NULL : TASK &  
+
 
 	TICK_INCREMENT: TICK * TICK --> TICK &
  	TICK_INCREMENT = %(tick, inc).(tick : TICK & inc : TICK | (tick+inc) mod MAX_DELAY)
@@ -51,10 +57,11 @@ VARIABLES
 	running,
 	ready,
 	suspended
+	
 	    
 INVARIANT
 	tasks : FIN(TASK) &
-	/*tasks /= {} &*/
+	tasks /= {} &
 	
 	running : TASK &
 	/*running : tasks &*/
@@ -74,14 +81,12 @@ INVARIANT
 	blocked /\ suspended = {} &
 	ready /\ suspended = {} &
 
-	(tasks <: ({running} \/ blocked \/ ready \/ suspended))
-	
-	/* (( (ready = {}) & (running = TASK_NULL)) or TASK_NULL : ready) & */
+	(tasks = ({running} \/ blocked \/ ready \/ suspended))
     
 	
 INITIALISATION
     
-    tasks := {} ||
+    tasks:={TASK_NULL}||
     running := TASK_NULL ||
     blocked, ready, suspended := {}, {}, {}
     
@@ -96,17 +101,17 @@ OPERATIONS
 	/**	
 		\brief Task creation
 	
-		\do This method create a new. The task created have the state ready, if the its priority is less equals than the current task priority, 				otherwise the task will have the state running and the current task will change its state to ready.
-		
+		\do 
+			This method create a new. The task created can have the state ready or running. This choice depend of priorities of the tasks in ready 
+			state and the priority of the new task and will be implement in future refinement
+					
 		\parameters
-			pvTaskCode - Code that will be executed by the task
-			pcName - The task name
-			usStackDepth - The length of task stack
-			pvParameters - Then parameters use for the task code 
-			uxPriority - The priority of the task
+		
+			priority - The priority of the task
 	
 		\note 
 			The actual function takes the handled as a parameter passed by reference.
+			The paramenter priority is declareted here, but is not used, only in the refinement 
 	**/
 	result <-- Create (priority) =
 	PRE
@@ -136,12 +141,18 @@ OPERATIONS
 	/**
 		\brief Delete Task
 		
-		\do	Delete a task managed by FreeRTOS. If the task deleted is the current task, a new task, with the ready state and priority
-			great or equals than the others tasks in ready state, will be the current task and change its state for running
-			The NULL task cannot be deleted.
+		\do	
+			Delete a task managed by FreeRTOS. If the task deleted is the current task, a task, with the ready state will became the running task.
+			The NULL task can't be deleted.
 			 
 		\parameters 
-			pxTaskToDelete - Task that will be deleted
+			aTask - Task that will be deleted
+			
+		\question
+		    can it delete the idle task?
+		    	R - the handle to idle task is not visible for user
+			when the task that gonna delete is the unique task in tasks, what it should do?
+				R- I don't know
 			
 	**/
 	Delete (atask)=
@@ -174,15 +185,12 @@ OPERATIONS
 		\brief Suspend Task
 		
 		\do	
-			This method change the state of passed task for 'suspended'. If the task that will be suspend is the current task, a new 
-			task, with state raedy and priority great or equals than the others ready tasks, will be choice to be the current task.
+			This method change the state of passed task for 'suspended'. If the task that will be suspend is the current task, a task, with the
+			state ready will choice to be the current task.
 			 
 		\parameters 
-			pxTaskToDelete - Task that will be deleted
-			
-		\returns 
-			rr - Return pdTRUE if the task was suspended with success and pdFALSE otherwise.
-			
+			atask- Task that will be deleted
+						
 	**/
 	Suspend (atask)=
 	PRE
@@ -212,11 +220,10 @@ OPERATIONS
 		\brief	Resume Task
 		
 		\do	
-			This method resume a suspended tasks. If the task resumed have the priority great than current task. the resumed task
-			will be the current task and the current task will go to ready task list.
+			This method resume a suspended tasks. The resumed task can go to ready or running state
 			 
 		\parameters 
-			pxTaskToResume - Task that will be resume
+			atask - Task that will be resume
 			
 	**/
 	Resume (atask) =
@@ -241,7 +248,7 @@ OPERATIONS
 			Get the priority of the task passed
 			 
 		\parameters 
-			pxTask - Task that will be returned the priority
+			atask - Task that will be returned the priority
 			
 		\returns
 			priority - Priority of the passed task
@@ -261,7 +268,7 @@ OPERATIONS
 			Return the currently running task
 			
 		\returns
-			cTask - The currently running task
+			result - The currently running task
 			
 	**/
 	result <-- GetCurrent =
@@ -276,7 +283,7 @@ OPERATIONS
 			Get the number of tasks managed by the FreeRTOS
 			 			
 		\returns
-			numberOfTasks - Priority of the passed task
+			numberOfTasks -  number of tasks managed by the FreeRTOS
 			
 	**/
 	result <-- GetNumberOfTasks =
@@ -288,16 +295,17 @@ OPERATIONS
 		\brief	Delay Task
 		
 		\do	
-			Blocked the task currently for a given number of tick, take with reference the current tick 
-			and choice a new task with ready state to run
+			Change the state of the current task for the blocked state during the number tick passed. But here it only change the state of task
+			leave the feature time of block for the refinement
+			
 			
 		\paramenters
-			xTicksToDelay - The amount of tick that the current task should block
+			tick - The amount of tick that the current task should block. Is declared but no used here
 			
 	**/
 	DelayTask (ticks)=
 	PRE
-    	ticks : TICK & not(ticks = 0) 
+    	ticks:TICK & not(ticks = 0) 
 	THEN
     	ANY
     	    task 
@@ -316,22 +324,25 @@ OPERATIONS
 		
 		\do	
 			Start the scheduler and create the idle task			
+		\return 
+			
 	**/
 	StartScheduler = 
 	PRE
     	running = TASK_NULL 
 	THEN
-
+		
    	    ANY
-   	        idle_name, 
-   	        idle_task 
+   	       	idle_name, 
+   	       	idle_task 
         WHERE
-            idle_name : NAME & 
-            idle_task : TASK & 
-            idle_task /: tasks
+           	idle_name : NAME & 
+           	idle_task : TASK & 
+           	idle_task /: tasks
    	    THEN
-            tasks := tasks \/ { idle_task } 
+           	tasks := tasks \/ { idle_task }
 		END
+        
  	END
  	;
 	
@@ -348,16 +359,6 @@ OPERATIONS
     	blocked, suspended, ready := {}, {}, {}
 	END;
 	
-	/**
-		\brief	Suspend All
-		
-		\do	
-			Suspend the scheduler activities changing its state to suspended
-	**/
-	SuspendAll=
-	BEGIN 
-   		skip
-	END;
 
 	/**
 		\brief	Resume All
@@ -399,7 +400,8 @@ OPERATIONS
 	/**
 		\brief	Remove From Block List
 		
-		Unblock the given task
+		\do
+			Unblock the given task
 			
 	**/
 	Unblock(task)=

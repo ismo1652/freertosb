@@ -19,12 +19,9 @@ SEES
     Types    
 INCLUDES
     Queue_Basic,
-    Task_Basic,
+    Task_Core,
     FreeRTOSConfig
-SEES
-    Task_Core
-    
-    
+
 PROMOTES
 	xQueueCreate
     
@@ -34,7 +31,7 @@ OPERATIONS
 		/brief Queue Send
 	
 		/do	
-			Send one item for indicate queue. If the queue is full and the task can waintig for until for one space in queue
+			Send one item for indicate queue. If the queue is full and the task can waiting for until for one space in queue
 			the current task is block and insert in the set of tasks that waiting to send a item, other wise the item is insert in
 			the queue
 		
@@ -46,43 +43,34 @@ OPERATIONS
 	**/    
 	return <-- xQueueSend(pxQueue, pvItemToQueue, xTicksToWait)=
 	PRE
-    	pxQueue:queues &  
-    	pvItemToQueue:ITEM  & 
+    	pxQueue:queues  &  
+    	pvItemToQueue:ITEM  &  
     	xTicksToWait:TICK
 	THEN
-    SELECT xTicksToWait>0 & 
-        	(QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE) &
-        	INCLUDE_vTaskDelay = 1 /** mandatory to call operation vTaskDelay */
-        
-    	THEN 
-        	insertTaskWaitingToSend(pxQueue,current_task)||
-        	vTaskDelay(xTicksToWait)||
+	    CHOICE
+        	insertTaskWaitingToSend(pxQueue,running)|| 
+        	DelayTask(xTicksToWait)||
         	return:=pdTRUE
         	
-    	WHEN QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=FALSE
+    	OR
+    		ANY 
+    		    task,copy_position
+    		WHERE 
+    		    task:TASK & 
+    			task:blocked & 
+		   		task:queue_receiving(pxQueue) & 
+   			    copy_position:COPY_POSITION    			    
         	THEN
-    			ANY 
-    			    task,copy_positrunningion 
-    			WHERE 
-    			    task:tasks & 
-    			    	task_state(task)=blocked & 
-    			   		task:queue_receiving(pxQueue) & 
-    			    copy_position:COPY_POSITION
-    			    
-        		THEN
-           			sendItem(pxQueue,pvItemToQueue,task,copy_position)||
-        			removeFromBlockedList(task)||
-        			return:=pdPASS
+       			sendItem(pxQueue,pvItemToQueue,task,copy_position)||
+       			Unblock(task)||
+       			return:=pdPASS
         	END        
-    	WHEN 
-    	    xTicksToWait=0 & 
-    	    QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE
-        THEN
+    	OR
     		return:=errQUEUE_FULL		
    	 	END		
 	END
 	;
-
+	
 	/**
 		/brief Queue Send To Back
 	
@@ -103,38 +91,27 @@ OPERATIONS
     	pvItemToQueue:ITEM  & 
     	xTicksToWait:TICK
 	THEN
-    	SELECT 
-    	    xTicksToWait>0 & 
-    	    QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE &
-    	    INCLUDE_vTaskDelay = 1 /** mandatory to call operation vTaskDelay */
-    	THEN 
-        	insertTaskWaitingToSend(pxQueue,current_task)||
-       	 	vTaskDelay(xTicksToWait)||
+    	CHOICE
+        	insertTaskWaitingToSend(pxQueue,running)||
+        	DelayTask(xTicksToWait)||
         	return:=pdTRUE
         	
-    	WHEN 
-    	    QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=FALSE 
-        THEN
+    	OR
     		ANY 
-    		    task,
-    		    copy_position 
+    		    task,copy_position
     		WHERE 
-    		    task:tasks & 
-    		    task_state(task)=blocked & 
-    		    task:queue_receiving(pxQueue) & 
-    		    copy_position:COPY_POSITION
-    		    
+    		    task:TASK & 
+    			task:blocked & 
+		   		task:queue_receiving(pxQueue) & 
+   			    copy_position:COPY_POSITION    			    
         	THEN
-           		sendItem(pxQueue,pvItemToQueue,task,copy_position)||
-        		removeFromBlockedList(task)||
-        		return:=pdPASS
+       			sendItem(pxQueue,pvItemToQueue,task,copy_position)||
+       			Unblock(task)||
+       			return:=pdPASS
         	END        
-   		 WHEN 
-   		     xTicksToWait=0 & 
-   		     QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE
-        THEN
+    	OR
     		return:=errQUEUE_FULL		
-    	END	
+   	 	END
 	END
 	;
 
@@ -159,37 +136,27 @@ OPERATIONS
     	pvItemToQueue:ITEM  & 
     	xTicksToWait:TICK
 	THEN
-    	SELECT xTicksToWait>0 & 
-    	    	QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE &
-    	    	INCLUDE_vTaskDelay = 1  /** mandatory to call operation vTaskDelay */ 
-    	THEN 
-        	insertTaskWaitingToSend(pxQueue,current_task)||
-        	vTaskDelay(xTicksToWait)||
+    	CHOICE
+        	insertTaskWaitingToSend(pxQueue,running)||
+        	DelayTask(xTicksToWait)||
         	return:=pdTRUE
         	
-    	WHEN 
-    	    QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=FALSE
-        THEN
+    	OR
     		ANY 
-    		    task,
-    		    copy_position 
+    		    task,copy_position
     		WHERE 
-    		    task:tasks & 
-    		    	task_state(task)=blocked & 
-    		    	task:queue_receiving(pxQueue) & 
-    		    copy_position:COPY_POSITION
-    		    
+    		   task:TASK & 
+    			task:blocked &
+		   		task:queue_receiving(pxQueue) & 
+   			    copy_position:COPY_POSITION    			    
         	THEN
-           		sendItem(pxQueue,pvItemToQueue,task,copy_position)||
-        		removeFromBlockedList(task)||
-        		return:=pdPASS
+       			sendItem(pxQueue,pvItemToQueue,task,copy_position)||
+       			Unblock(task)||
+       			return:=pdPASS
         	END        
-   		WHEN 
-   		    xTicksToWait=0 & 
-   		    QUEUE_ISFULL(pxQueue,queue_items,queue_capacity)=TRUE
-        THEN
+    	OR
     		return:=errQUEUE_FULL		
-    	END	
+   	 	END
 	END	
 	;
 
@@ -214,37 +181,26 @@ OPERATIONS
 	PRE
     	xQueue:queues & xTicksToWait:TICK
 	THEN
-    	SELECT 
-    	    QUEUE_ISEMPTY(xQueue,queue_items) = TRUE & 
-    	    xTicksToWait>0 &
-    	    INCLUDE_vTaskDelay = 1  /** mandatory to call operation vTaskDelay */
-    	THEN
-        	insertTaskWaitingToRecived(xQueue,current_task)||
-        	vTaskDelay(xTicksToWait)||
+    	CHOICE
+        	insertTaskWaitingToRecived(xQueue,running)||
+        	DelayTask(xTicksToWait)||
         	return,pvBuffer:=pdTRUE,ITEM_NULL
                             
-    	WHEN 
-    	    QUEUE_ISEMPTY(xQueue,queue_items)=TRUE & 
-    	    xTicksToWait=0
-    	THEN
+    	OR
         	return,pvBuffer:=errQUEUE_EMPTY,ITEM_NULL
-        
-    	WHEN 
-        	QUEUE_ISEMPTY(xQueue,queue_items)=FALSE
-    	THEN
+    	OR
         	ANY 
         	    task 
         	WHERE 
         	    task:TASK & 
-        	    	task:tasks & 
         	    	task: queue_sending(xQueue) & 
-        	    	task_state(task)=blocked
+        	    	task:blocked
         	THEN         
         		pvBuffer<--receivedItem(xQueue,pdFALSE,task)||
-        		removeFromBlockedList(task)
+        		Unblock(task)
         	END|| 
         	return:=pdPASS
-    	END    
+    	END
 	END
 	;
 	
@@ -267,38 +223,27 @@ OPERATIONS
 	PRE
     	xQueue:queues & xTicksToWait:TICK
 	THEN
-    	SELECT 
-    	    QUEUE_ISEMPTY(xQueue,queue_items) = TRUE & 
-    	    xTicksToWait>0 &
-    	    INCLUDE_vTaskDelay = 1  /** mandatory to call operation vTaskDelay */
-    	THEN
-        	insertTaskWaitingToRecived(xQueue,current_task)||
-        	vTaskDelay(xTicksToWait)||
+    	CHOICE
+        	insertTaskWaitingToRecived(xQueue,running)||
+        	DelayTask(xTicksToWait)||
         	return,pvBuffer:=pdTRUE,ITEM_NULL
                             
-    	WHEN 
-    	    QUEUE_ISEMPTY(xQueue,queue_items)=TRUE & 
-    	    xTicksToWait=0
-    	THEN
+    	OR
         	return,pvBuffer:=errQUEUE_EMPTY,ITEM_NULL
-        
-    	WHEN 
-        	QUEUE_ISEMPTY(xQueue,queue_items)=FALSE
-        
-    	THEN
+    	OR
         	ANY 
         	    task 
         	WHERE 
-        	    task:TASK & 
-        	    task:tasks & 
-        	    task: queue_sending(xQueue) & 
-        	    task_state(task)=blocked
-        	    
+        	        task:TASK & 
+        	    	task: queue_sending(xQueue) & 
+        	    	task:blocked
         	THEN         
-        		pvBuffer<--receivedItem(xQueue,pdTRUE,task)       	
+        		pvBuffer<--receivedItem(xQueue,pdFALSE,task)
         	END|| 
-        	return:=pdPASS    
+        	return:=pdPASS
     	END
-	END
+    END
+    	
+
 
 END

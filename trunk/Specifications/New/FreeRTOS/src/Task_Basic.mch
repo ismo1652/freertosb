@@ -31,7 +31,10 @@ SEES
     
 INCLUDES
 
-    Task_Core
+    Task_Core,
+    Queue_Basic
+SETS
+    SCHEDULER_STATE = {taskSCHEDULER_NOT_STARTED, taskSCHEDULER_RUNNING, taskSCHEDULER_SUSPENDED} /** states of the scheduler */
     
 VARIABLES
     
@@ -64,11 +67,14 @@ OPERATIONS
 			usStackDepth - The length of task stack
 			pvParameters - Then parameters use for the task code 
 			uxPriority - The priority of the task
-	
+		\returns 
+			result - Indicate if the task was created or not
+			handle - Return the handle for created task or return NULL task if the task couldn't created.
 		\note 
 			The actual function takes the handled as a parameter passed by reference.
+			
 	*/
-	zz, handle <-- xTaskCreate (pvTaskCode, pcName, usStackDepth, pvParameters, uxPriority) =
+	result, handle <-- xTaskCreate (pvTaskCode, pcName, usStackDepth, pvParameters, uxPriority) =
 	PRE
     	pvTaskCode : TASK_CODE & 
     	pcName : NAME & 
@@ -78,9 +84,9 @@ OPERATIONS
 	THEN 
 	    CHOICE 
         	handle <-- Create (uxPriority) ||
-        	zz := pdPASS
+        	result := pdPASS
 		OR
-        	zz, handle := errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY, TASK_NULL
+        	result, handle := errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY, TASK_NULL
     	END	                     
 	END;
 
@@ -88,7 +94,7 @@ OPERATIONS
 	/**
 		\brief Delete Task
 		
-		\do	Delete a task managed by FreeRTOS. If the task deleted is the current task, a new task, with the ready state and priority
+		\do	Delete a task managed by FreeRTOS. If the task deleted is the current task, a task, with the ready state and priority
 			great or equals than the others tasks in ready state, will be the current task and change its state for running
 			The NULL task cannot be deleted.
 			 
@@ -102,15 +108,16 @@ OPERATIONS
    		pxTaskToDelete : tasks &
    		pxTaskToDelete /= TASK_NULL
 	THEN
-    	Delete (pxTaskToDelete)
+    	Delete (pxTaskToDelete)||
+    	removeFromEventListQueue(pxTaskToDelete)
 	END;
 	
 	/**
 		\brief Suspend Task
 		
 		\do	
-			This method change the state of passed task for 'suspended'. If the task that will be suspend is the current task, a new 
-			task, with state raedy and priority great or equals than the others ready tasks, will be choice to be the current task.
+			This method change the state of passed task for 'suspended'. If the task that will be suspend is the current task, the task with 	
+			highest priority in ready task list will be the current task changing its state to running.
 			 
 		\parameters 
 			pxTaskToDelete - Task that will be deleted
@@ -288,7 +295,7 @@ OPERATIONS
 		\brief	Start Scheduler
 		
 		\do	
-			Start the scheduler and create the idle task			
+			Start the scheduler and create the idle task.
 	**/
 	vTaskStartScheduler = 
 	PRE
@@ -297,7 +304,8 @@ OPERATIONS
     	blocked = {} & suspended = {} & ready = {}  	
 	THEN
 	    CHOICE
-	        StartScheduler
+	        StartScheduler||
+	        scheduler:=taskSCHEDULER_RUNNING
     	OR
         	skip
     	END
@@ -325,7 +333,7 @@ OPERATIONS
 	**/
 	vTaskSuspendAll=
 	BEGIN 
-   		SuspendAll ||
+   		
    		scheduler := taskSCHEDULER_SUSPENDED
 	END;
 
@@ -336,16 +344,28 @@ OPERATIONS
 			Resume the scheduler:
 			increment the tick with missed ticks; 
 			verify the list of blocked tasks to unblock the tasks with expired timers.
+			
+			
 	**/
 	xTaskResumeAll = 
 	PRE
 	    scheduler = taskSCHEDULER_SUSPENDED
 	THEN
-    	scheduler := taskSCHEDULER_RUNNING ||
-	    ResumeAll (TICK_INCREMENT(tickCount, tickMissed)) ||
-    	tickCount := TICK_INCREMENT(tickCount, tickMissed)
+	    CHOICE
+    		scheduler := taskSCHEDULER_RUNNING ||
+	    	ResumeAll (TICK_INCREMENT(tickCount, tickMissed)) ||
+    		tickCount := TICK_INCREMENT(tickCount, tickMissed)
+    	OR
+    	    skip
+    	END
+    	
 	END;
+	/**
+		/brief tick increment
 	
+		/do 
+			Function used for scheduler in time interruption. It increment the tick variable and check the task blocked list.
+	**/
 	incrementTick =
 	BEGIN
     	IF scheduler = taskSCHEDULER_RUNNING THEN 
@@ -353,20 +373,9 @@ OPERATIONS
     	ELSE 
     	    tickMissed := TICK_INCREMENT(tickCount, 1)
     	END ||
+    	
     	ResumeAll (TICK_INCREMENT(tickCount, 1)) 
-	END;
-	
-	/**
-		\brief	Remove From Block List
-		
-		Unblock the given task
-			
-	**/
-	removeFromBlockedList(task)=
-	PRE
-		task : TASK &
-		task : blocked
-	THEN
-		Unblock (task)
 	END
+	
+	
 END
