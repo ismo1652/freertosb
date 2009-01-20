@@ -2,8 +2,8 @@
 
  \brief Basic layer of definitions for task support in FreeRTOS.
  
- This machine defines the concept of a task in FreeRTOS and some of the core operations related to tasks that do not depend on 
- definitions in other modules, such as queues.
+ This machine defines the concept of a task in FreeRTOS and some of the core operations related to tasks that 
+ do not depend on definitions in other modules, such as queues.
 
  Some concepts are not handled:
  	- switch context when the tick interruption occur
@@ -59,7 +59,10 @@ OPERATIONS
 	/**	
 		\brief Task creation
 	
-		\do This method create a new. The task created have the state ready, if the its priority is less equals than the current task priority, 				otherwise the task will have the state running and the current task will change its state to ready.
+		\do 
+			This method create a new. The task created have the state ready, if the its priority is less
+			equals than the current task priority, otherwise the task will have the state running and the
+			current task will change its state to ready.
 		
 		\parameters
 			pvTaskCode - Code that will be executed by the task
@@ -94,9 +97,9 @@ OPERATIONS
 	/**
 		\brief Delete Task
 		
-		\do	Delete a task managed by FreeRTOS. If the task deleted is the current task, a task, with the ready state and priority
-			great or equals than the others tasks in ready state, will be the current task and change its state for running
-			The NULL task cannot be deleted.
+		\do	Delete a task managed by FreeRTOS. If the task deleted is the current task, a task, with the ready
+		 state and priority great or equals than the others tasks in ready state, will be the current task and
+		 change its state for running. The NULL task cannot be deleted.
 			 
 		\parameters 
 			pxTaskToDelete - Task that will be deleted
@@ -116,8 +119,9 @@ OPERATIONS
 		\brief Suspend Task
 		
 		\do	
-			This method change the state of passed task for 'suspended'. If the task that will be suspend is the current task, the task with 	
-			highest priority in ready task list will be the current task changing its state to running.
+			This method change the state of passed task for 'suspended'. If the task that will be suspend is 
+			the current task, the task with highest priority in ready task list will be the current task
+			changing its state to running.
 			 
 		\parameters 
 			pxTaskToDelete - Task that will be deleted
@@ -144,8 +148,8 @@ OPERATIONS
 		\brief	Resume Task
 		
 		\do	
-			This method resume a suspended tasks. If the task resumed have the priority great than current task. the resumed task
-			will be the current task and the current task will go to ready task list.
+			This method resume a suspended tasks. If the task resumed have the priority great than current task.
+			the resumed task will be the current task and the current task will go to ready task list.
 			 
 		\parameters 
 			pxTaskToResume - Task that will be resume
@@ -252,8 +256,8 @@ OPERATIONS
 		\brief	Delay Task
 		
 		\do	
-			Blocked,the task currently for then number of tick, take with reference the time of last unblocked task,
-			and choice a new task with ready state to run. This method is used in cyclical tasks.
+			Blocked,the task currently for then number of tick, take with reference the time of last unblocked
+			task, and choice a new task with ready state to run. This method is used in cyclical tasks.
 		\parameters
 			\pxPreviousWakeTime - Time at which the task was last unblocked
 			\xTimeIncrement- Time that will increment the pxPreviousWakeTime.
@@ -364,7 +368,8 @@ OPERATIONS
 		/brief tick increment
 	
 		/do 
-			Function used for scheduler in time interruption. It increment the tick variable and check the task blocked list.
+			Function used for scheduler in time interruption. It increment the tick variable and check the task
+			blocked list.
 	**/
 	incrementTick =
 	BEGIN
