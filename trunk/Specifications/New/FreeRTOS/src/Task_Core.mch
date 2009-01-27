@@ -44,6 +44,7 @@ PROPERTIES
 	TICK = 0..MAX_DELAY &
 	
  	TASK_NULL : TASK &  
+ 	
 
 	TICK_INCREMENT: TICK * TICK --> TICK &
  	TICK_INCREMENT = %(tick, inc).(tick : TICK & inc : TICK | (tick+inc) mod MAX_DELAY)
@@ -60,48 +61,60 @@ INVARIANT
 	tasks : FIN(TASK) &
 	tasks /= {} &
 	
-	running : TASK &
+	
 	/*running : tasks &*/
 	
 	blocked : FIN(TASK) &
 	blocked <: tasks &
-	not (running : blocked) &	
+	
 
 	ready : FIN(TASK) &
 	ready <: tasks &
-	not (running : ready) &
-	blocked /\ ready = {} &
 	
 	suspended : FIN(TASK) &
 	suspended <: tasks &
-	not (running : suspended) &
-	blocked /\ suspended = {} &
-	ready /\ suspended = {} &
-
-	tasks = {running} \/ blocked \/ ready \/ suspended
-    
 	
+	running : TASK &
+	running: tasks &
+	running/:ready &
+	running/:blocked &
+	running/:suspended & 
+
+	blocked/\ready = {} & 
+	blocked/\suspended = {}&
+	suspended/\ready= {} &	
+	
+	tasks = {running} \/ blocked \/ ready \/ suspended
+/*
+ASSERTIONS    
+    !(tt,aa,bb,cc,dd).(tt:TASK & aa<: TASK & bb<: TASK & cc <: TASK & dd<: TASK & aa/\bb/\cc/\dd ={} =>(
+        (tt:aa => (tt/:bb & tt/:cc &tt/:dd)) &
+           	(tt:bb => (tt/:aa & tt/:cc &tt/:dd)) &
+           		(tt:cc => (tt/:aa & tt/:bb &tt/:dd)) &
+           			(tt:dd => (tt/:bb & tt/:cc &tt/:aa))))
+*/                
+ 	
 INITIALISATION
     
     tasks:={TASK_NULL}||
     running := TASK_NULL ||
     blocked, ready, suspended := {}, {}, {}
-   
+  /*
 ASSERTIONS
-    /*
+   
     !(tk,tasks,rtask,btasks,rtasks,stasks).(tk:TASK &  tasks:POW(TASK) & rtask:TASK & btasks:POW(TASK) &
          rtasks:POW(TASK) & stasks:POW(TASK) =>
         	(tasks ({rtask} \/ btasks \/ rtasks \/ stasks)) => 
         		(tasks<: ({tk}\/{rtask}\/ btasks \/ rtasks \/ stasks)))
     */
-    
+    /*
     !(stasks1,stasks2,stasks3).(stasks1:POW(TASK) & stasks2:POW(TASK) & stasks3:POW(TASK) 
         => (stasks1 \/ stasks2 \/stasks3 = (stasks1 \/ stasks2)\/stasks3 )& 
 	       	(stasks1 \/ (stasks2 \/ stasks3) = stasks1 \/ stasks2 \/stasks3)) &
         
     !(s1,s2,s3,s4).(s1:POW(TASK) & s2:POW(TASK) & s3:POW(TASK) & s4:POW(TASK)
         => s1 \/ ( s2 \/ s3 \/ s4) = s1 \/  s2 \/ s3 \/ s4 ) 
-    /*
+    
     !(s1,s2,s3).(s1:POW(TASK) & s2:POW(TASK) & s3:POW(TASK) 
         => 	s1 \/ s2 \/ s3  = s1 \/ (s2 \/ s3) &
         	s1 \/ s2 \/ s3  = s2 \/ (s1 \/ s3)  &
@@ -141,11 +154,8 @@ OPERATIONS
             task /: tasks 
     	THEN     	    
         	tasks := { task } \/ tasks ||
-        	CHOICE
-        	    IF running : tasks 
-        	    THEN
-        	        ready := {running} \/ ready 
-        	    END||  
+        	CHOICE        	    
+        	    ready := {running} \/ ready ||        	    
     	   	   	running := task
 			OR
 			   	ready :=  { task } \/ ready
@@ -176,9 +186,10 @@ OPERATIONS
 	PRE
 	    atask : TASK &
    		atask : tasks &
-   		atask /= TASK_NULL
+   		atask /= TASK_NULL &
+   		not(tasks={ atask })
 	THEN
-    	tasks := tasks - { atask } ||
+    	tasks := tasks - { atask } || 	
     	IF atask = running	THEN
         	ANY
         	    task
