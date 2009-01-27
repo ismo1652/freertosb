@@ -80,11 +80,11 @@ INVARIANT
 	running/:blocked &
 	running/:suspended & 
 
-	blocked/\ready = {} & 
+	ready/\blocked = {} & 
 	blocked/\suspended = {}&
 	suspended/\ready= {} &	
 	
-	tasks = {running} \/ blocked \/ ready \/ suspended
+	tasks = {running}\/ suspended \/ blocked\/ ready
 /*
 ASSERTIONS    
     !(tt,aa,bb,cc,dd).(tt:TASK & aa<: TASK & bb<: TASK & cc <: TASK & dd<: TASK & aa/\bb/\cc/\dd ={} =>(
@@ -199,11 +199,12 @@ OPERATIONS
     	    THEN
     	        running := task ||
     	        ready := ready - { task }
-			END
-		ELSIF atask : blocked THEN
-		    blocked := blocked - { atask }
-		ELSIF atask : ready THEN
+			END		
+		
+		ELSIF atask : ready  THEN
 		    ready := ready - { atask }
+		ELSIF atask : blocked  THEN
+		    blocked := blocked - { atask }
 		ELSIF atask : suspended THEN
 		    suspended := suspended - { atask }
 		END
@@ -356,9 +357,7 @@ OPERATIONS
 			
 	**/
 	StartScheduler = 
-	PRE
-    	running = TASK_NULL 
-	THEN
+	BEGIN
 		
    	    ANY
    	       	idle_name, 
@@ -366,9 +365,16 @@ OPERATIONS
         WHERE
            	idle_name : NAME & 
            	idle_task : TASK & 
-           	idle_task /: tasks
+           	idle_task /: tasks 
    	    THEN
-           	tasks := tasks \/ { idle_task }
+           	tasks := tasks \/ { idle_task }||
+           	CHOICE
+           	    ready:=ready \/ {idle_task}
+           	OR
+				ready:=ready \/ {running}||           	    
+           	    running:=idle_task
+           	END
+           	
 		END
         
  	END
@@ -382,7 +388,7 @@ OPERATIONS
 	**/
 	EndScheduler =
 	BEGIN
-    	tasks := {} ||
+    	tasks := {TASK_NULL} ||
     	running := TASK_NULL ||
     	blocked, suspended, ready := {}, {}, {}
 	END;
