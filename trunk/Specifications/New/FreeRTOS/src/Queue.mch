@@ -18,9 +18,7 @@ MACHINE
 SEES
     Types    
 INCLUDES
-    Queue_Basic,
-    Task_Core,
-    FreeRTOSConfig
+    Queue_Basic
 
 PROMOTES
 	xQueueCreate
@@ -47,27 +45,12 @@ OPERATIONS
     	pvItemToQueue:ITEM  &  
     	xTicksToWait:TICK
 	THEN
-	    CHOICE
-        	insertTaskWaitingToSend(pxQueue,running)|| 
-        	DelayTask(xTicksToWait)||
-        	return:=pdTRUE
-        	
-    	OR
-    		ANY 
-    		    task,copy_position
-    		WHERE 
-    		    task:TASK & 
-    			task:blocked & 
-		   		task:queue_receiving(pxQueue) & 
-   			    copy_position:COPY_POSITION    			    
-        	THEN
-       			sendItem(pxQueue,pvItemToQueue,task,copy_position)||
-       			Unblock(task)||
-       			return:=pdPASS
-        	END        
-    	OR
-    		return:=errQUEUE_FULL		
-   	 	END		
+	    ANY copy_position
+	    WHERE
+	        copy_position : COPY_POSITION
+	    THEN
+	        return <-- xQueueGenericSend(pxQueue, pvItemToQueue, xTicksToWait,copy_position)
+	    END   	 	    		
 	END
 	;
 	
@@ -87,31 +70,16 @@ OPERATIONS
 	**/    
 	return <-- xQueueSendToBack(pxQueue, pvItemToQueue, xTicksToWait)=
 	PRE
-    	pxQueue:queues &  
-    	pvItemToQueue:ITEM  & 
+    	pxQueue:queues  &  
+    	pvItemToQueue:ITEM  &  
     	xTicksToWait:TICK
 	THEN
-    	CHOICE
-        	insertTaskWaitingToSend(pxQueue,running)||
-        	DelayTask(xTicksToWait)||
-        	return:=pdTRUE
-        	
-    	OR
-    		ANY 
-    		    task,copy_position
-    		WHERE 
-    		    task:TASK & 
-    			task:blocked & 
-		   		task:queue_receiving(pxQueue) & 
-   			    copy_position:COPY_POSITION    			    
-        	THEN
-       			sendItem(pxQueue,pvItemToQueue,task,copy_position)||
-       			Unblock(task)||
-       			return:=pdPASS
-        	END        
-    	OR
-    		return:=errQUEUE_FULL		
-   	 	END
+	    ANY copy_position
+	    WHERE
+	        copy_position : COPY_POSITION
+	    THEN
+	        return <-- xQueueGenericSend(pxQueue, pvItemToQueue, xTicksToWait,copy_position)
+	    END   	 	    		
 	END
 	;
 
@@ -132,32 +100,17 @@ OPERATIONS
 	**/ 
 	return <-- xQueueSendToFront(pxQueue,pvItemToQueue,xTicksToWait)=
 	PRE
-    	pxQueue:queues &  
-    	pvItemToQueue:ITEM  & 
+    	pxQueue:queues  &  
+    	pvItemToQueue:ITEM  &  
     	xTicksToWait:TICK
 	THEN
-    	CHOICE
-        	insertTaskWaitingToSend(pxQueue,running)||
-        	DelayTask(xTicksToWait)||
-        	return:=pdTRUE
-        	
-    	OR
-    		ANY 
-    		    task,copy_position
-    		WHERE 
-    		   task:TASK & 
-    			task:blocked &
-		   		task:queue_receiving(pxQueue) & 
-   			    copy_position:COPY_POSITION    			    
-        	THEN
-       			sendItem(pxQueue,pvItemToQueue,task,copy_position)||
-       			Unblock(task)||
-       			return:=pdPASS
-        	END        
-    	OR
-    		return:=errQUEUE_FULL		
-   	 	END
-	END	
+	    ANY copy_position
+	    WHERE
+	        copy_position : COPY_POSITION
+	    THEN
+	        return <-- xQueueGenericSend(pxQueue, pvItemToQueue, xTicksToWait,copy_position)
+	    END   	 	    		
+	END
 	;
 
 
@@ -181,26 +134,7 @@ OPERATIONS
 	PRE
     	xQueue:queues & xTicksToWait:TICK
 	THEN
-    	CHOICE
-        	insertTaskWaitingToRecived(xQueue,running)||
-        	DelayTask(xTicksToWait)||
-        	return,pvBuffer:=pdTRUE,ITEM_NULL
-                            
-    	OR
-        	return,pvBuffer:=errQUEUE_EMPTY,ITEM_NULL
-    	OR
-        	ANY 
-        	    task 
-        	WHERE 
-        	    task:TASK & 
-        	    	task: queue_sending(xQueue) & 
-        	    	task:blocked
-        	THEN         
-        		pvBuffer<--receivedItem(xQueue,pdFALSE,task)||
-        		Unblock(task)
-        	END|| 
-        	return:=pdPASS
-    	END
+    	return,pvBuffer<--xQueueGenericReceive(xQueue,xTicksToWait,pdFALSE)
 	END
 	;
 	
@@ -223,26 +157,9 @@ OPERATIONS
 	PRE
     	xQueue:queues & xTicksToWait:TICK
 	THEN
-    	CHOICE
-        	insertTaskWaitingToRecived(xQueue,running)||
-        	DelayTask(xTicksToWait)||
-        	return,pvBuffer:=pdTRUE,ITEM_NULL
-                            
-    	OR
-        	return,pvBuffer:=errQUEUE_EMPTY,ITEM_NULL
-    	OR
-        	ANY 
-        	    task 
-        	WHERE 
-        	        task:TASK & 
-        	    	task: queue_sending(xQueue) & 
-        	    	task:blocked
-        	THEN         
-        		pvBuffer<--receivedItem(xQueue,pdFALSE,task)
-        	END|| 
-        	return:=pdPASS
-    	END
-    END
+    	return,pvBuffer<--xQueueGenericReceive(xQueue,xTicksToWait,pdTRUE)
+	END
+	
     	
 
 

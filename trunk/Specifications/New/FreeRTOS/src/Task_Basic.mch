@@ -32,7 +32,7 @@ SEES
 INCLUDES
 
     Task_Core,
-    Queue_Basic
+    Queue_Core
 SETS
     SCHEDULER_STATE = {taskSCHEDULER_NOT_STARTED, taskSCHEDULER_RUNNING, taskSCHEDULER_SUSPENDED} /** states of the scheduler */
     
@@ -105,11 +105,13 @@ OPERATIONS
 			pxTaskToDelete - Task that will be deleted
 			
 	**/
-	deleteTask(pxTaskToDelete)=
+	vTaskDelete(pxTaskToDelete)=
 	PRE
    		INCLUDE_vTaskDelete = 1 & 
    		pxTaskToDelete : tasks &
-   		pxTaskToDelete /= TASK_NULL
+   		pxTaskToDelete /= TASK_NULL &
+   		not(tasks = {pxTaskToDelete})
+   		
 	THEN
     	Delete (pxTaskToDelete)||
     	removeFromEventListQueue(pxTaskToDelete)

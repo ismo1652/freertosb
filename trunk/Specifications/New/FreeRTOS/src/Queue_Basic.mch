@@ -1,244 +1,164 @@
 /* Queue_Basic
 
- \brief Basic layer of definitions for queue support in FreeRTOS.
+ \brief Queue API of FreeRTOS
  
- This machine defines the concept of a queue in FreeRTOS without the features of length queue and size queue itens.
+ This machine implement the methods of Queue API in FreeRTOS
+
  Queues are modelled as sets, instead as true queues.
  
  Author: Stephenson Galvao, David Deharbe
- Creation date: Fri Dec 5 2008
+ Creation date: Tue Jan 27 2009
  Universidade Federal do Rio Grande do Norte
- Departamento de Informática e Matemática Aplicada
+ Departamento de Informatica e Matematica Aplicada
  Programa de Pos-Graduacao em Sistemas e Computacao
  Formal Methods and Languages Laboratory
  */ 
-
 MACHINE
-
     Queue_Basic
-
 SEES
+    Types    
+INCLUDES
+    Queue_Core,
+    Task_Core,
+    FreeRTOSConfig
 
-    Types,
-    Task_Core
-
-SETS
-    ITEM;			/** queue items */
-    COPY_POSITION;	/** position of insertions in queues = {queueSEND_TO_BACK,queueSEND_TO_FRONT}*/
-    QUEUE 			/** queues */
-
-CONSTANTS
-    
-	QUEUE_NULL,
-	ITEM_NULL,
-    REMOVE_EVENT
-
-PROPERTIES
-
-    QUEUE_NULL:QUEUE &
-    ITEM_NULL:ITEM &
-    REMOVE_EVENT : TASK * POW(QUEUE) * (QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) &
-    REMOVE_EVENT = 
-    	%(task, queues, pending).
-    		(task : TASK & queues : POW(QUEUE) & pending : QUEUE +-> POW(TASK) |
-    				%(queue).(queue : queues | pending(queue) - {task}))
-                            
-ASSERTIONS
-    
-    !(task, queues, pending).
-    	(task : TASK & queues : POW(QUEUE) & pending : QUEUE +-> POW(TASK) => 
-    	    dom(REMOVE_EVENT(task, queues, pending)) = queues)
-    	    
-VARIABLES
-
-    /** Different queues in FreeRTOS */
-    queues,
-    	
-    /** miscellaneous queue properties */
-    queue_items, /**Set of items of a queue **/
-    queue_receiving, /**Set of tasks waiting to recive one item of queue **/
-    queue_sending	/**Set of tasks waiting to send one item to queue **/
-     
-    
-INVARIANT
-    queues : POW(QUEUE) & 
-    queue_items : QUEUE +-> POW(ITEM) &
-    queue_receiving : QUEUE+-> POW(TASK) & 
-    queue_sending : QUEUE+-> POW(TASK) &
-    	
-	/**All queue must have a set of item, a set of tasks waiting to recive, set of task waiting to send and a capacity **/
-	queues = dom(queue_items) &
-	queues = dom(queue_receiving) &
-	queues = dom(queue_sending) 
-    
-INITIALISATION
-    /**
-    queues := {QUEUE_NULL}||
-    queue_items := {QUEUE_NULL |-> {}}||
-    queue_receiving := {QUEUE_NULL |-> {}}||
-    queue_sending := {QUEUE_NULL |-> {}}||
-    **/
-    queues := {}||
-    queue_items := {}||
-    queue_receiving := {}||
-    queue_sending := {}
-    
+PROMOTES
+	xQueueCreate
     
 OPERATIONS
+    
 	/**
-		/brief Create Queue
-		/do
-			Create a new queue that will be manage by FreeRTOS. The length queue and size itens of queue features aren't used in this level
-			of abstraction and the decision of when the queue can or not be create will be implemente in future refinement.
-			
-		/parameters
-			uxQueueLength - Queue length - No used in this abstraction level
-			uxItemSize - the size of one item of queue - No used in this abstraction level
- 	
-	**/
-	xQueueHandle <-- xQueueCreate(uxQueueLength, uxItemSize) =
-	PRE
-    	uxQueueLength: NAT & 
-    	uxItemSize:NAT
-	THEN    
-    	CHOICE
-			ANY
-			    queue 
-			WHERE
-			    queue : QUEUE & 
-			    queue /: queues
-			THEN	
-		    	queues := queues \/ {queue}||
-		    	queue_items := queue_items \/ {queue |-> {}} ||
-		    	queue_receiving := queue_receiving \/ {queue |-> {}} ||
-		    	queue_sending := queue_sending \/ {queue |-> {}}||
-		    	xQueueHandle := queue
-			END		    
-     	OR
-        	xQueueHandle:=QUEUE_NULL
-     	END
-   	END;
-
-	/**
-		/brief Send Item
+		/brief Queue Send
+	
+		/do	
+			Send one item for indicate queue. If the queue is full and the task can waiting for until for one space in queue
+			the current task is block and insert in the set of tasks that waiting to send a item, other wise the item is insert in
+			the queue
 		
-		/do
-			Inserts one item in the queue and remove the task from the set of tasks that are waiting to receive one item. The given task shall be
-			waiting on the given queue.
-			
-		/parameters
+		/paramenters
 			pxQueue - Queue that will send the item
-			pxItem - Queue that will send to queue
-			task - Task in reciving set that will unblock
-			copy_position - Position that the item will insert in the queue, this can be queueSEND_TO_BACK,queueSEND_TO_FRONT, to insert 
-							a item in front and black respective
-			
-	**/
-	sendItem(pxQueue, pxItem, task, copy_position) =
-	PRE
-    	pxQueue : queues & 
-    	pxItem:ITEM & 
-    	task:TASK & 
-    	copy_position : COPY_POSITION &	    
-	    task : queue_receiving(pxQueue)
-	THEN
-    	queue_items(pxQueue) := queue_items(pxQueue) \/ {pxItem}||
-    	queue_receiving(pxQueue) := queue_receiving(pxQueue) - {task}
-	END;
+			pvItemToQueue - Item that will be send to the queue
+			xTicksToWait - Time that the task can waiting for one space in queue, wich the queue is full
 	
-	/**
-		/brief Insert Task in Waiting to Recive
-		
-		/do
-			Insert a task in the set of tasks waiting to recive a item of passed queue
-			
-		/parameters
-			pxQueue - Queue that the task will be insert in the reciving
-			pxTask - Task that will insert in the set of task waiting to recive (reciving)
-	**/
-	insertTaskWaitingToSend(pxQueue, pxTask) =
+	**/    
+	return <-- xQueueGenericSend(pxQueue, pvItemToQueue, xTicksToWait,copy_position)=
 	PRE
-		pxQueue : queues & 
-		pxTask : TASK
+    	pxQueue:queues  &  
+    	pvItemToQueue:ITEM  &  
+    	xTicksToWait:TICK &
+    	copy_position:COPY_POSITION
 	THEN
-    	queue_sending(pxQueue) := queue_sending(pxQueue) \/ {pxTask}
-	END;
+	    IF (xTicksToWait>0) 
+	    THEN 
+	    	CHOICE
+        		insertTaskWaitingToSend(pxQueue,running)|| 
+        		DelayTask(xTicksToWait)||
+        		return:=pdTRUE        	
+    		OR
+    			ANY 
+    		   		task
+    			WHERE 
+    		   		task:TASK & 
+    				task:blocked & 
+		   			task:queue_receiving(pxQueue)
+        		THEN
+       				sendItem(pxQueue,pvItemToQueue,task,copy_position)||
+       				Unblock(task)||
+       				return:=pdPASS
+        		END        
+   	 		END
+   	 	ELSE
+   	 	    CHOICE
+   	 	    	ANY 
+   		   			task
+   				WHERE 
+   		   			task:TASK & 
+   					task:blocked & 
+	   				task:queue_receiving(pxQueue) 
+		   			
+       			THEN
+   					sendItem(pxQueue,pvItemToQueue,task,copy_position)||
+   					Unblock(task)||
+   					return:=pdPASS
+       			END
+       		OR
+       		    return:=errQUEUE_FULL	
+       		END 		
+       		
+       	END
+       		
+   	 	    		
+	END
+	;
+	
+	
+
 
 	/**
-		/brief Insert Task in Waiting to Send
+		/brief Queue Recived Item
+	
+		/do	
+			Remove and return one item of queue. If the queue is empty and the task can wainting for one item arrive in the queue
+			the current task is block and insert in the set reciving, set of tasks waiting to recive one item of queue. 
 		
-		/do
-			Insert a task in the set of tasks waiting to send one item to passed queue
+		/paramenters
+			pxQueue - Queue that will send the item
+			xTicksToWait - Time that the task can waiting for one item arrive in queue, wich the queue is empty
 			
-		/parameters
-			pxQueue - Queue that the task will be insert in the sending
-			pxTask - Task that will insert in the set sending
-	**/
-	insertTaskWaitingToRecived(pxQueue, pxTask) =
-	PRE
-    	pxQueue : queues &
-    	pxTask : TASK
-	THEN
-    	queue_receiving(pxQueue) := queue_receiving(pxQueue) \/ {pxTask}
-	END	;
+		/note
+			In the original implementation pvBuffer is passed as reference and if the queue is empty, nothing is change 
+			in the pvBuffer. Here it's implement as return of function and if the queue is empty, the ITEM_NULL is return
 	
-	/**
-		/brief Received Item Recive
-		
-		/do
-			Remove or not one item of indicated queue and remove the passed task from the set of tasks waiting to send. For remove 
-			the intem the parameter justPeeking shall be false, for only read the item in the queue without remove then, the paramenter
-			justPeeking shall be true. 
-									
-		/parameters
-			pxQueue - Queue that the task will be insert in the sending
-			justPeeking - Flag that indicate if the item will reade and remove or only read
-			pxTask - Task that have the item that will be read
-	**/
-	xItem <-- receivedItem(pxQueue, justPeeking, task) =
+	**/ 
+	return,pvBuffer<--xQueueGenericReceive(xQueue,xTicksToWait,justPeeking)=
 	PRE
-    	pxQueue : queues & 
-    	justPeeking : BIT & 
-    	task : TASK & 
-    	task : queue_sending(pxQueue)
+    	xQueue:queues & 
+    	xTicksToWait:TICK &
+    	justPeeking : BIT
 	THEN
-	    ANY
-	        item
-	    WHERE
-	        item : ITEM & 
-	        item : queue_items(pxQueue)
-    	THEN
-	        IF justPeeking = pdFALSE
-    	    THEN 
-        	    queue_items(pxQueue) := queue_items(pxQueue) - {item}||
-	            queue_sending(pxQueue) := queue_sending(pxQueue) - {task}
-        	END ||
-        	xItem:=item
-	    END
-	END;
-	
-	/**
-		/brief 
-			Remove From Event List Queue
-		/do
-			Remove a task from all events sets (reciving, sending) in all queues of FreeRTOS
-
-		/parameters
-			task - Task that will be removing
-		
-	**/	
-	removeFromEventListQueue(task) =
-	PRE
-    	task : TASK  
-	THEN
-	    ANY
-	        receiving, sending  
-    	WHERE
-        	receiving = REMOVE_EVENT(task, queues, queue_receiving) &
-        	sending = REMOVE_EVENT(task, queues, queue_sending)
-		THEN
-       		queue_receiving := queue_receiving <+ receiving ||
-       		queue_sending := queue_sending <+ sending
+	    IF xTicksToWait > 0
+	    THEN
+	        
+    		CHOICE
+        		insertTaskWaitingToRecived(xQueue,running)||
+        		DelayTask(xTicksToWait)||
+        		return,pvBuffer:=pdTRUE,ITEM_NULL
+    		OR
+        		ANY 
+        	    	task 
+        		WHERE 
+        	    	task:TASK & 
+        	    	task: queue_sending(xQueue) & 
+        	    	task:blocked
+        		THEN         
+        			pvBuffer<--receivedItem(xQueue,justPeeking,task)||
+        			IF justPeeking=pdFALSE THEN Unblock(task) END
+        		END|| 
+        		return:=pdPASS
+        	END
+        		
+       	ELSE
+       	    CHOICE
+        	    ANY 
+        	    	task 
+        		WHERE 
+        	    	task:TASK & 
+        	    	task: queue_sending(xQueue) & 
+        	    	task:blocked
+        		THEN         
+        			pvBuffer<--receivedItem(xQueue,justPeeking,task)||
+        			IF justPeeking=pdFALSE THEN Unblock(task) END
+        		END|| 
+        		return:=pdPASS
+        	OR
+        	    return,pvBuffer:=errQUEUE_EMPTY,ITEM_NULL
+        	END
+        	
+        		    
     	END
 	END
+	
+		
+
+
 END
