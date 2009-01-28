@@ -1,10 +1,20 @@
+/*
+Notas para o relatório:
+	
+	A principal preocupação desse módulo inicial foi implementar de forma abstrata como ocorre 
+	a mudança de estado de uma tarefa no FreeRTOS. Para isso, nele, foram especificados princi-
+	palmente os conceitos de tarefa e sua característica de estado. Além disso, no Task_Core, 
+	também foram criadas funções responsáveis pela mudança de estado de um tarefa, sendo
+	essas utilizadas como funções base na implementação da API Task em Task.mch
+*/
+
 /* Task_Core
 
  \brief Core definitions for task support in FreeRTOS.
  
- Nessa especificação inicial nos implementamos, de uma forma abstrata, como é feita a troca de estado das
- tarefas no FreeRTOS. Nela nos abstraímos características como prioridades, código da tarefa e contexto, 
- ficando essas para serem tratada em futuros refinamentos.
+ Module responsible for specific the features task. In this initial specification, 
+ we concerns priority with the changes of task states, abstracting the outher features 
+ as priority, code task, context.
  
  
  Author: Stephenson Galvao, David Deharbe
@@ -24,12 +34,12 @@ SEES
 
 SETS
     TASK;		/** tasks */	    
-	STACK;		/**stack of task**/
-	TASK_CODE  /*pointer to code of task*/
+	STACK;		/** stack of task**/
+	TASK_CODE  /* pointer to code of task*/
     
 CONSTANTS 
     PRIORITY,	/** task priorities */
-	TASK_NULL,	/** special NULL task. It is used in the initialisation for ensure the invariant tasks/={} */
+	TASK_NULL,	/** special NULL task. It is used for ensure the invariant tasks/={} */
 	TICK, /*Tick available in freeRTOS*/
 	TICK_INCREMENT /** function used to update the tick counter */	
 	
@@ -61,14 +71,11 @@ INVARIANT
 	tasks : FIN(TASK) &
 	tasks /= {} &
 	
-	
-	/*running : tasks &*/
-	
 	blocked : FIN(TASK) &
 	blocked <: tasks &
 	
-
-	ready : FIN(TASK) &
+	ready : FIN(TASKNesse módulo foi especificado o conceito de tarefa, principalmente a característica de estados.
+	Assim a maior) &
 	ready <: tasks &
 	
 	suspended : FIN(TASK) &
@@ -85,45 +92,12 @@ INVARIANT
 	suspended/\ready= {} &	
 	
 	tasks = {running}\/ suspended \/ blocked\/ ready
-/*
-ASSERTIONS    
-    !(tt,aa,bb,cc,dd).(tt:TASK & aa<: TASK & bb<: TASK & cc <: TASK & dd<: TASK & aa/\bb/\cc/\dd ={} =>(
-        (tt:aa => (tt/:bb & tt/:cc &tt/:dd)) &
-           	(tt:bb => (tt/:aa & tt/:cc &tt/:dd)) &
-           		(tt:cc => (tt/:aa & tt/:bb &tt/:dd)) &
-           			(tt:dd => (tt/:bb & tt/:cc &tt/:aa))))
-*/                
  	
 INITIALISATION
     
     tasks:={TASK_NULL}||
     running := TASK_NULL ||
     blocked, ready, suspended := {}, {}, {}
-  /*
-ASSERTIONS
-   
-    !(tk,tasks,rtask,btasks,rtasks,stasks).(tk:TASK &  tasks:POW(TASK) & rtask:TASK & btasks:POW(TASK) &
-         rtasks:POW(TASK) & stasks:POW(TASK) =>
-        	(tasks ({rtask} \/ btasks \/ rtasks \/ stasks)) => 
-        		(tasks<: ({tk}\/{rtask}\/ btasks \/ rtasks \/ stasks)))
-    */
-    /*
-    !(stasks1,stasks2,stasks3).(stasks1:POW(TASK) & stasks2:POW(TASK) & stasks3:POW(TASK) 
-        => (stasks1 \/ stasks2 \/stasks3 = (stasks1 \/ stasks2)\/stasks3 )& 
-	       	(stasks1 \/ (stasks2 \/ stasks3) = stasks1 \/ stasks2 \/stasks3)) &
-        
-    !(s1,s2,s3,s4).(s1:POW(TASK) & s2:POW(TASK) & s3:POW(TASK) & s4:POW(TASK)
-        => s1 \/ ( s2 \/ s3 \/ s4) = s1 \/  s2 \/ s3 \/ s4 ) 
-    
-    !(s1,s2,s3).(s1:POW(TASK) & s2:POW(TASK) & s3:POW(TASK) 
-        => 	s1 \/ s2 \/ s3  = s1 \/ (s2 \/ s3) &
-        	s1 \/ s2 \/ s3  = s2 \/ (s1 \/ s3)  &
-			s1 \/ s2 \/ s3  = s3 \/ (s1 \/ s2)  )
-  	*/      	
-        	  
-        	 
-        
-    
     
 OPERATIONS
 
@@ -133,7 +107,7 @@ OPERATIONS
 		\do 
 			This method create a new task. The task created can have the state ready or running. This choice 
 			depend both of the priorities of the tasks in ready state and the priority of the new task created
-			and will be implement in future refinement
+			and will be implement in future refinement. The parameter priority is declared but not used.
 					
 		\parameters
 		
@@ -141,7 +115,7 @@ OPERATIONS
 	
 		\note 
 			The actual function takes the handled as a parameter passed by reference.
-			The paramenter priority is declareted here, but is not used, only in the refinement 
+			
 	**/
 	result <-- Create (priority) =
 	PRE
@@ -169,8 +143,8 @@ OPERATIONS
 		\brief Delete Task
 		
 		\do	
-			Delete a task managed by FreeRTOS. If the task deleted is the current task, a task, with the ready
-			state will became the running task. The NULL task can't be deleted.
+			Delete a task managed by FreeRTOS. If the task deleted is the current task, a task with the ready
+			state will became the running task. The NULL task can't be deleted. 
 			 
 		\parameters 
 			aTask - Task that will be deleted
@@ -179,7 +153,7 @@ OPERATIONS
 		    can it delete the idle task?
 		    	R - the handle to idle task is not visible for user
 			when the task that gonna delete is the unique task in tasks, what do it do?
-				R- I don't know
+				R- I don't allow this. The handle for idle task can't be take.
 			
 	**/
 	Delete (atask)=
@@ -214,11 +188,11 @@ OPERATIONS
 		\brief Suspend Task
 		
 		\do	
-			This method change the state of passed task for 'suspended'. If the task that will be suspend is 
-			the current task, a task, with the state ready will choice to be the current task.
+			This method suspend the passed task, changing its state for 'suspended'. If the task that will be suspend is 
+			the current task, a task with the state ready will choice to be the current task.
 			 
 		\parameters 
-			atask- Task that will be deleted
+			atask- Task that will be suspend
 						
 	**/
 	Suspend (atask)=
@@ -249,7 +223,8 @@ OPERATIONS
 		\brief	Resume Task
 		
 		\do	
-			This method resume a suspended tasks. The resumed task can go to ready or running state
+			This method resume a suspended tasks. The resumed task can go to ready or running state depend 
+			the priority of resumed tasks. So as, this choice will be specific in future refinement
 			 
 		\parameters 
 			atask - Task that will be resume
@@ -274,13 +249,14 @@ OPERATIONS
 		\brief	Get Task Priority
 		
 		\do	
-			Get the priority of the task passed
-			 
+			Get the priority of the task passed. Here this only return a priority available. This method will 
+			implement in future refinement.
+						 
 		\parameters 
 			atask - Task that will be returned the priority
 			
 		\returns
-			priority - Priority of the passed task
+			priority - a priority belong of Priority set
 			
 	**/
 	priority <-- GetPriority(atask)=

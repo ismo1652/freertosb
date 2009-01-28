@@ -29,10 +29,11 @@ CONSTANTS
 	INCLUDE_vTaskDelete,		/** vTaskDelete */
 	INCLUDE_xTaskGetSchedulerState,	/** xTaskGetSchedulerState */
 	INCLUDE_xTaskGetCurrentTaskHandle,	/** xTaskGetCurrentTaskHandle */
-	INCLUDE_vTaskDelay,
-	INCLUDE_vTaskDelayUntil
+	INCLUDE_vTaskDelay,	/**vTaskDelay**/
+	INCLUDE_vTaskDelayUntil	/**vTaskDelayUntil**/
 
 	/* 
+	No used	
 	configUSE_PREEMPTION, configUSE_IDLE_HOOK, configUSE_TICK_HOOK,
 	configCPU_CLOCK_HZ, configTICK_RATE_HZ, configMAX_TASK_NAME_LEN,
 	configUSE_TRACE_FACILITY, configUSE_16_BIT_TICKS, configIDLE_SHOULD_YIELD,
@@ -59,7 +60,7 @@ PROPERTIES
 	INCLUDE_vTaskDelayUntil : BIT &
 	INCLUDE_vTaskDelay : BIT		
 /*
-
+No Used
 & configUSE_PREEMPTION : BIT
 & configUSE_IDLE_HOOK : BIT
 & configUSE_TICK_HOOK : BIT
