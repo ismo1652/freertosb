@@ -85,7 +85,7 @@ OPERATIONS
 
 
 	/**
-		/brief Queue Send To Back
+		/brief Queue Send To Front
 	
 		/do	
 			Send one item to front of the indicate queue. If the queue is full and the task can waintig for until for one space in queue
@@ -139,7 +139,7 @@ OPERATIONS
 	;
 	
 	/**
-		/brief Queue Recived Item
+		/brief Queue Peek Item
 	
 		/do	
 			Return one item of queue whitout remove then.

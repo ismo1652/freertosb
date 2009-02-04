@@ -60,7 +60,7 @@ OPERATIONS
 		\brief Task creation
 	
 		\do 
-			This method create a new. The task created have the state ready, if the its priority is less
+			This method create a new. The created task have the state ready, if the its priority is less
 			equals than the current task priority, otherwise the task will have the state running and the
 			current task will change its state to ready.
 		
@@ -97,9 +97,10 @@ OPERATIONS
 	/**
 		\brief Delete Task
 		
-		\do	Delete a task managed by FreeRTOS. If the task deleted is the current task, a task, with the ready
-		 state and priority great or equals than the others tasks in ready state, will be the current task and
-		 change its state for running. The NULL task cannot be deleted.
+		\do	
+		 	Delete a task managed by FreeRTOS. If the task deleted is the current task, a task, with the ready
+		 	state and priority great or equals than the others tasks in ready state, will be the current task and
+		 	change its state for running. The NULL task cannot be deleted.
 			 
 		\parameters 
 			pxTaskToDelete - Task that will be deleted
@@ -240,8 +241,9 @@ OPERATIONS
 		\brief	Delay Task
 		
 		\do	
-			Blocked the task currently for a given number of tick, take with reference the current tick 
-			and choice a new task with ready state to run
+			Delay the currently task for a given number of tick  and choice a new task with ready state 
+			to run. The time of delay task is relative to the time at the method was called. This method 
+			is not good for cyclical task.
 			
 		\paramenters
 			xTicksToDelay - The amount of tick that the current task should block
@@ -249,9 +251,11 @@ OPERATIONS
 	**/
 	vTaskDelay(xTicksToDelay)=
 	PRE
-    	xTicksToDelay : TICK & not(xTicksToDelay = 0) & INCLUDE_vTaskDelay = 1 
+    	xTicksToDelay : TICK & 
+    	INCLUDE_vTaskDelay = 1 &
+    	not(TICK_INCREMENT (tickCount, xTicksToDelay)=0)
 	THEN
-    	DelayTask (xTicksToDelay)
+    	DelayTask (TICK_INCREMENT (tickCount, xTicksToDelay))
 	END;
 	
 	/**
@@ -260,9 +264,10 @@ OPERATIONS
 		\do	
 			Blocked,the task currently for then number of tick, take with reference the time of last unblocked
 			task, and choice a new task with ready state to run. This method is used in cyclical tasks.
+			
 		\parameters
-			\pxPreviousWakeTime - Time at which the task was last unblocked
-			\xTimeIncrement- Time that will increment the pxPreviousWakeTime.
+			pxPreviousWakeTime - Time at which the task was last unblocked
+			xTimeIncrement- Time that will increment the pxPreviousWakeTime.
 			
 	**/
 	vTaskDelayUntil(pxPreviousWakeTime, xTimeIncrement) =
@@ -285,6 +290,7 @@ OPERATIONS
 		
 		\do	
 			Return the current number of tick 
+			
 		\returns
 			numberOfTicks - The current number of ticks 
 			
@@ -339,8 +345,9 @@ OPERATIONS
 	**/
 	vTaskSuspendAll=
 	BEGIN 
-   		
+  		
    		scheduler := taskSCHEDULER_SUSPENDED
+   		
 	END;
 
 	/**
@@ -366,6 +373,7 @@ OPERATIONS
     	END
     	
 	END;
+	
 	/**
 		/brief tick increment
 	

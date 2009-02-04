@@ -143,8 +143,8 @@ OPERATIONS
 		\brief Delete Task
 		
 		\do	
-			Delete a task managed by FreeRTOS. If the task deleted is the current task, a task with the ready
-			state will became the running task. The NULL task can't be deleted. 
+			Delete a task managed by FreeRTOS. If the task that will be delete is the current task, a ready 
+			task will became the running task. The NULL task can't be deleted. 
 			 
 		\parameters 
 			aTask - Task that will be deleted
@@ -188,7 +188,7 @@ OPERATIONS
 		\brief Suspend Task
 		
 		\do	
-			This method suspend the passed task, changing its state for 'suspended'. If the task that will be suspend is 
+			This method suspend the passed task. If the task that will be suspend is 
 			the current task, a task with the state ready will choice to be the current task.
 			 
 		\parameters 
@@ -224,7 +224,7 @@ OPERATIONS
 		
 		\do	
 			This method resume a suspended tasks. The resumed task can go to ready or running state depend 
-			the priority of resumed tasks. So as, this choice will be specific in future refinement
+			the priority of resumed tasks (this choice will be specific in future refinement)
 			 
 		\parameters 
 			atask - Task that will be resume
@@ -249,8 +249,8 @@ OPERATIONS
 		\brief	Get Task Priority
 		
 		\do	
-			Get the priority of the task passed. Here this only return a priority available. This method will 
-			implement in future refinement.
+			This method get the priority of the task passed, but here this only return a priority available. 
+			It will implement in future refinement.
 						 
 		\parameters 
 			atask - Task that will be returned the priority
@@ -305,7 +305,7 @@ OPERATIONS
 			
 			
 		\paramenters
-			tick - The amount of tick that the current task should block. Is declared but no used here
+			tick - The tick that the task should be unbloked. Is declared but no used here
 			
 	**/
 	DelayTask (ticks)=
@@ -328,7 +328,8 @@ OPERATIONS
 		\brief	Start Scheduler
 		
 		\do	
-			Start the scheduler and create the idle task			
+			Start the scheduler and create the idle task		
+				
 		\return 
 			
 	**/
@@ -374,9 +375,8 @@ OPERATIONS
 		\brief	Resume All
 		
 		\do	
-			Resume the scheduler:
-			increment the tick with missed ticks; 
-			verify the list of blocked tasks to unblock the tasks with expired timers.
+			Method used for resume the scheduler. It increment the tick with missed ticks and verify the list of 
+			blocked tasks to unblock the tasks with expired timers.
 	**/
 	ResumeAll (tick) = 
 	PRE
