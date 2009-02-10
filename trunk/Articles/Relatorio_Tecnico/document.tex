@@ -1,0 +1,331 @@
+% Exemplo de relatório técnico e outros documentos do DIMAp-UFRN
+% com texto em português formatado com LaTeX
+
+\documentclass[capa]{rt-dimap}
+% Opções da classe rt-dimap
+%   [capa]  -> Gerar a capa colorida do relatório técnico
+%   [plain] -> Usar o estilo "plain" de citação bibliográfica
+%\newcommand{\FreeRTOS}{\operatorname{\textit{FreeRTOS }}}
+\begin{document}
+%---------------------------------------------------------- PAGINA DE CAPA %
+% Número do relatório (para reserva, consulte "regivan@dimap.ufrn.br.br").
+\TRNumber{000}
+
+% O tipo do documento: Relatório Técnico, Relatório de Disciplina, etc.
+%   \TRType{Technical Report}
+%   \TRTipo{Relatório Técnico}
+
+%\TRType{Final Year Project Proposal}
+%\TRTipo{Prop. de Projeto F. de Curso}
+
+% \TRType{Lecture Report}
+% \TRTipo{Relatório de Disciplina}
+
+
+% Data de publição (para a capa)
+\TRYear{2009}  
+\TRMonth{02} % Numérico, 01-12
+
+% Lista de autores para capa (sem afiliações).
+\TRAuthor{Stephenso Galvão, David Déharbe}
+
+% Título para a capa (use \\ para forcar quebras de linha).
+\TRTitle{Modelagem em B do \\Sistema de Tempo Real FreeRTOS}
+
+\TRMakeCover
+%---------------------------------------------------------- PAGINA DE CAPA %
+
+
+%%---------------------------------------------------------- TITULO E AUTOR DA PAG 1 %
+% TITULO e NOMES DOS AUTORES, completos, para a pagina 1.
+% Use "\\" para quebrar linhas, "\and" para separar autores.
+%
+\title{\bf Modelagem em B do \\Sistema de Tempo Real FreeRTOS}
+
+\author{Stephenson Galvão \\ {\small stepgalvao@consiste.ufrn.br}  
+	 \and David Déharbe \\ {\small deharbe@consiste.ufrn.br} }
+    %\thanks{Aluno do Programa de Pós-graduação em Sistemas e Computação,  UFRN}
+\date{}
+
+\maketitle
+%---------------------------------------------------------- TITULO E AUTOR DA PAG 1 %
+
+
+%---------------------------------------------------------- CABECALHO DAS PAGINAS %
+% Nomes de autores ABREVIADOS e título ABREVIADO, para cabecalhos em cada página.
+\markboth{\small Galvão, S.S.L.}{\small Modelagem do FreeRTOS}
+\pagestyle{myheadings}
+%---------------------------------------------------------- CABECALHO DAS PAGINAS %
+
+
+%----------------------------------------------------------ABSTRACT %
+\begin{abstract}
+This is the abstract. 
+\end{abstract}
+
+\begin{keywords}
+FreeRTOS.
+\end{keywords}
+%----------------------------------------------------------ABSTRACT %
+
+%----------------------------------------------------------RESUMO %
+\begin{resumo} 
+Este é o resumo
+\end{resumo}
+
+\begin{palavras-chave}
+FreeRTOS.
+\end{palavras-chave}
+%----------------------------------------------------------RESUMO %
+
+
+\section{Introdução}
+\label{sec:intr}
+
+
+Sistemas de tempo real (STR) são sistemas que tem como principal característica
+um rigoroso tempo de resposta aos eventos externos. Devido a isso, eles são bastante
+utilizados, pela industria, em aplicações críticas que possuem o tempo de respota
+como um fator crucial. O monitoramento de paciente em hospitais, o controle de
+processo industriais e o controle de veículos são apenas alguns exemplos da
+aplicação dos sistemas de tempo real.
+
+Em razão dessa grante importância dos STR, foi propostor em \cite{jim},
+por Jim, o desafio de especificar formalmente um sistema de tempo real
+denominado FreeRTOS, proporcionando ao mesmo a segurança, confiabilidade e
+fidelidade que uma especificação formal proporciona.
+
+O FreeRTOS trata-se de um sistema de tempo real de código fonte pequeno,
+aproximadamente 2.242 linhas de código, e aberto. Além disso, ele é portável, 
+oficialmente, para cerca de 17 arquiteturas diferentes (8051, PIC, ARM, etc) e
+tem como principais características a sua acessabilidade, eficiência e
+portabilidade.
+
+Seguindo esse contexto, o presente relatório tem como principal objetivo
+descrever uma modelagem inicial, feita em B, do STR FreeRTOS e, com isso,
+resolver parte do desafio proposto pelo Jim. Entretanto, por trata-se de uma
+especificação inicial, alguns conceitos do sistema de tempo real foram brevemente
+excluidos da modelagem, sendo os mesmo especificados em futuros refinamento.
+Assim, primordialmente foram especificados, em um alto nível de abstração,
+somente os conceitos e funcionalidades de tarefas e filas de mensagens, dando
+ênfase principalemente à caracteristica de estado de um tarefa e suas trocas.
+
+Para cumprir o seu objetivo, esse relatório foi divido da seguinte forma:
+Primeiramente tem-se uma introdução ao FreeRTOS, demonstrado os seus principais
+conceitos e características; em seguinda, é apresentado o plano de modelagem
+que foi seguido, na qual estão as funcionalidades das API que foram
+especificadas nessa modelagem inicial;..
+
+
+
+%Para ser aceito para publicação, um Relatório Técnico deve ser avalisado por,
+%pelo menos um professor do INF. No caso de um professor ser autor ou co-autor
+%do relatório, poderá solicitar que um outro professor faça a avaliação do
+%mesmo. Neste caso, o nome deste professor avaliador deverá constar na seção de
+%agradecimentos (Seção \ref{sec:agrad}).
+
+
+
+\section{FreeRTOS}
+\label{sec:freertos}
+% [Uma introdução ao FreeRTOS demonstrando as suas funcionalidades (casos no qual
+% o FreeRTOS é utilizado), características(portabilidade, pouco código,ect) e
+% conceitos(tarefa,co-rotina, fila de mensagem, mutex, ect)]
+ 
+O \textit{FreeRTOS} é um sistemas de tempo real projetado para ser pequeno,
+simples e fácil de usar. O seu código fonte é aberto e possui aproximadamente
+2.242 linhas de código, que estão basicamente distribuidas em três arquivos C,
+nas quais é implementado o seu núcleo duro. Além disso, outra característica
+importante desse STR é a sua portabilidade, sendo oficialmente portável para 17
+arquiteturas diferentes, entre elas a PIC, ARM, Zilog Z80 e PC, bastantes usadas
+pela industria eletrônica.
+
+O \textit{kernel} do \textit{FreeRTOS}, além de ser multiprocesso, suporta três
+tipo diferentes de configuração: preemptivo, cooperativo e híbrido. No tipo
+preemptivo, a processo em execução pode ser enterrompido a qualquer momento pelo
+escalonador, sendo em seguida substituido por outro processo. Direfente do
+preemptivo, no tipo cooperativo, o processo em execução é quem descide o momento
+de sua pausa, seguida sua substituição. E, no tipo híbrido, o escalonador
+funciona hora como preemptivo e hora como cooperativo.
+
+[Exemplificar o funcionamento escalonador preemptivo e cooperativo usando uma
+figura ?]
+
+Outros conceitos importantes implementado pelo FreeRTOS e presente na maioria
+dos sistemas de tempo real são os de tarefa, co-rotina, fila de mensagem,
+semáforo e mutex. Eles basicamente formam todo o núcleo do FreeRTOS e devido a
+sua grande importância, serão detalhados a seguir
+
+\subsection{Tarefa}
+Tarefas, similires a processo, são unidades de trabalho independentes que compoem
+um sistema multitarefas. No FreeRTOS, elas são implementadas através de um pilha
+que serve para armazenar o contexto de execução no momento que a tarefa é
+interrompida, uma prioridade que indica a sua importância para o sistema, um
+estado que desmonstra a atual situação da tarefa e uma função que é executado
+quando a tarefa assume o controle do processado. 
+
+Os estados que uma tarefa pode assumir no FreeRTOS são: executando, pronta,
+bloqueada e suspensa. O estado ``executando'' informa que a tarefa está em
+execução, ou sejá, possui, atualmente, o controle do processador. Somente uma
+tarefa pode possuir o estado executando no FreeRTOS. O estado ``pronta'' informa
+que a tarefa está pronta para entrar, aguardando assumir o controle do
+processador. No estado bloqueada á tarefa encontra-se bloqueada a espera de algum
+evento necessáio para continuar a sua execução. E no estado ``suspensa'', a
+tarefa foi suspensa pelo escalonador através da chamada ao método vTaskSuspend(),
+disponível na API do FreeRTOS. O gráfico completo de transição de estado das
+tarefas do FreeRTOS pode ser visto na figura \ref{fig:tkstates}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{tkstate.eps}
+\caption{Gráfico de transição de estados das tarefas do FreeRTOS}
+\label{fig:tkstates}
+\end{figure}
+
+A prioridade de uma tarefa pode váriar de 0 a uma constante de prioridade máxima,
+indicada pelo o usuário. No FreeRTOS, as prioridades são usadas principalmente na
+política de escalonamento entre tarefas, a qual garante que as tarefas de maior
+prioridade no estado pronta ou executando, tem preferência sobre as tarefas de
+menor prioridade. Assim, a tarefa em execução deve ter prioridade maior ou igual
+as tarefas no estado pronto. Um exemplo de como funciona o escalonador do
+FreeRTOS para as tarefas pode ser visto na figura \ref{fig:scheduler}, na qual as
+tarefas de menores prioridades são sempre interrumpdas por tarefas de maiores
+prioridades quando essas assumem o estado de pronta.
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{scheduler.eps}
+\caption{Funcionamento do escalonador do FreeRTOS}
+\label{fig:scheduler}
+\end{figure}
+
+%Assim, o gráfico de transição de estados das tarefas do FreeRTOS comporta-se
+%como o da figura \ref{fig:tkstates}.Nele uma tarefa pode ir do estado
+%executando para pronta, bloqueado ou suspensa, de bloqueada para suspensa ou
+%pronta, de suspensa para pronta e de pronta para executando ou suspens
+
+% [Exemplificar utilizando uma figura do funcionamento do escalonador do
+% FreeRTOS]
+  
+\subsection{Co-Rotina}
+As co-rotinas são similares às tarefas, também possuem prioridade, estados e uma
+função que é executado no momento em que a co-rotina assume o controle do
+escalonador. Entranto, existem algumas diferenças importantes entre tarefas e
+co-rotinas. Uma delas é a pilha de contexto. Co-rotinas não possuem pilha de
+contexto e, conseguentemente, não possuem contexto próprio, ou seja, os valores
+armazenados nos registradores por uma co-rotinas, não são guardados no momento em
+que ela interrompe a sua execução. Assim uma co-rotina pode armazenar o valor
+três em um registrador antes de ser interrompida e quando retorna sua execução o
+valor dessa variável pode ou não ser o mesmo, pois outra co-rotina ao entrar em
+execução pode ter alterado o valor do registrado.
+
+Outra diferença entre co-rotinas e tarefas está na quantidade de estado. As
+co-rotinas só possuem os estado ``executando'', ``pronto'' e ``bloqueada''
+diferente das tarefas, que possuem além dos três o ``suspensa''.
+Conseguentemente o gráfico de transição de estados de uma co-rotina também é
+diferente do gráfico de tarefas, sendo esse demonstrado na figura
+\ref{fig:cstates}
+
+As co-rotinas são gerenciada pelo FreeRTOS de forma coopertiva, ou seja, elas
+descidem o momento de interrupção da sua execução. Assim, resta apenas ao
+escalonador a tarefa de descidir qual co-rotina deve assumir o processador no
+momento que a co-rotina em execução interrompi-se. A política para essa
+escolha, assim como ocorre com as tarefas, é baseada na prioridade, sendo que a
+co-rotina pronta para entrar em execução de maior prioridade tem preferência
+sobre as demais de menores prioridade.
+
+%momento e que ocorre um troca de co-rotina. Devido a isso, deve-se tomar
+%cuidados especiais no uso das co-rotinas, pois valores armazenados na memória
+%por uma co-rótina podem ser alterados por outras no momento em que a primeira
+%interrompe a sua execução.
+
+\subsection{Fila de Mensagens}
+Filas de mensagens são estruturas primitivas de comunicação entre tarefas. Elas
+funcionam como um túnel no qual tarefas enviam e recebem mensagem do mesmo. No
+FreeRTOS, as filas de mensagem possuem tamanho fixo defino pelo tamanho do ítem
+(mensagem) que ela pode receber e pela quantidade de ítens que podem ser
+armazenados. Assim, para uma tarefa enviar uma mensagem para uma fila,
+primeiramente a fila não pode estar cheia, caso contrário, a tarefa é bloqueada
+aguardando que sejá liberado um lugar na fila. O mesmo caso ocorre com quando uma
+tarefa tenta receber uma mensagem de uma fila, so que aqui a fila deve possuir
+pelo menos um item, para que esse seja lido, e, caso contrário, a tarefa é
+bloqueda aguardando a chegada de uma mensagem na fila.
+
+O FreeRTOS permite especificar o tempo máximo que uma tarefa pode ficar bloqueada
+esperado que ocorrar um evento(liberação de espaço ou chega de mensagem) em uma
+fila. E em casos de existerem mais de uma tarefa bloqueadas aguardando por uma
+fila, as tarefas de maior prioridade têm preferência sobre as de menor.
+
+\subsection{Semâforos}
+Semâforos são mecanismo usados na sicronização entre tarefas. Ele funciona como
+uma chave que libera o uso de uma determinado recurso por uma tarefa. Assim
+quando uma tarefa deseja acessar um recurso comportilhado ela primeiramente deve
+tentar pegar o semâforo do recurso, caso ele está liberado, a tarefa tem a
+utilizar o recurso e, em seguida, libera o semâforo, caso contrário, a tarefa é
+bloqueada até que o semâforo sejá liberado.
+
+No FreeRTOS os semâforo funcionam como uma fila de um único item. Assim, quando
+a fila estiver vazia indica que o semâforo está sendo usado e quando a fila
+estiver cheia indica que o semâforo está liberado. Desse modo, as tarefas que
+utilizam o semâforo não estão preocupadas com o conteúdo do item da fila, mas
+apenas com o estado da fila, se ela está cheia ou vazia.
+
+
+\subsection{Mutex}
+Mutex são parecidos com o semâforo. A única diferênça entre os dois é que o mutex
+implementa o mecanismo de herança de prioridade, que impede que uma tarefa de
+maior prioridade fique bloqueada a espera de um semâforo ocupado por uma de menor
+prioridade que devido a sua baixa prioridade está aguardando para entrar em
+execução.
+
+Para evitar esse problema, o mecanismo de inversão de prioridade, ao perceber
+que uma tarefa solicita o semâforo, verifica se a tarefa solicitante possui
+prioridade maior que a tarefa com o semâforo. Caso afirmativo, a tarefa que
+retem o semâforo tem mometaneamente sua prioridade elevada, para que assim ela
+possar realizar a sua função sem interrupções e, conseguentemente, liberar
+rapidamente o semâforo.
+
+\section{Modelagem}
+\label{sec:modelagem}
+[Explicar que, por tratar-se de um modelo inicial, apenas alguns conceitos do
+FreeRTOS foram modelados (Tarefa e Fila de Mensagem). Além disso, falar do
+nível de abstração, no qual cada conceito foi modelado. Por exemplo, para o
+conceito de tarefa, as características de prioridade, troca de contexto e código
+de execução foram abstraídas da modelagem inicial, sendo especificadas apenas a
+característica de estado e suas mudanças ]
+
+
+\subsection{Funcionalidades modeladas} 
+
+[Falar quais as funcionalidades da API do FreeRTOS foram especificadas nessa
+modelagem inicial. Além disso, explicar as características de cada
+funcionalidades. Ou seja, nessa subsessão irei falar do plano de modelagem
+discutido anteriormente, the sheet router ]
+
+
+\subsection{Modelagem dos conceitos e funcionalidades}
+ 
+[Explicar forma modelados os conceitos de tarefa e fila de mensagem,
+demonstrando como as características dos mesmo foram modelados em B. Falar
+também, nessa sessão, sobre a modelagem das funcionalidades da API do FreeRTOS,
+demonstrando como o comportamento das funções foram modelados no nível de
+abstração sugerido]
+
+\section{Considerações finais}
+\label{sec:consideracoes} 
+[Falar sobre as dificuldades encontradas na modelagem, como também a
+inviabilidadede modelar um sistema de natureza concorrente no formalismo B]
+
+
+\section{Trabalhos Futuros}
+[Falar sobre o que pretende-se fazer nos futuros refinamentos. Como
+especificar a característica de prioridade para o conceito de tarefa]
+
+
+
+\bibliography{UFRN-DIMAp-2006-100-RT}
+
+
+
+\end{document}
