@@ -157,6 +157,7 @@ semáforo e mutex. Eles basicamente formam todo o núcleo do FreeRTOS e devido a
 sua grande importância, serão detalhados a seguir
 
 \subsection{Tarefa}
+\label{subsec:tarefa}
 Tarefas, similires a processo, são unidades de trabalho independentes que compoem
 um sistema multitarefas. No FreeRTOS, elas são implementadas através de um pilha
 que serve para armazenar o contexto de execução no momento que a tarefa é
@@ -209,6 +210,7 @@ prioridades quando essas assumem o estado de pronta.
 % FreeRTOS]
   
 \subsection{Co-Rotina}
+\label{subsec:crotina}
 As co-rotinas são similares às tarefas, também possuem prioridade, estados e uma
 função que é executado no momento em que a co-rotina assume o controle do
 escalonador. Entranto, existem algumas diferenças importantes entre tarefas e
@@ -241,6 +243,7 @@ sobre as demais de menores prioridade.
 %interrompe a sua execução.
 
 \subsection{Fila de Mensagens}
+\label{subsec:fmensagem}
 Filas de mensagens são estruturas primitivas de comunicação entre tarefas. Elas
 funcionam como um túnel no qual tarefas enviam e recebem mensagem do mesmo. No
 FreeRTOS, as filas de mensagem possuem tamanho fixo defino pelo tamanho do ítem
@@ -286,22 +289,59 @@ retem o semâforo tem mometaneamente sua prioridade elevada, para que assim ela
 possar realizar a sua função sem interrupções e, conseguentemente, liberar
 rapidamente o semâforo.
 
-\section{Modelagem}
+\section{Projeto da Modelagem}
 \label{sec:modelagem}
-[Explicar que, por tratar-se de um modelo inicial, apenas alguns conceitos do
-FreeRTOS foram modelados (Tarefa e Fila de Mensagem). Além disso, falar do
-nível de abstração, no qual cada conceito foi modelado. Por exemplo, para o
-conceito de tarefa, as características de prioridade, troca de contexto e código
-de execução foram abstraídas da modelagem inicial, sendo especificadas apenas a
-característica de estado e suas mudanças ]
 
+Como mostrado na sessão \ref{sec:freertos} o FreeRTOS possui uma enorme
+quantidade de conceitos e funcionalidades. Devido a isso, antes de iniciar-se a
+sua especificação foi criado em \cite{sroute} um projeto de modelagem, no qual
+alguns do principais conceitos e funcionalidades do FreeRTOS foram escolhidos
+para serem modelados inicialmente, para o mesmo deu-se o nome de \textit{sheet
+route}.
 
-\subsection{Funcionalidades modeladas} 
+Assim, devido a sua grande importância, os conceito inicialmente escolhidos pelo
+\textit{sheet route} foram: tarefa (sessão \ref{subsec:tarefa}) e fila de
+mensagem (sessão \ref{subsec:fmensagem}). As funcionalidades da API que utilizam
+esses conceitos escolhidas, para o melhor entendimente e gerenciamento, foram
+divididas em cinco grupos: criação de tarefa; controle de tarefa; controle do
+kernel; utilidades de tarefas e gerenciamento de fila. Em seguida, tem-se o
+detalhamento de cada grupo junto com suas funcionalidades que os compoem.
 
-[Falar quais as funcionalidades da API do FreeRTOS foram especificadas nessa
-modelagem inicial. Além disso, explicar as características de cada
-funcionalidades. Ou seja, nessa subsessão irei falar do plano de modelagem
-discutido anteriormente, the sheet router ]
+\subsection{Criação de Tarefa}
+\label{subsec:tcreation}
+
+Nesse grupo, estão presente as funcionalidades responsáveis pela criação,
+exclusão e referênciamente de uma tarefa. Ele é formado pela seguintes
+operações:
+
+\begin{itemize}
+
+  \item{\textbf{xTaskCreate} - Cria uma nova tarefa que será gerenciada pelo
+  FreeRTOS}  
+  \item{\textbf{xTaskDelete} - Remove uma tarefa da lista de tarefas
+  gerenciáveis pelo FreeRTOS. Entranto, a completa remoção da tarefa do
+  sistema, liberação da memória, é feita pela a tarefa de gerênciamento
+  \textit{idle task}, execultado quando o processador encontra-se ocioso}
+  \item {\textbf{xTaskHadle} - Estrutura de referênciamente a uma tarefa}
+ 
+\end{itemize}
+
+\subsection{Controle de tarefa}
+\label{subsec:tcontrol}
+\subsection{Controle do kernel}
+\label{subsec:kcontrol}
+\subsection{Utilidades de tarefas}
+\label{subsec:tutilities}
+\subsection{Gerenciamente de fila de mensagem}
+\label{subsec:management}
+
+% [Explicar que, por tratar-se de um modelo inicial, apenas alguns conceitos do
+% FreeRTOS foram modelados (Tarefa e Fila de Mensagem). Além disso, falar do
+% nível de abstração, no qual cada conceito foi modelado. Por exemplo, para o
+% conceito de tarefa, as características de prioridade, troca de contexto e
+% código de execução foram abstraídas da modelagem inicial, sendo especificadas
+% apenas a característica de estado e suas mudanças ]
+
 
 
 \subsection{Modelagem dos conceitos e funcionalidades}

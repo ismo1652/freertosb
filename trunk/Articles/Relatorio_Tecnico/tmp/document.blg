@@ -3,9 +3,10 @@ The top-level auxiliary file: document.aux
 The style file: dimap-ufrn.bst
 Database file #1: UFRN-DIMAp-2006-100-RT.bib
 Warning--I didn't find a database entry for "jim"
+Warning--I didn't find a database entry for "sroute"
 You've used 0 entries,
             2129 wiz_defined-function locations,
-            508 strings with 3793 characters,
+            509 strings with 3799 characters,
 and the built_in function-call counts, 18 in all, are:
 = -- 0
 > -- 0
@@ -44,4 +45,4 @@ warning$ -- 0
 while$ -- 0
 width$ -- 0
 write$ -- 2
-(There was 1 warning)
+(There were 2 warnings)
