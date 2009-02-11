@@ -90,7 +90,7 @@ como um fator crucial. O monitoramento de paciente em hospitais, o controle de
 processo industriais e o controle de veículos são apenas alguns exemplos da
 aplicação dos sistemas de tempo real.
 
-Em razão dessa grante importância dos STR, foi propostor em \cite{jim},
+Em razão dessa grante importância dos STR, foi propostor em \cite{jim:sbmf},
 por Jim, o desafio de especificar formalmente um sistema de tempo real
 denominado FreeRTOS, proporcionando ao mesmo a segurança, confiabilidade e
 fidelidade que uma especificação formal proporciona.
@@ -99,7 +99,7 @@ O FreeRTOS trata-se de um sistema de tempo real de código fonte pequeno,
 aproximadamente 2.242 linhas de código, e aberto. Além disso, ele é portável, 
 oficialmente, para cerca de 17 arquiteturas diferentes (8051, PIC, ARM, etc) e
 tem como principais características a sua acessabilidade, eficiência e
-portabilidade.
+portabilidade \cite{freertos}.
 
 Seguindo esse contexto, o presente relatório tem como principal objetivo
 descrever uma modelagem inicial, feita em B, do STR FreeRTOS e, com isso,
@@ -163,7 +163,7 @@ um sistema multitarefas. No FreeRTOS, elas são implementadas através de um pilha
 que serve para armazenar o contexto de execução no momento que a tarefa é
 interrompida, uma prioridade que indica a sua importância para o sistema, um
 estado que desmonstra a atual situação da tarefa e uma função que é executado
-quando a tarefa assume o controle do processado. 
+quando a tarefa assume o controle do processado \cite{Li:2003}. 
 
 Os estados que uma tarefa pode assumir no FreeRTOS são: executando, pronta,
 bloqueada e suspensa. O estado ``executando'' informa que a tarefa está em
@@ -297,25 +297,27 @@ quantidade de conceitos e funcionalidades. Devido a isso, antes de iniciar-se a
 sua especificação foi criado em \cite{sroute} um projeto de modelagem, no qual
 alguns do principais conceitos e funcionalidades do FreeRTOS foram escolhidos
 para serem modelados inicialmente, para o mesmo deu-se o nome de \textit{sheet
-route}.
+route}. Nesse projeto também foram incluidos alguns parâmentros utilizados pela
+as funcionalidades da API. A lista de todos os parâmetros utilizados será
+mostrada em seguida, junto com a lista das funcionalidades.
 
 Assim, devido a sua grande importância, os conceito inicialmente escolhidos pelo
 \textit{sheet route} foram: tarefa (sessão \ref{subsec:tarefa}) e fila de
-mensagem (sessão \ref{subsec:fmensagem}). As funcionalidades da API que utilizam
-esses conceitos escolhidas, para o melhor entendimente e gerenciamento, foram
-divididas em cinco grupos: criação de tarefa; controle de tarefa; controle do
-kernel; utilidades de tarefas e gerenciamento de fila. Em seguida, tem-se o
-detalhamento de cada grupo junto com suas funcionalidades que os compoem.
+mensagem (sessão \ref{subsec:fmensagem}). E as funcionalidades da API que
+utilizam esses conceitos especificadas, para o melhor entendimento e
+gerenciamento, foram divididas em cinco grupos: criação de tarefa; controle de
+tarefa; controle do kernel; utilidades de tarefas e gerenciamento de fila. Em
+seguida, tem-se o detalhamento da composição de cada grupo como também uma
+lista com os parâmetros de configuracões especificados. 
 
-\subsection{Criação de Tarefa}
+\subsection{Criação de tarefa}
 \label{subsec:tcreation}
 
-Nesse grupo, estão presente as funcionalidades responsáveis pela criação,
-exclusão e referênciamente de uma tarefa. Ele é formado pela seguintes
-operações:
+No grupo de Criação de tarefas, estão presente algumas funcionalidades
+responsáveis pela criação, exclusão e referênciamente de tarefas. Ele é
+composto pelas seguintes operações:
 
 \begin{itemize}
-
   \item{\textbf{xTaskCreate} - Cria uma nova tarefa que será gerenciada pelo
   FreeRTOS}  
   \item{\textbf{xTaskDelete} - Remove uma tarefa da lista de tarefas
@@ -323,35 +325,126 @@ operações:
   sistema, liberação da memória, é feita pela a tarefa de gerênciamento
   \textit{idle task}, execultado quando o processador encontra-se ocioso}
   \item {\textbf{xTaskHadle} - Estrutura de referênciamente a uma tarefa}
- 
 \end{itemize}
 
 \subsection{Controle de tarefa}
 \label{subsec:tcontrol}
+O grupo de Controle de tarefa é responsável pelo controle e gerênciamento das
+tarefas presentes no FreeRTOS. Desse modo, as funcionalidades que forma esse
+grupo são:
+
+\begin{itemize}
+  \item{\textbf{uxTaskPriorityGet} - Informa a prioridade de uma tarefa}
+  \item{\textbf{vTaskSuspend} - Coloca uma tarefa no estado suspenso}
+  \item{\textbf{vTaskResume}- Retorna uma tarefa suspensa colocando no estado
+  pornto}
+  \item {\textbf{vTaskPrioritySet} - Altera a prioridade de uma tarefa}
+  \item {\textbf{vTaskDelay} - Coloca uma tarefa no estado bloqueada por uma
+  determinada quantidade de tempo. Esse método não é recomendado para tarefas
+  ciclicas, pois o intervalo entre um desbloquei e um novo bloqueio de uma
+  tarefa pode variar a cada nova chamada ao método}
+  \item {\textbf{vTaskDelayUntil} - Assim como o \textit{vTaskDelay}, esse
+  método também coloca uma tarefa no estado bloqueada por uma determinada
+  quantidade de tempo. Entretanto, a quantidade de tempo entre o desbloqueio e
+  o bloqueio de uma nova tarefa é sempre a mesma, sendo assim, recomendado para 
+  a utilização em tarefas cíclicas}
+\end{itemize}
+
 \subsection{Controle do kernel}
 \label{subsec:kcontrol}
+As funcionalidades presentes no gurpo Controle do kernel são responsáveis por
+gerênciar, iniciar, finalizar as atividades do kernel do FreeRTOS. Nesse grupo
+estão presentes as seguintes operações:
+\begin{itemize}
+  \item{\textbf{vTaskStartScheduler} - Inicia o escalonador colocando para o
+  estado executando e cria a \textit{idle task}, uma tarefa de gerênciamento do
+  FreeRTOS, resposánvel por liberar da memória tarefas, fila de mensagens,
+  co-rotinas, etc excluidas}
+  \item{\textbf{vTaskEndScheduler} - Finaliza as atividades do escalonador
+  colocando-lo para o estado não iniciado e excluido todas as tarefas, fila de 
+  mensagens, co-rotinas, etc, que estão sendo gerencidas pelo FreeRTOS }
+  \item{\textbf{vTaskSuspendAll}- Suspende temporariamente as atividades do
+  escalonador passando o seu estado para suspenso}
+  \item {\textbf{xTaskResumeAl} - Retorna as atividades do escalonador quando o
+  mesmo encontra-se suspenso, retornando o seu estado para rodando}
+\end{itemize}
+
+
+
 \subsection{Utilidades de tarefas}
 \label{subsec:tutilities}
-\subsection{Gerenciamente de fila de mensagem}
-\label{subsec:management}
+No grupo de utilidades de tarefas, encontram-se algumas operações responsáveis
+por dar informações úties sobre os estado do kernel do FreeRTOS. Assim, esse
+grupo é composto pelas seguintes funções:
 
-% [Explicar que, por tratar-se de um modelo inicial, apenas alguns conceitos do
-% FreeRTOS foram modelados (Tarefa e Fila de Mensagem). Além disso, falar do
-% nível de abstração, no qual cada conceito foi modelado. Por exemplo, para o
-% conceito de tarefa, as características de prioridade, troca de contexto e
-% código de execução foram abstraídas da modelagem inicial, sendo especificadas
-% apenas a característica de estado e suas mudanças ]
+\begin{itemize}
+  \item{\textbf{xTaskGetCurrentTaskHandle} - Retorna uma referência para a
+  tarefa que está em execução}
+  \item{\textbf{xTaskGetSchedulerState} - Informa o atual estado do
+  escalonador, podendo o mesmo estar em execução, suspenso ou não iniciado}
+  \item{\textbf{uxTaskGetNumberOfTasks} - Informa a quantidade de tarefas
+  tarefas estão sendo gerenciadas pelo FreeRTOS}
+  \item {\textbf{xTaskGetTickCount} - Informa a quantidade de tempo decorrido
+  desde de que o escalonador foi iniciado}
+\end{itemize}
 
+\subsection{Gerenciamento das filas de mensagens}
+\label{subsec:fmanagemente}
+Por último, às operações presentes no grupo de Gerenciamento das filas de
+mensagens cabêm as funcionalidades de criar, excluir e gerenciar as filas de
+mensagens do FreeRTOS. Esse grupo é formado pela as seguintes funções:
 
+\begin{itemize}
+  \item{\textbf{xQueueCreate} - Cria uma nova fila de mensagem}
+  \item{\textbf{xQueueSend} - Envia uma nova mensagem para a fila, caso a fila
+  esteja cheia a tarefa remetente será bloqueada até que seja liberado um
+  espaço na fila}
+  \item{\textbf{xQueueSendToBack} - Envia uma nova mensagem para o final da
+  fila de mensagem, caso a fila esteja cheia a tarefa remetente será bloqueada
+  até que seja liberado um espaço na fila}
+  \item {\textbf{xQueueSendToFront} - Envia uma nova mensagem para o início da
+  fila de mensagem, caso a fila esteja cheia a tarefa remetente será bloqueada
+  até que seja liberado um espaço na fila}
+  \item {\textbf{xQueueReceive} - Ler e retira a mensagem contida no início da
+  fila de mensagens, caso a fila esteja vazia, a tarefa é bloqueada até que um 
+  item chegue na fila }
+  \item{\textbf{xQueuePeek} - Ler, sem retirar, uma mensagem da fila. Caso a
+  fila esteja vazia, a tarefa que solicitou a leitura é bloqueada até que um
+  item chegue na fila}
+  \item {\textbf{vQueueDelete} - Exclui uma fila de mensagem do FreeRTOS}
+\end{itemize}
 
-\subsection{Modelagem dos conceitos e funcionalidades}
- 
-[Explicar forma modelados os conceitos de tarefa e fila de mensagem,
-demonstrando como as características dos mesmo foram modelados em B. Falar
-também, nessa sessão, sobre a modelagem das funcionalidades da API do FreeRTOS,
-demonstrando como o comportamento das funções foram modelados no nível de
-abstração sugerido]
+\subsection{Parâmentros de configuração}
+\label{subsec:config}
+Os parâmetros de configuração são atributos usados na implementação das
+funcionalidades descritas acima. Eles são responsáveis pelo o comportamento e
+configuração do sistema. Assim antes da criação de novos sistemas utilizando o
+FreeRTOS o usuário primeiramente de preencher-los de acordo com as necessidades
+do sistema. A lista completa de todos os parâmentros utilizados no projeto
+\textit{sheet route} pode ser encontrada a seguir:
 
+\begin{itemize}
+  \item {\textbf{configMAX\_PRIORITIES} - Esse parâmentro informa o número da
+  prioridade máxima que pode ser utilizada no FreeRTOS}
+  \item {\textbf{INCLUDE\_vTaskPrioritySet} - Indica a utilização ou não da
+  funcionalidade \textit{vTaskPrioritySet}}
+  \item {\textbf{INCLUDE\_vTaskSuspend} - Indica a utilização ou não da
+  funcionalidade \textit{vTaskSuspend}}
+  \item {\textbf{INCLUDE\_uxTaskPriorityGet} - Indica a utilização ou não da
+  funcionalidade \textit{uxTaskPriorityGet}}
+  \item {\textbf{INCLUDE\_vTaskDelete} - Indica a utilização ou não da
+  funcionalidade \textit{vTaskDelete}}
+  \item {\textbf{INCLUDE\_xTaskGetSchedulerState} - Indica a utilização ou não
+  da funcionalidade \textit{xTaskGetSchedulerState}}
+  \item {\textbf{INCLUDE\_xTaskGetCurrentTaskHandle} - Indica a utilização ou
+  não da funcionalidade \textit{xTaskGetCurrentTaskHandle}}
+  \item {\textbf{INCLUDE\_vTaskDelay} - Indica a utilização ou
+  não da funcionalidade \textit{vTaskDelay}}
+  \item {\textbf{INCLUDE\_vTaskDelayUntil} - Indica a utilização ou
+  não da funcionalidade \textit{vTaskDelayUntil}} 
+\end{itemize}
+	
+\section{Modelagem}
 \section{Considerações finais}
 \label{sec:consideracoes} 
 [Falar sobre as dificuldades encontradas na modelagem, como também a

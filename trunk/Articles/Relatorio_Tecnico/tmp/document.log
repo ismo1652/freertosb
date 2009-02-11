@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2008.11.3)  11 FEB 2009 00:05
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2008.11.3)  11 FEB 2009 10:32
 entering extended mode
  Source specials enabled.
  %&-line parsing enabled.
@@ -244,11 +244,7 @@ LaTeX Font Info:    Font shape `T1/ptm/bx/it' in size <12> not available
 (Font)              Font shape `T1/ptm/b/it' tried instead on input line 62.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <17.28> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 82.
-
-
-LaTeX Warning: Citation `jim' on page 1 undefined on input line 93.
-
-[1]
+ [1]
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 159.
 File: tkstate.eps Graphic file (type eps)
@@ -262,29 +258,26 @@ LaTeX Warning: Reference `fig:cstates' on page 4 undefined on input line 230.
 
 LaTeX Warning: Citation `sroute' on page 5 undefined on input line 297.
 
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 319.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 321.
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 319.
- [5] (./document.bbl
-
-LaTeX Warning: Empty `thebibliography' environment on input line 3.
-
-) [6] (./document.aux)
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 321.
+ [5] [6] [7]
+(./document.bbl) [8] (./document.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 2678 strings out of 94102
- 33619 string characters out of 1165833
+ 2681 strings out of 94102
+ 33660 string characters out of 1165833
  100198 words of memory out of 1500000
- 5925 multiletter control sequences out of 10000+50000
+ 5928 multiletter control sequences out of 10000+50000
  31669 words of font info for 42 fonts, out of 1200000 for 2000
  637 hyphenation exceptions out of 8191
  32i,14n,26p,258b,362s stack positions out of 5000i,500n,6000p,200000b,5000s
 
-Output written on document.dvi (7 pages, 20876 bytes).
+Output written on document.dvi (9 pages, 30344 bytes).

@@ -2,47 +2,46 @@ This is BibTeX, Version 0.99c (Web2C 7.5.6)
 The top-level auxiliary file: document.aux
 The style file: dimap-ufrn.bst
 Database file #1: UFRN-DIMAp-2006-100-RT.bib
-Warning--I didn't find a database entry for "jim"
 Warning--I didn't find a database entry for "sroute"
-You've used 0 entries,
+You've used 3 entries,
             2129 wiz_defined-function locations,
-            509 strings with 3799 characters,
-and the built_in function-call counts, 18 in all, are:
-= -- 0
-> -- 0
+            523 strings with 4098 characters,
+and the built_in function-call counts, 618 in all, are:
+= -- 53
+> -- 27
 < -- 0
-+ -- 0
-- -- 0
-* -- 2
-:= -- 7
-add.period$ -- 0
-call.type$ -- 0
-change.case$ -- 0
++ -- 11
+- -- 8
+* -- 35
+:= -- 126
+add.period$ -- 9
+call.type$ -- 3
+change.case$ -- 12
 chr.to.int$ -- 0
-cite$ -- 0
-duplicate$ -- 0
-empty$ -- 1
-format.name$ -- 0
-if$ -- 1
+cite$ -- 3
+duplicate$ -- 26
+empty$ -- 47
+format.name$ -- 8
+if$ -- 115
 int.to.chr$ -- 0
-int.to.str$ -- 0
-missing$ -- 0
-newline$ -- 3
-num.names$ -- 0
-pop$ -- 0
+int.to.str$ -- 3
+missing$ -- 2
+newline$ -- 18
+num.names$ -- 6
+pop$ -- 10
 preamble$ -- 1
-purify$ -- 0
+purify$ -- 10
 quote$ -- 0
-skip$ -- 1
+skip$ -- 13
 stack$ -- 0
-substring$ -- 0
-swap$ -- 0
+substring$ -- 15
+swap$ -- 6
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 0
+type$ -- 10
 warning$ -- 0
-while$ -- 0
-width$ -- 0
-write$ -- 2
-(There were 2 warnings)
+while$ -- 6
+width$ -- 4
+write$ -- 31
+(There was 1 warning)

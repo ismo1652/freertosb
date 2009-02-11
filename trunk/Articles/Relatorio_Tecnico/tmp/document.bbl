@@ -1,3 +1,18 @@
-\begin{thebibliography}{}
+\begin{thebibliography}{1}
+
+\bibitem{freertos}
+\MakeUppercase{FreeRTOS\/}.
+\newblock {\bf Freertos}.
+\newblock Site de informações sobre o FreeRTOS.
+
+\bibitem{Li:2003}
+\MakeUppercase{Li, Q; Yao, C\/}.
+\newblock {\bf Real Time Concepts for Embedded Systems}.
+\newblock CMP Books, 2003.
+
+\bibitem{jim:sbmf}
+\MakeUppercase{Woodcock, J\/}.
+\newblock {\bf Grand challenge in software verification}.
+\newblock Slides apresentados no SBMF 2008, 2008.
 
 \end{thebibliography}
