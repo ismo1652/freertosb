@@ -1,0 +1,978 @@
+%% LaTeX Beamer presentation template (requires beamer package)
+%% see http://latex-beamer.sourceforge.net/
+%% idea contributed by H. Turgut Uyar
+%% template based on a template by Till Tantau
+%% this template is still evolving - it might differ in future releases!
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+\usetheme
+%{Bergen}
+%{Berlin}
+%{Antibes}
+{Berkeley}
+%{Boadilla}
+%{Frankfurt}
+%{Copenhagen}
+%{Darmstadt}
+\setbeamercovered{transparent}
+}
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+
+% font definitions, try \usepackage{ae} instead of the following
+% three lines if you don't like this look
+\usepackage{mathptmx}
+\usepackage[scaled=.90]{helvet}
+\usepackage{courier}
+
+
+\usepackage[T1]{fontenc}
+\include{commands}
+
+\title{Modelagem em B do FreeRTOS}
+
+%\subtitle{}
+
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+%\author{F.~Author\inst{1} \and S.~Another\inst{2}}
+\author{Stephenson Galvão, David Déharbe}
+
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+\institute[Universities of]
+{
+%
+Universidade Federal do Rio Grande do Norte\\
+Departamento de Informática e Matemática Aplicada\\
+Programa de Pos-Graduacao em Sistemas e Computacao\\
+Laboratório de Métodos Formais e Linguagem 
+}
+
+\date{Fevereiro/2009}
+
+
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+\subject{Talks}
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSection[]
+{
+\begin{frame}<beamer>
+\frametitle{Roteiro}
+\tableofcontents[currentsection]
+\end{frame}
+}
+
+\AtBeginSubsection[]
+{
+\begin{frame}<beamer>
+\frametitle{Roteiro}
+\tableofcontents[currentsection,currentsubsection]
+\end{frame}
+}
+\pgfdeclareimage[width=1.4cm]{logo}{figuras/freertos}
+\logo{\pgfuseimage{logo}}
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command:
+
+%\beamerdefaultoverlayspecification{<+->}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Roteiro}
+\tableofcontents
+% You might wish to add the option [pausesections]
+\end{frame}
+
+
+\section{FreeRTOS}
+
+\subsection[Características]{Características}
+
+\begin{frame}
+\frametitle{Características}
+%\framesubtitle{Subtitles are optional}
+\begin{itemize}
+  \item{Trabalha em ambientes com recursos limitados}
+  \item{Acessível} % Código fonte aberto e disponível no site FreeRTOS.org
+  \item{Simples} % Possui aproximadamente 2.242 linhas de código
+  \item{Popular} % Possui uma taxa com mais de 6000 downloads/mês
+  \item{Fácil de usar}
+  \item {Portável}%Suporta oficialmente 17 arquiteturas diferentes
+\end{itemize}
+\end{frame}
+
+\subsection[Principais Conceitos]{Principais conceitos}
+\begin{frame}
+\frametitle{Principais Conceitos}
+\begin{itemize}
+  \item {Tarefa}
+  \item {Co-rotina}
+  \item {Fila de mensagens}
+  \item {Semáforo}
+  \item {Mutex}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Tarefa}
+  \begin{block} {Definição}
+  	Unidade de trabalho independente que compoem um
+  	sistema
+  \end{block}
+\begin{itemize} 
+\item Características:
+  	\begin{itemize}
+      \item Estado - (executando, pronto, bloqueado e suspenso);
+	  \item Prioridade - (0..$\mathit{configMAX\_PRIORITIES}$);
+      \item Função de execução;
+      \item Pilha de contexto
+     \end{itemize}
+  %\end{block}
+\item Realiza escalonamento preemptivo
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Co-rotina}
+\begin{block}{Definição}
+  Semelhante a tarefa, são unidades de trabalho indepedentes que compartilha o
+  mesmo contexto
+\end{block}
+\begin{itemize}
+\item Características:
+
+   \begin{itemize}
+      \item Estado - (executando, pronto e bloqueado);
+	  \item Prioridade - (0..$\mathit{configMAX\_PRIORITIES}$);
+      \item Função de execução
+   \end{itemize}
+\setlength{\fboxrule}{3pt}
+\setlength{\fboxsep}{1pt}   
+\item \fcolorbox{red}{white}{Não possuem pilha de contexto}
+\item Realiza escalonamento cooperativo
+\end{itemize}    
+\end{frame}
+
+\begin{frame}
+\frametitle{Fila de mensagens}
+\begin{block}{Definição}
+  Estrutura primitiva de comunicação entre as tarefas. Através dela
+  tarefas enviam e recebem mensagem
+\end{block}
+\begin{itemize}
+\item Características:
+   \begin{itemize}
+      \item Lista de itens; 
+      \item Tamanho do item ;
+	  \item Quantidade de itens;
+      \item Listas de eventos para tarefas que:
+      \begin{itemize}
+      		\item Aguardam para enviar uma mensagem para fila
+      		\item Aguardam para receber uma mensagem da fila
+      \end{itemize}  
+   \end{itemize}
+\item  Permite definir o tempo máximo que uma tarefa deve aguardar por uma fila
+\end{itemize}    
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Semáforo}
+\begin{block}{Definição}
+Objeto do kernel que uma ou mais tarefas podem solicitar ou liberar
+com o proposito de sicronizar-se.
+\end{block}
+
+\begin{block}{Utilização}
+Quando uma tarefa deseja utilizar um recurso compartilhando, ela
+primeiramente solicita o semáforo desse recurso e, após o uso do recurso,liberar
+o semáforo.
+\end{block}
+
+\begin{block}{Analogia}
+São semelhantes a uma fila de um único item, sendo
+que fila cheia indica semáforo liberado e fila vazia indica semáforo em uso.
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Mutex}
+\begin{block}{Definição}
+Um semáforos com o mecanismo de herança de prioridade.
+São utilizados na implementação da exclusão mútua.
+\end{block}
+\begin{itemize}
+  \item Herança de prioridade: 
+  \begin{itemize}
+    \item Eleva temporariamente a prioridade da tarefa com o semáforo
+    \item Evita a inversão de prioridade - Bloqueio da tarefa mais prioritária
+    por uma de menor prioridade
+    \item Exemplo - Quando a tarefa mais prioritária é bloqueada ao solicitar o
+    semáforo ocupado por uma menos prioritária
+   \end{itemize}   
+\end{itemize}
+\end{frame}
+
+\section{Projeto de Modelagem}
+
+\begin{frame}
+\frametitle{Projeto de modelagem}
+\begin{itemize}
+  \item Conceitos
+  \begin{itemize}
+    \item Tarefa
+    \item Fila de mensagens
+  \end{itemize}
+  \item Conjunto de funcionalidades
+  \begin{itemize}
+    \item Criação de tarefa
+    \item Controle de tarefa
+    \item Utilidade de tarefa
+    \item Controle do kernel
+    \item Gerenciamento de fila de mensagens
+  \end{itemize}  	 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Conjunto de funcionalidades}
+\begin{columns}
+\begin{column}{6.0cm}
+\begin{itemize}
+  \item Criação de tarefa:
+	\begin{itemize}
+  		\item $\mathit{vTaskCreate}$
+  		\item $\mathit{vTaskDelate}$
+  		\item $\mathit{xTaskHandle}$
+    \end{itemize}
+    \item Controle de tarefa:
+    \begin{itemize}
+      \item $\mathit{vTaskSuspend}$
+      \item $\mathit{vTaskResume}$
+      \item $\mathit{uxTaskPriorityGet}$ 
+      \item $\mathit{vTaskPrioritySet}$
+      \item $\mathit{vTaskDelay}$
+      \item $\mathit{vTaskDelayUntil}$
+    \end{itemize}
+    \item Utilidades de tarefa:
+    \begin{itemize}
+      \item $\mathit{xTaskGetCurrentTaskHandle}$
+      \item $\mathit{xTaskGetSchedulerState}$
+      \item $\mathit{uxTaskGetNumberOfTasks}$
+      \item $\mathit{xTaskGetTickCount}$ 
+    \end{itemize} 
+\end{itemize}
+\end{column}
+\begin{column}{5.0cm}
+\begin{itemize}
+  \item Controle do kernel: 
+	\begin{itemize}
+  		\item  $\mathit{vTaskStartScheduler}$
+  		\item  $\mathit{vTaskEndScheduler}$
+  		\item  $\mathit{vTaskSuspendAll}$
+  		\item  $\mathit{xTaskResumeAll}$
+    \end{itemize}
+    
+    \item Gerenciamento de fila:
+    \begin{itemize}
+      \item  $\mathit{xQueueCreate}$
+      \item  $\mathit{xQueueSend}$
+      \item  $\mathit{xQueueSendToBack}$
+      \item  $\mathit{xQueueSendToFront}$
+      \item  $\mathit{xQueueReceive}$
+      \item  $\mathit{xQueuePeek}$
+      \item  $\mathit{vQueueDelete}$
+      \item[]
+      \item[]
+      \item[]  
+      
+    \end{itemize}
+     
+\end{itemize}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+
+
+%\begin{frame}
+%\frametitle{Conjunto de funcionalidades}
+%\begin{columns}
+%\begin{column}{5.0cm}
+%\begin{itemize}
+%  \item<1-4> Criação de tarefa:
+%	\begin{itemize}
+%  		\item <1,2> $\mathit{vTaskCreate}$
+%  		\item <1,3> $\mathit{vTaskDelate}$
+%  		\item <1,4> $\mathit{xTaskHandle}$
+%    \end{itemize}
+%    \item<5-11> Controle de tarefa
+%    \begin{itemize}
+%     \item <5,6> $\mathit{vTaskSuspend}$
+%      \item <5,7> $\mathit{vTaskResume}$
+%      \item <5,8> $\mathit{uxTaskPriorityGet}$ 
+%      \item <5,9> $\mathit{vTaskPrioritySet}$
+%      \item <5,10> $\mathit{vTaskDelay}$
+%      \item <5,11> $\mathit{vTaskDelayUntil}$
+%    \end{itemize}
+%    \item<12-16> Utilidades de Tarefa
+%    \begin{itemize}
+%      \item<12,13> $\mathit{xTaskGetCurrentTaskHandle}$
+%      \item<12,14> $\mathit{xTaskGetSchedulerState}$
+%      \item<12,15> $\mathit{uxTaskGetNumberOfTasks}$
+%      \item<12,16> $\mathit{xTaskGetTickCount}$ 
+%    \end{itemize} 
+%\end{itemize}
+%\end{column}
+%\begin{column}{5.0cm}
+%\begin{itemize}
+%  \item<1-5> Controle do kernel: 
+%	\begin{itemize}
+%  		\item <1,2> $\mathit{vTaskStartScheduler}$
+%  		\item <1,3> $\mathit{vTaskEndScheduler}$
+%  		\item <1,4> $\mathit{vTaskSuspendAll}$
+%  		\item <1,5> $\mathit{xTaskResumeAll}$
+%    \end{itemize}
+%    
+%    \item<6-14> Controle de tarefa 
+%    \begin{itemize}
+%      \item <6,7> $\mathit{xQueueCreate}$
+%      \item <6,8> $\mathit{xQueueSend}$
+%      \item <6,9> $\mathit{xQueueSendToBack}$
+%      \item <6,10> $\mathit{xQueueSendToFront}$
+%      \item <6,11> $\mathit{xQueueReceive}$
+%      \item <6,12> $\mathit{xQueuePeek}$
+%      \item <6,13> $\mathit{vQueueDelete}$
+%    \end{itemize}
+     
+%\end{itemize}
+%\end{column}
+%\end{columns}
+%\end{frame}
+
+%\begin{frame}
+%\frametitle{Conjunto de funcionalidades (Continuação)}
+
+%\end{frame}
+
+
+%\begin{frame}
+%\frametitle{Criação de tarefa}
+
+% You can create overlays
+%\begin{itemize}
+%  \item using the \texttt{pause} command:
+%  \begin{itemize}
+%    \item First item.
+%    \pause
+%    \item Second item.
+%  \end{itemize}
+%  \item using overlay specifications:
+%  \begin{itemize}
+%    \item<3-> First item.
+%    \item<4-> Second item.
+%  \end{itemize}
+% \item using the general \texttt{uncover} command:
+%  \begin{itemize}
+%    \uncover<5->{\item First item.}
+%    \uncover<6->{\item Second item.}
+%  \end{itemize}
+%\end{itemize}
+%\end{frame}
+\section{Modelagem}
+\subsection{Introdução}
+\begin{frame}
+\frametitle{Intodução}
+\begin{itemize}
+  \item Dividida basicamente em 5 máquinas:  
+  \begin{itemize}
+    \item Task\_Core
+    \item Task\_Basic
+    \item Queue\_Core
+    \item Queue\_Basic
+    \item Queue
+  \end{itemize}
+  \item Passagem de parâmetros por referência 
+  \item Alto nível de abstração
+\end{itemize}
+\end{frame}
+\subsection{Desenvolvimento}
+
+\begin{frame}
+\frametitle{Organização das máquinas}
+
+\begin{figure}[!h]
+\includegraphics[scale=0.6]{figuras/morganization.jpg}
+\end{figure}
+\end{frame}
+
+\subsubsection*{Task\_Core}
+\begin{frame}
+\frametitle{Máquina Task\_Core}
+\begin{itemize}
+  \item Especifica o conceito de tarefa
+  \begin{itemize}
+  	\item Característica especificada:
+  		\begin{itemize}  
+        	\item Estado
+         \end{itemize}
+    \item Características abstraídas:      
+         \begin{itemize}  
+        	\item Prioridade
+        	\item Função de execução
+        	\item Pilha de contexto
+         \end{itemize}          
+  \end{itemize}
+  \item Especifica operações que:
+  \begin{itemize}
+    \item Gerenciam as características de uma tarefa (Estado)
+    \item Preocupam-se principalmente como a troca de estado 
+    \item Servem de base para especificação das funcionalidades da API
+  \end{itemize} 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Conceito de tarefas}
+
+\begin{columns}
+
+\begin{column}{5cm}
+\begin{flushleft}
+\begin{small}
+$$
+\begin{array}[t]{l}
+
+\SETS \\
+\quad   \TASK;\\
+\quad   \ldots \\\\
+    		
+\VARIABLES\\
+\quad   \tasks,\\
+\quad   \blocked,\\
+\quad	\running,\\
+\quad	\ready, \\
+\quad	\suspended\\
+\quad	\ldots
+\end{array}
+$$
+\end{small}
+\end{flushleft}
+\end{column}
+
+\begin{column}{5cm}
+\begin{flushleft}
+\begin{small}
+$$
+\begin{array}[t]{l}
+\INVARIANT\\
+
+\quad \tasks \in \fin(\TASK) \land \\
+\quad \tasks \neq \emptyset \land \\\\
+
+\quad \blocked	\in \fin(\TASK) \land \\
+\quad \blocked  \subset \tasks \land \\\\
+
+\quad \ready \in \fin(\TASK) \land \\
+\quad \ready \subset \tasks \land \\\\	
+
+\quad \suspended \in \fin(\TASK) \land \\
+\quad \suspended \subset \tasks \land \\
+
+\quad \running \in \TASK \land \\
+\quad \ldots
+\end{array}
+$$
+\end{small}
+\end{flushleft}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+\begin{frame}
+\frametitle{Operações}
+\begin{itemize}
+  \item<1,2>Create 
+  \item<1> Delete
+  \item<1> Suspend
+  \item<1> Resume
+  \item<1> GetPriority
+  \item<1> GetCurrent
+  \item<1> GetNumberOfTasks
+  \item<1> DelayTask
+  \item<1> Unblock
+  \item<1> StartScheduler
+  \item<1> EndScheduler
+  \item<1> ResumeAll
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Operação Create}
+\begin{columns}
+
+\begin{column}{5cm}
+\begin{flushleft}
+\begin{small}
+$$
+\begin{array}[t]{l}
+\result \longleftarrow \Create (\priority) =\\
+\PRE\\
+	    \priority \in \PRIORITY\\
+\THEN\\	
+\quad \ANY \\
+\quad \quad \task\\
+\quad \WHERE\\
+\quad\quad \task \in \TASK \land \\
+\quad\quad \task \not\in \tasks\\ 
+
+\ldots\\
+\end{array}
+$$
+\end{small}
+\end{flushleft}
+\end{column}
+
+\begin{column}{5cm}
+\begin{flushleft}
+\begin{small}
+$$
+\begin{array}[t]{l}
+\quad \THEN \\ 
+\quad \quad \tasks := \{ \task \} \cup \tasks \parallel\\
+\quad \quad \CHOICE \\
+\quad \quad \quad \ready := \{\running\} \cup \ready \parallel\\        	    
+\quad \quad \quad \running := \task \\
+\quad \quad \OR\\
+\quad \quad	\quad \ready :=  { \task } \cup \ready\\
+\quad \quad \END \parallel\\
+\quad \quad \result := \task\\
+\quad \END\\                  
+\END;
+\end{array}
+$$
+\end{small}
+\end{flushleft}
+\end{column}
+\end{columns}
+\end{frame}
+
+\subsubsection*{Task\_Basic}
+\begin{frame}
+\frametitle{Máquina Task\_Basic}
+\begin{itemize}
+  \item Especifica característica do escalonador:
+  \begin{itemize}
+    \item Estado
+    \item Tempo de execução
+  \end{itemize}  
+  \item Especificam operações que:
+  \begin{itemize}
+    \item Compoem os seguintes conjunto de funcionalidade:
+    	\begin{itemize}
+    		\item Criação de tarefa
+    		\item Controle de tarefa
+    		\item Utilidades de tarefa
+    		\item Controle do Kernel
+        \end{itemize}    
+   \item Utilizam-se da máquina \textit{Task\_Core} 
+  \end{itemize}    	
+    
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Característica do escalonador}
+\begin{flushleft}
+\begin{small}
+$$
+\begin{array}[t]{l}
+\SETS\\
+\quad   \mathit{SCHEDULER\_STATE} = \{\mathit{taskSCHEDULER\_NOT\_STARTED},\\
+\quad\quad%\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad
+									\mathit{taskSCHEDULER\_RUNNING}, 
+%%\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad
+									\mathit{taskSCHEDULER\_SUSPENDED}\}\\
+    
+\VARIABLES  \\
+\quad	\tickCount ,\\		
+\quad	\tickMissed ,\\		
+\quad	\scheduler\\		
+   
+\INVARIANT\\
+\quad	\tickCount \in \TICK \land \\
+\quad	\tickMissed \in \TICK \land \\
+\quad	\scheduler \in \mathit{SCHEDULER\_STATE}\\
+\end{array}
+$$
+\end{small}
+\end{flushleft}
+\end{frame}
+
+\begin{frame}
+\frametitle{Operações}
+\begin{columns}
+
+\begin{column}{5.0cm}
+\begin{itemize}
+  \item<1,2> Criação de tarefa
+  	\begin{itemize}
+  		\item<1,2> xTaskCreate
+  		\item<1> vTaskDelete
+      \end{itemize}
+  \item<1> Controle de tarefa    
+     \begin{itemize}  
+  		\item<1> vTaskSuspend
+  		\item<1> vTaskResume
+  		\item<1> uxTaskPriorityGet
+  		\item<1> uxTaskPrioritySet
+  		\item<1> vTaskDelay
+  		\item<1> vTaskDelayUntil
+  	\end{itemize} 
+  
+\end{itemize}
+\end{column}
+
+\begin{column}{6.0cm}
+\begin{itemize}	
+  \item<1> Utilidades de tarefas 
+  \begin{itemize}
+	\item<1> xTaskGetCurrentTaskHandle
+  	\item<1> uxTaskGetNumberOfTasks
+  	\item<1> xTaskGetSchedulerState
+  	\item<1> xTaskGetTickCount
+  \end{itemize}
+  \item<1>Gerenciamento do Kernel
+  \begin{itemize}		
+  	\item<1>vTaskStartScheduler
+  	\item<1>vTaskEndScheduler
+  	\item<1>vTaskSuspendAll
+  	\item<1>xTaskResumeAll
+  	\item<1>incrementTick
+  \end{itemize}
+\end{itemize}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Operação xTaskCreate}
+\begin{columns}
+
+\begin{column}{5cm}
+\begin{flushleft}
+\begin{small}
+$$
+\begin{array}[t]{l}
+\result, \handle \longleftarrow \\
+\quad\quad
+\xTaskCreate (\pvTaskCode,\\
+\quad\quad
+\pcName, \usStackDepth,\\
+\quad\quad
+\pvParameters, \uxPriority) = \\
+\quad\PRE\\
+\quad\quad \pvTaskCode \in \mathit{TASK\_CODE} \land \\ 
+\quad\quad \pcName \in \NAME \land \\ 
+\quad\quad \usStackDepth \in \nat \\  
+\quad\quad \pvParameters \subset \PARAMETER \\ 
+\quad\quad \uxPriority \in \PRIORITY\\
+\ldots\\
+\end{array}
+$$
+\end{small}
+\end{flushleft}
+\end{column}
+
+\begin{column}{5cm}
+\begin{flushleft}
+\begin{small}
+$$
+\begin{array}[t]{l}
+\THEN \\
+\quad \CHOICE \\
+\quad\quad \handle \gets \Create (\uxPriority) \parallel\\
+\quad\quad \result := \pdPASS\\
+\quad \OR \\
+\quad\quad
+\result:=\mathit{errCOULD\_NOT\_ALLOCATE\_REQUIRED\_MEMORY}\parallel\\
+\quad\quad \handle := \mathit{TASK\_NULL} \\ \quad \END\\	                     
+\END;\\\\
+\end{array}
+$$
+\end{small}
+\end{flushleft}
+\end{column}
+
+\end{columns}
+\end{frame}
+\subsubsection*{Queue\_Core}
+\begin{frame}
+\frametitle{Máquina Queue\_Core}
+\begin{itemize}
+  \item Especifica a conceito de fila de mensagens
+  	\begin{itemize}
+        \item Características especificadas: 
+    		\begin{itemize} 
+        		\item Conjunto de ítens
+        		\item Fila de evento para envio de mensagem
+        		\item Fila de evento para o recebimento de mensagem  
+        	\end{itemize}
+		\item Características abstraídas
+		\begin{itemize}
+          \item Tamanho do item
+          \item Quantidade de item 
+        \end{itemize} 
+  	\end{itemize}
+  \item Possui um conjunto de operações que:  
+  	\begin{itemize}
+        \item Gerenciam as característica especificadas
+        \item Preocupa-se principalmente com:
+        \begin {itemize}
+          \item Inserção e remoção de um item na fila
+          \item Inserção e remoção de uma tarefa na lista de evento 
+          \end{itemize}
+        \item Server como base para a especificação da API
+        
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Modelagem da Fila de Mensagens}
+\begin{columns}
+\begin{column}{4cm}
+\begin{flushleft}
+\begin{small}
+$$
+\begin{array}[t]{l}
+\SETS\\
+\quad \ITEM;\\			
+\quad \mathit{COPY\_POSITION};\\	
+\quad \QUEUE\\ 			
+    
+\VARIABLES\\
+\quad \queues,\\
+\quad \mathit{queue\_items},\\ 
+\quad \mathit{queue\_receiving},\\ 
+\quad \mathit{queue\_sending}\\
+\end{array}
+$$
+\end{small}
+\end{flushleft}
+	  
+\end{column}
+
+\begin{column}{6cm}
+\begin{flushleft}
+\begin{small}
+$$
+\begin{array}[t]{l}
+\INVARIANT\\
+\quad \queues \in \pow(\QUEUE) \land \\
+\quad \mathit{queue\_items} \in \QUEUE \pfun \pow(\ITEM) \land\\
+\quad \mathit{queue\_receiving} \in \QUEUE \pfun \pow(\TASK) \land \\ 
+\quad \mathit{queue\_sending} \in \QUEUE \pfun \pow(\TASK) \land \\
+
+\quad \queues = \dom(\mathit{queue\_items}) \land \\
+\quad \queues = \dom(\mathit{queue\_receiving}) \land \\
+\quad \queues = \dom(\mathit{queue\_sending})\\
+\end{array}
+$$
+\end{small}
+\end{flushleft}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Funcionalidades}
+\begin{itemize}
+  \item<1,2> xQueueCreate
+  \item<1> sendItem
+  \item<1> insertTaskWaitingToSend
+  \item<1> insertTaskWaitingToRecived
+  \item<1> receivedItem
+  \item<1> removeFromEventListQueue
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Operação xQueueCreate}
+\begin{flushleft}
+\begin{small}
+$$
+\begin{array}[t]{l}
+\ldots\\
+\CHOICE\\
+\quad \ANY\\
+\quad \quad	\queue\\ 
+\quad \WHERE\\
+\quad \quad \queue \in \QUEUE \land \\ 
+\quad \quad \queue \not\in \queues \land \\
+\quad \THEN	\\
+\quad\quad \queues := \queues \cup \{\queue\} \parallel\\
+\quad\quad 
+\mathit{queue\_items} := \mathit{queue\_items} \cup \{\queue \mapsto\emptyset \} \parallel \\
+ \quad\quad
+\mathit{queue\_receiving} := \mathit{queue\_receiving} \cup \{\queue \mapsto\emptyset \} \parallel\\
+\quad\quad
+\mathit{queue\_sending} := \mathit{queue\_sending} \cup \{\queue \mapsto
+\emptyset\} \parallel \\
+\quad\quad\xQueueHandle := \queue\\
+\quad \END\\		    
+\OR\\
+\quad \xQueueHandle := \mathit{QUEUE\_NULL}\\
+\ldots
+\end{array}
+$$
+\end{small}
+\end{flushleft}
+\end{frame}
+
+\subsubsection*{Queue\_Basic}
+\begin{frame}
+\frametitle{Máquina Queue\_Basic}
+\begin{itemize}
+  \item Especifica:
+  	\begin{itemize}
+    	\item Comportamentos comuns da API Gerenciamento de tarefa
+    	\item Operações mais complexa que as presente em \textit{Queue\_Core}
+      \end{itemize}
+   \item Formada por duas operações:
+   \begin{itemize}
+     \item xQueueGenericSend
+     	\begin{itemize}
+           \item Envia um item para uma fila e desbloqueia uma tarefa que
+           		aguarda pela chegada de um item
+           \item Coloca a tarefa atual no lista de evento de tarefa que esperam
+           		para enviar um item para fila
+           \item Retorna uma mensagem de erro
+       	\end{itemize}  
+     \item xQueueGenericReceive
+     \begin{itemize}
+           \item Envia um item para uma fila e desbloqueia uma tarefa que
+           		aguarda pela chegada de um item
+           \item Coloca a tarefa atual no lista de evento de tarefa que esperam
+           		para enviar um item para fila
+           \item Retorna uma mensagem de erro
+       	\end{itemize}      
+   \end{itemize}    
+   	 
+  
+\end{itemize}
+\end{frame}
+
+
+\subsubsection*{Queue}
+\begin{frame}
+\frametitle{Máquina Queue}
+\begin{itemize}
+  \item Especifica as operações da API Gerenciamento de Fila
+  \item Básicamente utiza-se das funções \textit{QueueGenericReceive} e
+  		\textit{xQueueGenericSend}
+\end{itemize}
+\begin{block}{xQueueSendToBack}
+\begin{small}
+$$
+\begin{array}[t]{l}
+\ldots\\
+\ANY \mathit{copy\_position}\\
+\WHERE\\
+\quad \mathit{copy\_position} \in  \mathit{COPY\_POSITION}\\
+\THEN\\
+\quad \mathit{return} \gets \mathit{xQueueGenericSend}(\mathit{pxQueue},\\
+\quad\quad\quad\quad\quad
+\mathit{pvItemToQueue}, \mathit{xTicksToWait},\mathit{copy\_position})\\ 
+\END\\
+\ldots\\
+\end{array}
+$$
+\end{small}
+\end{block}
+
+\end{frame}
+\subsection{Obrigações de prova}
+
+\begin{frame}
+\frametitle{Resulmo das obrigações de prova}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Máquinas} & \textbf{Nª Ob.} & \textbf{Nª P.A.} & \textbf{Nª P.I.}\\
+\hline \hline
+\textit{Task\_Core} & $179$ & $161$ & $18$\\ \hline
+\textit{Task\_Base} & $16$ & $16$ & $0$\\ \hline
+\textit{Queue\_Core} & $27$ & $27$ & $0$\\ \hline
+\textit{Queue\_Basic}& $2$ & $2$ & $0$\\ \hline
+\textit{Queue}& $0$ & $0$ & $0$\\ \hline
+\end{tabular}
+
+\end{frame}
+
+\section{Considerações Finais}
+
+\begin{frame}
+\frametitle{Conclusões}
+\begin{itemize}
+  \item Modelagem precária
+  \item Dificuldades em especificar as características dos conceitos
+  \item Necessidade de formalismo que possam:
+  \begin{itemize}
+    \item Especificar a concorência entre as tarefas
+    \item Verificar a memória heap 
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Contatos}
+\begin{itemize}
+  \item Página do projeto
+  \begin{itemize}
+    \item \url{http://code.google.com/p/freertosb/} 
+  \end{itemize} 
+  \item E-mails:
+  \begin{itemize}
+    \item Stephenson - stepgalvao@gmail.com 
+    \item David - deharbe@gmail.com 
+  \end{itemize}  
+
+\end{itemize}  
+\end{frame}
+
+
+
+\end{document}
