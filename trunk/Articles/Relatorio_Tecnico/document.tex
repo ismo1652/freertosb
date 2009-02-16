@@ -6,6 +6,44 @@
 %   [capa]  -> Gerar a capa colorida do relatório técnico
 %   [plain] -> Usar o estilo "plain" de citação bibliográfica
 %\newcommand{\FreeRTOS}{\operatorname{\textit{FreeRTOS }}}
+
+%% Keywords for the B method
+\newcommand{\MACHINE}{\operatorname{\mathbf{MACHINE}}}
+\newcommand{\REFINEMENT}{\operatorname{\mathbf{REFINEMENT}}}
+\newcommand{\IMPLEMENTATION}{\operatorname{\mathbf{IMPLEMENTATION}}}
+\newcommand{\REFINES}{\operatorname{\mathbf{REFINES}}}
+\newcommand{\SEES}{\operatorname{\mathbf{SEES}}}
+\newcommand{\IMPORTS}{\operatorname{\mathbf{IMPORTS}}}
+\newcommand{\SETS}{\operatorname{\mathbf{SETS}}}
+\newcommand{\CONSTANTS}{\operatorname{\mathbf{CONSTANTS}}}
+\newcommand{\PROPERTIES}{\operatorname{\mathbf{PROPERTIES}}}
+\newcommand{\VARIABLES}{\operatorname{\mathbf{VARIABLES}}}
+\newcommand{\INVARIANT}{\operatorname{\mathbf{INVARIANT}}}
+\newcommand{\INITIALISATION}{\operatorname{\mathbf{INITIALISATION}}}
+\newcommand{\OPERATIONS}{\operatorname{\mathbf{OPERATIONS}}}
+\newcommand{\BEGIN}{\operatorname{\mathbf{BEGIN}}}
+\newcommand{\END}{\operatorname{\mathbf{END}}}
+\newcommand{\PRE}{\operatorname{\mathbf{PRE}}}
+\newcommand{\IF}{\operatorname{\mathbf{IF}}}
+\newcommand{\THEN}{\operatorname{\mathbf{THEN}}}
+\newcommand{\ELSE}{\operatorname{\mathbf{ELSE}}}
+\newcommand{\ELSIF}{\operatorname{\mathbf{ELSIF}}}
+\newcommand{\ANY}{\operatorname{\mathbf{ANY}}}
+\newcommand{\WHERE}{\operatorname{\mathbf{WHERE}}}
+\newcommand{\CASE}{\operatorname{\mathbf{CASE}}}
+\newcommand{\OF}{\operatorname{\mathbf{OF}}}
+\newcommand{\EITHER}{\operatorname{\mathbf{EITHER}}}
+\newcommand{\OR}{\operatorname{\mathbf{OR}}}
+\newcommand{\WHILE}{\operatorname{\mathbf{WHILE}}}
+\newcommand{\DO}{\operatorname{\mathbf{DO}}}
+\newcommand{\VARIANT}{\operatorname{\mathbf{VARIANT}}}
+
+%% Commonly used math entities
+\newcommand{\pow}{\operatorname{\mathbb{P}}}
+\newcommand{\dom}{\operatorname{\mbox{dom}}}
+\newcommand{\nat}{\operatorname{\mathbb{N}}}
+\newcommand{\pfun}{\operatorname{\rightarrow\mkern-22mu+}}
+
 \begin{document}
 %---------------------------------------------------------- PAGINA DE CAPA %
 % Número do relatório (para reserva, consulte "regivan@dimap.ufrn.br.br").
@@ -148,9 +186,6 @@ preemptivo, no tipo cooperativo, o processo em execução é quem descide o momento
 de sua pausa, seguida sua substituição. E, no tipo híbrido, o escalonador
 funciona hora como preemptivo e hora como cooperativo.
 
-[Exemplificar o funcionamento escalonador preemptivo e cooperativo usando uma
-figura ?]
-
 Outros conceitos importantes implementado pelo FreeRTOS e presente na maioria
 dos sistemas de tempo real são os de tarefa, co-rotina, fila de mensagem,
 semáforo e mutex. Eles basicamente formam todo o núcleo do FreeRTOS e devido a
@@ -285,14 +320,14 @@ execução.
 Para evitar esse problema, o mecanismo de inversão de prioridade, ao perceber
 que uma tarefa solicita o semâforo, verifica se a tarefa solicitante possui
 prioridade maior que a tarefa com o semâforo. Caso afirmativo, a tarefa que
-retem o semâforo tem mometaneamente sua prioridade elevada, para que assim ela
+retém o semâforo tem mometaneamente sua prioridade elevada, para que assim ela
 possar realizar a sua função sem interrupções e, conseguentemente, liberar
 rapidamente o semâforo.
 
 \section{Projeto da Modelagem}
-\label{sec:modelagem}
+\label{sec:project}
 
-Como mostrado na sessão \ref{sec:freertos} o FreeRTOS possui uma enorme
+Como demonstrado na sessão \ref{sec:freertos}, o FreeRTOS possui uma enorme
 quantidade de conceitos e funcionalidades. Devido a isso, antes de iniciar-se a
 sua especificação foi criado em \cite{sroute} um projeto de modelagem, no qual
 alguns do principais conceitos e funcionalidades do FreeRTOS foram escolhidos
@@ -305,8 +340,8 @@ Assim, devido a sua grande importância, os conceito inicialmente escolhidos pelo
 \textit{sheet route} foram: tarefa (sessão \ref{subsec:tarefa}) e fila de
 mensagem (sessão \ref{subsec:fmensagem}). E as funcionalidades da API que
 utilizam esses conceitos especificadas, para o melhor entendimento e
-gerenciamento, foram divididas em cinco grupos: criação de tarefa; controle de
-tarefa; controle do kernel; utilidades de tarefas e gerenciamento de fila. Em
+gerenciamento, foram divididas em cinco conjuntos: criação de tarefa; controle
+de tarefa; controle do kernel; utilidades de tarefas e gerenciamento de fila. Em
 seguida, tem-se o detalhamento da composição de cada grupo como também uma
 lista com os parâmetros de configuracões especificados. 
 
@@ -319,7 +354,9 @@ composto pelas seguintes operações:
 
 \begin{itemize}
   \item{\textbf{xTaskCreate} - Cria uma nova tarefa que será gerenciada pelo
-  FreeRTOS}  
+  FreeRTOS} retornando uma referência para a mesma. Caso não haja espaço
+  suficiente para a criação da tarefa, uma referência para uma tarefa nula é
+  retornada.
   \item{\textbf{xTaskDelete} - Remove uma tarefa da lista de tarefas
   gerenciáveis pelo FreeRTOS. Entranto, a completa remoção da tarefa do
   sistema, liberação da memória, é feita pela a tarefa de gerênciamento
@@ -445,6 +482,558 @@ do sistema. A lista completa de todos os parâmentros utilizados no projeto
 \end{itemize}
 	
 \section{Modelagem}
+\label{sec:Modelling}
+
+A modelagem B do FreeRTOS, foi dividida entre 7 máquinas (), nas quais são
+modelados os conceitos de tarefa, fila de mensagem, suas funcionalidades e seus
+parâmetros de configuração, descritos na sessão \ref{sec:project}. Assim, para
+uma melhor compreensão essa sessão foi dividida da seguinte forma, modelagem
+dos conceitos, explica como foram modelados os conceitos de tarefa e fila de
+mensagem, e modelagem das funcionalidades, demonstra como foram especificadas
+as funcionalidades e os parâmetros de configuração do FreeRTOS.
+
+\subsection{Modelagem dos conceitos}
+\subsubsection{Tarefas}
+
+%Como dito na sessão \ref{subsec:tarefa}, o conceito de tarefa é formado pelas
+%seguintes características: pilha de contexto, estado, prioridade e função de
+%execução. 
+
+O conceito de tarefa é modelado através da máquina $\mathbf{Task\_Core}$.
+Entretanto, devido às dificuldades encontradas no momento das obrigações de
+prova, esse conceito foi modelado inicialmente contendo apenas a característica
+de estado, sendo as demais características (ver sessão \ref{subsec:tarefa})
+especificadas em futuros refinamento. Assim, a especificação do conceito de
+tarefa foi feita como demonstra as figura \ref{fig:task-modelling}, na qual
+inicialmente foi criado o conjuto abstrato $\mathit{TASK}$, que simboliza o
+conjunto universo de todas as tarefas que podem ser criadas pelo FreeRTOS e, em
+seguida, o  estado $\mathit{tasks}$, que representar as tarefas gerenciadas pelo
+FreeRTOS, gerando a seguinte definição $\mathit{tasks} \in
+\mathbf{FIN}(\mathit{TASK})$.
+
+Ainda na figura \ref{fig:task-modelling}, a especificação dos estados de uma
+tarefa é feita através das variáveis $\mathit{blocked}$, $\mathit{running}$,
+$\mathit{ready}$ e $\mathit{suspended}$, as quais representam os estados,
+bloqueado, executando, pronto e suspenso, respectivamente. Com isso, uma tarefa
+que encontra-se no estado bloqueado, deve obrigatoriamente pertencer ao conjunto
+de tarefas bloqueadas, $\mathit{blocked}$. Já  as restrições relacionadas a esses
+estados, demosntradas na figura \ref{fig:task-modelling}, determinam que somente
+uma tarefa pode estar em execução e que uma tarefa não pode possuir mais de uma
+estado em um mesmo momento.
+
+\begin{figure}[!b]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\mathbf{SETS}\\
+\quad   \mathit{TASK};\\
+\quad   \ldots \\\\
+    		
+\mathbf{VARIABLES}\\
+\quad   \mathit{tasks},\\
+\quad   \mathit{blocked},\\
+\quad	\mathit{running},\\
+\quad	\mathit{ready}, \\
+\quad	\mathit{suspended}\\
+\quad	\ldots
+\end{array}
+\begin{array}[t]{l}
+
+\mathbf{INVARIANTS}\\
+
+\quad \mathit{tasks} \in \mathbf{FIN}(\mathit{TASK}) \land \\
+\quad \mathit{tasks} \neq \emptyset \land \\\\
+
+\quad \mathit{blocked}	\in \mathbf{FIN}(\mathit{TASK}) \land \\
+\quad \mathit{blocked} \subset \mathit{tasks} \land \\\\
+
+\quad \mathit{ready} \in \mathbf{FIN}(\mathit{TASK}) \land \\
+\quad \mathit{ready} \subset \mathit{tasks} \land \\\\	
+
+\quad \mathit{suspended} \in \mathbf{FIN}(\mathit{TASK}) \land \\
+\quad \mathit{suspended} \subset \mathit{tasks} \land \\
+\quad \ldots
+\end{array}
+
+\begin{array}[t]{l}
+\quad \mathit{running} \in \mathit{TASK} \land \\
+\quad \mathit{running} \in \mathit{tasks} \land \\
+\quad \mathit{running}  \not\in \mathit{ready} \land \\
+\quad \mathit{running} \not\in  \mathit{blocked} \land \\
+\quad \mathit{running} \not\in  \mathit{suspended} \land \\\\
+
+\quad \mathit{ready} \cup \mathit{blocked} = \emptyset \land \\ 
+\quad \mathit{blocked} \cup \mathit{suspended} = \emptyset \land \\
+\quad \mathit{suspended} \cup \mathit{ready} = \emptyset \land \\\\
+
+\quad \mathit{tasks} = \mathit{\{running\}} \cup \mathit{suspended} \\ 
+\quad\quad\quad\quad\quad \cup \mathit{blocked} \cup \mathit{ready}
+
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Modelagem do conceito tarefa}
+\label{fig:task-modelling}
+\end{figure}
+
+\subsubsection{Fila de Mensagem}
+A maquina responsável pelo conceito de fila de mensagens e a
+$\mathbf{QUEUE\_CORE}$. Nela, uma fila de mensagem mensagem é especificada como
+sendo um conjunto de item, um conjunto de tarefas aguardando por um espaço na
+fila e um conjunto de tarefas a espera de um item da fila, como demonstra a
+figura \ref{fig:queue-modelling}. As demais características de um fila de
+mensagem (ver sessão \ref{subsec:fmensagem}) serão modeladas em futuros
+refinamento. 
+
+Assim, na especificação da figura \ref{fig:queue-modelling}, os conjuntos
+abstratos $\mathit{QUEUE}$ e $\mathit{ITEM}$, simbolizam todas as filas e itens
+que podem ser criados pelo FreeRTOS. E a variáveis $\mathit{queues}$,
+$\mathit{queue\_items}$, $\mathit{queue\_receiving}$ e $
+\mathit{queue\_sending}$, representam, respectivamente, as fila gerenciadas pelo
+FreeRTOS, uma função que liga uma fila a um conjunto de itens, uma função que
+liga uma fila a um conjunto de tarefas que esperam pela chegada de um item na
+fila e uma função que liga uma fila a um conjunto de tarefas que esperam por um
+espaço na fila. 
+
+Com isso, para criar-se uma fila, primeiramente adiciona-se uma representação da
+mesmo no conjunto $\mathit{queues}$ e , em seguinda, a mesma representação deve
+ser associada a um conjunto de itens e tarefas através das demais variáveis, pois
+como determina as definições $\mathit{queues} =
+\mathbf{dom}(\mathit{queue\_items})$, $\mathit{queues} =
+\mathbf{dom}(\mathit{queue\_receiving}) $ e $\mathit{queues} =
+\mathbf{dom}(\mathit{queue\_sending})$, toda fila gerenciada pelo FreeRTOS deve
+possuir um conjunto de itens, e dois conjuntos de tarefas que esperam por um
+lugar ou item na fila.
+
+\begin{figure}[!b]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\mathbf{SETS} \\
+\quad   \mathit{QUEUE};\\
+\quad   \mathit{ITEM};\\
+\quad   \ldots \\
+    		
+\mathbf{VARIABLES}\\
+\quad   \mathit{queues},\\
+\quad\quad   \mathit{queue\_items},\\
+\quad\quad   \mathit{queue\_receiving},\\
+\quad\quad	 \mathit{queue\_sending}
+\end{array}
+
+\begin{array}[t]{l}
+
+\mathbf{INVARIANTS}\\
+
+\quad \mathit{queues} \in \mathbf{POW}(\mathit{QUEUE}) \land \\
+\quad\quad \mathit{queue\_items} \in \mathit{QUEUE} \rightarrow\mkern-22mu+
+\quad\quad \mathbf{POW}(\mathit{ITEM})\land \\
+
+\quad\quad \mathit{queue\_receiving} \in \mathit{QUEUE} \rightarrow\mkern-22mu+
+\quad\quad \mathbf{POW}(\mathit{TASK}) \land \\ 
+
+\quad\quad \mathit{queue\_sending} \in \mathit{QUEUE}\rightarrow\mkern-22mu+
+\quad\quad \mathbf{POW}(\mathit{TASK}) \land \\\\
+    		
+\quad \mathit{queues} = \mathbf{dom}(\mathit{queue\_items}) \land \\
+\quad \mathit{queues} = \mathbf{dom}(\mathit{queue\_receiving}) \land \\
+\quad \mathit{queues} = \mathbf{dom}(\mathit{queue\_sending})
+
+\end{array}
+
+\end{array}
+$$
+\end{small}
+\caption{Modelagem do conceito fila de mensagem}
+\label{fig:queue-modelling}
+\end{figure}
+
+\subsection{Modelagem das funcionalidades}
+\label{subsec:fun-modelling}
+A modelagem das funcionalidades e um pouco mais complexa que a modelagem dos
+conceitos.Por isso, primeiramente dividiremos as funcionalidades em dois grupos, 
+funcionalidades de tarefa, nas quais estão as funcionalidades relacionadas ao
+conceito de tarefa e funcinalidades das fila de mensagem, onde estão as
+funcionalidades relacionadas às filas de mensagens.
+
+\subsubsection{Funcinalidades de tarefa}
+\label{subsubsec:tutilities}
+Esse grupo grupo é composto pelo o conjunto de  funcionalidades de criação de
+tarefa ( sessão \ref{subsec:tcreation}), controle de tarefa (sessão
+\ref{subsec:tcontrol}), utilidades de tarefa (sessão \ref{subsec:tutilities}) e
+controle do kernel (sessão \ref{subsec:kcontrol} ), sendo essas especificadas
+através das máquinas $\mathbf{TASK\_CORE}$ e $\mathbf{TASK\_BASIC}$. Na máquina
+$\mathbf{TASK\_CORE}$ além do conceito de tarefa, foram modeladas também
+operações básica que servem como suporte para a especificação das
+funcionalidades de tarefa. Nela estão presente as seguintes funções:
+\begin{itemize}
+\item{\textbf{Create} - Cria uma nova tarefa gerenciada pelo FreeRTOS, podendo
+as mesma possuir estado executando ou pronta, dependendo da prioridade da mesma.
+Entranto, como a característica prioridade foi abstraida dessa modelagem inicial,
+cabe ao refinamento que implementar tal característica descidir quando uma tarefa
+será criada com os estado pronto ou executando. Por isso esta, foi implementada
+recebendo uma prioridade como parâmetro, sendo que o mesmo não é usado
+inicialmente}
+
+\item{\textbf{Delete} - Exclui uma tarefa gerenciada pelo FreeRTOS. Se a tarefa
+que será excluida é a tarefa em execução, uma nova tarefa será escolhida, entre
+as tarefas de estado pronto, para entrar em execução.}
+
+\item{\textbf{Suspend} - Coloca uma tarefa no estado suspenso.No caso em que a
+tarefa suspensa será a tarefa em execução, uma nova tarefa deverá ser escolhida,
+entre as tarefas com estado pronto, para entrar em execução.}
+
+\item{\textbf{Resume} - Retorna uma tarefa que estava no estado suspenso
+colocando-a no estado pronto ou executando.}
+
+\item{\textbf{GetPriority} - Retorna a prioridade de uma determinada tarefa, mas como a característica
+prioridade não é especificada nessa modelagem inicial, essa operação retorna
+apenas um elemento que pertence ao conjunto abstrado denominado
+$\mathit{PRIORITIES}$, o quais representa as possíveis prioridades do FreeRTOS.}
+
+\item{\textbf{GetCurrent} - Retorna uma referência para a atual tarefa em
+execução}
+
+\item{\textbf{GetNumberOfTasks} - Retorna o número de tarefas que estão sendo gerenciadas pelo FreeRTOS, ou seja,
+retorna a cardinalidade do conjunto $\mathit{tasks}$ (sessão
+\ref{fig:task-modelling}).}
+
+\item{\textbf{DelayTask} - Coloca a tarefa em execução no estado boqueado por
+uma determinada quantidade de tempo.}
+
+\item{\textbf{Unblock}- Desboqueia uma tarefa que estava bloqueada, colocando-a
+no estado pronto ou executando.}
+ 
+\item{\textbf{StartScheduler}- Cria a \textit{idle task} (sessão
+\ref{subsec:kcontrol}), podendo ela ser cirada com o estado executando ou com o estado pronto}
+
+\item{\textbf{EndScheduler} - Exclui todas as tarefas do FreeRTOS, zerando os
+conjunto de estado e colocando a referência de tarefa nula na variável da
+tarefa em execução.}
+
+\item{\textbf{ResumeAll} - Desbloqueia todas as tarefas que deveriam ser
+boqueadas enquanto o escalonador estava suspenso devido à chamada ao método $\mathit{vTaskSuspendAll}$ (sessão
+\ref{subsec:kcontrol}).}
+
+\end{itemize}
+
+Na máquina $\mathbf{TASK\_BASIC}$ é onde as funcionalidades são realmente
+especificadas. Para isso, além de utilizar do conceito de tarefa e
+funcionalidades básica da $\mathbf{TASK\_CORE}$, ela também especifica algumas
+características importantes para modelagem dessas funcionalidades, sendo elas
+tick \footnote{Unidade de tempo usada pelo FreeRTOS. Nele o tempo é medido
+através de pulso de clock decorridos. Assim para cada pulso de clock o tick do
+FreeRTOS é incrementado de uma unidade }, especificada através das variáveis
+$\mathit{tickCount}$ e $\mathit{tickMissed}$ que armazenam respectivamente a
+quantidade de ticks decorrido quando o escalonador estar em execução e quando ele
+estar suspenso, e estado do escalonador (sessão \ref{subsec:kcontrol}), definido
+através do conjunto $\mathit{SCHEDULER\_STATE}$ e pela variável
+$\mathit{scheduler}$, que representam os possíveis estados de um escalonador e o
+seu atual estado, respectivamente.
+
+Como visto inicialmente, existem várias funcionalidades que compoem o grupo
+funcionalidades de tarefa. Devido a isso nos iremos demonstrar apenas as
+principais operações de cada conjunto, ficando ao critério do leitor,
+verificar na especificação disponível em \cite{freertosb} a implementação das
+demais funcionalidades.
+
+\subsubsection*{Criação de tarefa} 
+A principal operação do conjunto de
+funcionalidades criação de tarefa é a $\mathit{xTaskCreate}$ (sesssão
+\ref{subsec:tcreation}), a qual tem sua especificação demonstrada na figura. Nela
+são declarados vários parâmetros de função que serão utilizados apenas em futuros
+refinamentos. O seu funcionamento resulme-se na criação ou não de uma tarefa.
+Assim, para realizar a criação de uma tarefa ela utiliza-se da função básica
+$\mathit{Create}$ ( comentada acima) e em seguida retorna a constante
+$\mathbf{pdPASS}$ informando que a tarefa foi criada com sucesso. E para caso da
+tarefa não ser criada, ela retorna as constantes $\mathbf{TASK\_NULL}$ e
+$\mathbf{errCOULD\_NOT\_ALLOCATE\_REQUIRED\_MEMORY}$, que representam
+respectivamente uma tarefa nula e o erro de não possuir memória suficiente para a
+criação da tarefa.
+
+\begin{figure}[!h]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{result}, \mathit{handle} \longleftarrow \mathit{xTaskCreate}
+										(\mathit{pvTaskCode},\mathit{pcName},\\
+\quad\quad \quad\quad \quad\quad \quad\quad\quad\quad\quad\quad\quad\quad
+			\mathit{usStackDepth},\mathit{pvParameters}, \mathit{uxPriority}) = \\
+\mathbf{PRE}\\ 
+\quad \mathit{pvTaskCode} \in \mathit{TASK\_CODE} \land \\ 
+\quad \mathit{pcName} \in \mathit{NAME} \land \\ 
+\quad \mathit{usStackDepth} \in \mathit{NATURAL} \land \\  
+\quad \mathit{pvParameters} \subset \mathit{PARAMETER} \land \\ 
+\quad \mathit{uxPriority} \in \mathit{PRIORITY} \land \\
+\mathbf{THEN} \\
+\quad \mathbf{CHOICE}\\ 
+\quad \quad \mathit{handle} \leftarrow \mathit{Create} (\mathit{uxPriority})
+				\parallel\\ 
+\quad \quad \mathit{result} := \mathbf{pdPASS}\\
+\quad	\mathbf{OR} \\
+\quad \quad
+\mathit{result}:=\mathbf{errCOULD\_NOT\_ALLOCATE\_REQUIRED\_MEMORY} \parallel \\ 
+\quad \quad 
+\mathit{handle} := \mathbf{TASK\_NULL} \\
+\quad \mathbf{END};\\
+\end{array}
+\end{array}
+$$
+
+\end{small}
+\caption{Modelagem da operação $\mathit{xTaskCreate}$}
+\label{fig:xTaskCreate}
+\end{figure}
+
+\subsubsection*{Controle de tarefa} 
+
+No grupo controle de tarefa, a operação escolhida foi $\mathit{vTaskDelay}$,
+demonstrada na figura \ref{fig:vTaskDelay}. Para especificar o seu comportamento
+foi necessário a primeiramente criar-se a função $\mathit{TICK\_INCREMENT}$,
+usada para fazer uma soma entre dois tipos $\mathit{TICK}$. Assim para que a
+operação coloque a tarefa em execução no estado bloqueado durante uma determinada
+quantidade de tempo ela primeiramente soma a variável $\mathit{tickCount}$ com o
+quantidade de tempo desejado e, em seguida, utiliza-se da operção básica
+\textit{Delay}, que coloca uma tarefa no estado bloqueado até o \textit{tick}
+informado. Outro fator importante na especificação dessa funcionalidade é que
+como pré-condição aparece a restrição $\mathit{INCLUDE\_vTaskDelay} = 1$, a qual
+informa que o parâmetro de configuração $\mathit{INCLUDE\_vTaskDelay}$ deve estar
+preenchido com o valor um para que a operação seja realizada.
+
+
+\begin{figure}[!h]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\mathit{vTaskDelay}(\mathit{xTicksToDelay})=\\
+	\mathbf{PRE}\\
+\quad    	\mathit{xTicksToDelay} \in \mathit{TICK} \land \\ 
+\quad    	\mathit{INCLUDE\_vTaskDelay} = 1 \land \\
+\quad    	\mathbf{not}(\mathit{TICK\_INCREMENT}(\mathit{tickCount},
+			\mathit{xTicksToDelay})=0)\\ 
+\mathbf{THEN}\\
+\quad    \mathit{DelayTask} (\mathit{TICK\_INCREMENT} (\mathit{tickCount},
+													\mathit{xTicksToDelay}))\\ 
+\mathbf{END};
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Modelagem da operação $\mathit{vTaskDelay}$}
+\label{fig:vTaskDelay}
+\end{figure}
+
+\subsubsection*{Utilidades de tarefa} Na parte de utilidade de tarefa, as
+operações são bastante simples, pois elas apenas retornam informações importantes
+para o usuário sem fazer a alteração de qualquer estado da máquina. A operação
+escolhida para esse grupo foi $\mathit{xTaskGetCurrentTaskHandle}$, cuja sua
+especificação completa é exibida na figura \ref{fig:xTaskGetCurrentTaskHandle}.
+Nela a pré-condição $\mathit{INCLUDE\_xTaskGetCurrentTaskHandle} = 1$ exige que
+para que a sua utilização, o parâmetro de configuração
+$\mathit{INCLUDE\_xTaskGetCurrentTaskHandle}$ deve estar preenchido com o valor
+um e o seu funcionamento trata-se apenas da chamada à operação básica
+$\mathit{GetCurrent}$.
+
+
+\begin{figure}[!h]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\mathit{cTask} \longleftarrow \mathit{xTaskGetCurrentTaskHandle}= \\
+	\mathbf{PRE}\\
+\quad    	\mathit{INCLUDE\_xTaskGetCurrentTaskHandle} = 1\\
+	\mathbf{THEN}\\
+\quad    	\mathit{cTask} \gets \mathit{GetCurrent}\\
+
+ 
+\mathbf{END};
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Modelagem da operação $\mathit{xTaskGetCurrentTaskHandle}$}
+\label{fig:xTaskGetCurrentTaskHandle}
+\end{figure}
+
+
+\subsubsection*{Controle do kernel} Na parte de controle do kernel, existem
+várias operações importantes, entre elas está a $\mathit{vTaskStartSchedule}$ que
+é especificada como demonstra a figura \ref{fig:vTaskStartSchedule}. Ela inicia
+ou não as atividades do escalonador. Para iniciar as atividades do escalonador,
+primieramente deve-se criar a \textit{idle task}, o que é feito pela função
+$\mathit{StartScheduler}$, e em seguida deve-se colocar o estado do escalonador
+para iniciado, o que é feito na declaração
+$\mathit{scheduler}:=\mathbf{taskSCHEDULER\_RUNNING}$. Entretanto, antes de
+utilizar-se essa funcionalidade deve garantir que o escalonador está no estado
+não está em execução e que os conjuntos referentes as listas de tarefas estão
+vazios ou possuem somente a tarefa nula, no caso de $\mathit{tasks}$ e
+$\mathit{running}$.
+
+\begin{figure}[!h]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\mathit{vTaskStartScheduler} =\\ 
+\mathbf{PRE}\\
+\quad \mathit{scheduler} = \mathit{taskSCHEDULER\_NOT\_STARTED} \land \\
+\quad \mathit{running} = \mathbf{TASK\_NULL} \land \\
+\quad \mathit{blocked} = \emptyset \land \\ 
+\quad \mathit{suspended} = \emptyset \land \\ 
+\quad \mathit{ready} = \emptyset\\  	
+\mathbf{THEN}\\
+\quad \mathbf{CHOICE}\\
+\quad\quad \mathit{StartScheduler} \parallel\\
+\quad\quad \mathit{scheduler}:=\mathbf{taskSCHEDULER\_RUNNING}\\
+\quad \mathbf{OR}\\
+ \quad\quad \mathit{skip}\\
+\quad \mathbf{END}\\
+\mathbf{END};
+ 
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Modelagem da operação $\mathit{vTaskStartSchedule}$}
+\label{fig:vTaskStartSchedule}
+\end{figure}
+
+\subsubsection{Funcionalidades das filas de mensagens}
+Para especificar as funcionalidades das fila de mensagem, que são as operações do
+grupo gerênciamento de fila (sessão \ref{subsec:fmanagemente}), forma criadas
+três máquinas ($\mathbf{QUEUE\_CORE}$, $\mathbf{QUEUE\_BASIC}$ e
+$\mathbf{QUEUE}$ ). Na primeira máquina são especificados o conceito de tarefa e algumas
+funcionalidades básica necessárias na modelagem da operação da API de
+gerênciamento de fila. A segunda máquina trata de um aprimoramento, onde os
+comportamentos repetitivos a maioria das funcionalidades do grupo são são
+especificados em duas operações, assim as operações dessa máquina pode ser vista
+como uma façada\footnote{Padrão de projeto que \ldots} que une as operações
+básicas da máquina anterior em duas operações mais complexa que serão usadas na
+especificação das funcionalidades. Por último, na máquina $\mathbf{QUEUE}$ é onde
+são especificadas as funcionalidades em si.
+
+\subsubsection*{QUEUE\_CORE}
+A máquina $\mathbf{QUEUE\_CORE}$ é formada pelas as seguintes operações:
+\begin{itemize}
+  \item {\textbf{xQueueCreate} - Cria uma nova fila de mensagem retornando uma
+  referência para a mesma. Se a fila não poder ser criada uma constante de
+  tarefa nula $\mathbf{QUEUE\_NULL}$} é retornada no lugar da fila criada.
+  \item {\textbf{sendItem} - Adiciona um novo item a uma fila e retira da fila 
+  retirando da mesma uma tarefa que está na lista de espera pela chegada de um 
+  item }
+  \item {\textbf{receivedItem} - Remove, ou não um item de uma fila. Caso o
+  item seja removido, a função retorna uma referencia para o item em
+  questão, remove o item da fila e caso exista, retira uma tarefa do conjunto
+  de tarefas que estão esperando por um lugar na fila }
+  \item {\textbf{insertTaskWaitingToSend} - Insere uma tarefa no conjunto de
+  tarefas que estão aguardando por um lugar na fila para enviar um item}
+  \item {\textbf{insertTaskWaitingToRecived} - Insere uma tarefa no conjunto de
+  tarefas que estão esperando pela chegada de um item na fila }
+  \item {\textbf{removeFromEventListQueue} - Remove uma tarefa de todas as
+  listas de eventos de todas as filas gerenciadas pelo FreeRTOS}
+\end{itemize} 
+\subsubsection*{$\mathbf{QUEUE\_BASIC}$}
+Como dito anteriormenta, a máquina $\mathbf{QUEUE\_BASIC}$ é formada por duas
+operações, $\mathit{xQueueGenericSend}$ e $\mathit{xQueueGenericReceive}$.
+Essas possuem o funcionamento bastante parecido no qual é alterado apenas o
+contexto de utilização das duas. Enquanto a primeira serve para enviar um intem
+para uma fila, a segunda serve para retirar. Assim, a principal diferença entre
+as operações é o uso das funções básicas $\mathit{SendItem}$, presente na
+primeira operação e $\mathit{ReciveItem}$ presente na segunda operação. Com
+isso, iremos demonstrar as especificação da operação
+$\mathit{xQueueGenericSend}$.
+
+A operação $\mathit{xQueueGenericSend}$ possui três opções de comportamento:
+Enviar um item para uma fila de mensagem e caso exista, debloquear uma tarefa
+no conjunto de tarefas que esperam pera chegado de um item na fila; bloquear a
+tarefa atual, colocando-na na lista de tarefas que aguardam para enviar um item
+para a fila; e retornar o erro de que a operação não pode ser realizada com
+sucesso.
+
+O primeiro comportamento, enviar um item para a fila de mensagem e desbloquear
+uma tarefa da fila de eventos, é modelado como demonstra a figura
+\ref{fig:xQueueGenericSend-1}. Nela primeiro pega-se uma tarefa contida no
+conjunto $\mathit{queue\_receiving}$ da fila em questão. Em seguida, o item e a
+tarefa escolhida são enviados para a operação $\mathit{sendItem}$ para que o item
+possam ser enviados e a tarefa possa ser retirada do conjunto
+$\mathit{queue\_receiving}$. Por ultimo, a tarefa é desbloquead com a chamada ao
+método $\mathit{Unblock}$ (sessão \ref{subsubsec:tutilities}).
+
+
+\begin{figure}[!h]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\ldots\\
+\mathbf{ANY}\\
+\quad  \mathit{task}\\
+\mathbf{WHERE} \\
+\quad  \mathit{task}\in \mathit{TASK} \land \\ 
+\quad  \mathit{task}\in\mathit{blocked} \land \\ 
+\quad  \mathit{task} \in \mathit{queue\_receiving}(\mathit{pxQueue})\\ 		
+\mathbf{THEN}\\
+\quad \mathit{sendItem}(\mathit{pxQueue},
+		\mathit{pvItemToQueue},\mathit{task},\mathit{copy\_position}) \parallel\\ 
+\quad\mathit{Unblock}(\mathit{task})\parallel\\
+\quad\mathit{return}:=\mathit{pdPASS}\\
+\mathbf{END}\\
+\ldots
+ 
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Modelagem da operação $\mathit{xQueueGenericSend}$}
+\label{fig:xQueueGenericSend-1}
+\end{figure}
+
+
+Os comportamentos de bloquear a tarefa atual e retorno de erro são especificado
+de acordo com a figura \ref{fig:xQueueGenericSend-2}. Através dela pode-se ver
+que para bloquear a tarefa utual é feita apenas a chamada ao método
+$\mathit{DelayTask}$. E para informar que a operação não foi realizada com
+sucesso a operação apenas retorna a constante $\mathbf{errQUEUE\_FULL}$,
+indicando um erro de fila cheia
+
+ 
+\begin{figure}[!h]
+\begin{small}
+
+
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\ldots\\
+\mathit{insertTaskWaitingToSend}(\mathit{pxQueue},\mathit{running})\parallel\\ 
+\mathit{DelayTask}(\mathit{xTicksToWait})\parallel\\
+\mathit{return}:=\mathbf{pdTRUE}\\
+\ldots\\
+\mathit{return}:=\mathbf{errQUEUE\_FULL}\\	
+\ldots\\
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Continuação da modelagem da operação $\mathit{xQueueGenericSend}$}
+\label{fig:xQueueGenericSend-2}
+\end{figure}
+
+
+
+	
 \section{Considerações finais}
 \label{sec:consideracoes} 
 [Falar sobre as dificuldades encontradas na modelagem, como também a
