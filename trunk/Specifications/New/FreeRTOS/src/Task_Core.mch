@@ -74,8 +74,7 @@ INVARIANT
 	blocked : FIN(TASK) &
 	blocked <: tasks &
 	
-	ready : FIN(TASKNesse módulo foi especificado o conceito de tarefa, principalmente a característica de estados.
-	Assim a maior) &
+	ready : FIN(TASK) &
 	ready <: tasks &
 	
 	suspended : FIN(TASK) &
