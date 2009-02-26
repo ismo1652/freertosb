@@ -121,38 +121,52 @@ FreeRTOS.
 \label{sec:intr}
 
 
-Sistemas de tempo real (STR) são sistemas que tem como principal característica
+Sistemas de Tempo Real (STR) são sistemas que tem como principal característica
 um rigoroso tempo de resposta aos eventos externos. Devido a isso, eles são bastante
-utilizados, pela industria, em aplicações críticas que possuem o tempo de respota
-como um fator crucial. O monitoramento de paciente em hospitais, o controle de
-processo industriais e o controle de veículos são apenas alguns exemplos da
-aplicação dos sistemas de tempo real.
+utilizados, pelas industrias, em aplicações críticas que possuem o tempo de
+respota como um fator crucial. O monitoramento de paciente em hospitais, o controle de
+processos industriais e o controle de veículos (aeronaves, trens e automóveis)
+são apenas alguns exemplos de aplicações dos sistemas de tempo real.
 
-Em razão dessa grante importância dos STR, foi propostor em \cite{jim:sbmf},
-por Jim, o desafio de especificar formalmente um sistema de tempo real
-denominado FreeRTOS, proporcionando ao mesmo a segurança, confiabilidade e
-fidelidade que uma especificação formal proporciona.
+Em razão dessa  grante importância e utilização dos STR, foi proposto, por Jim,
+em \cite{jim:sbmf}, como um dos grandes desafios da ciência da computação, a
+especificação formal de um sistema operacional de tempo real, denominado
+FreeRTOS. Para assim, proporcionar ao mesmo a segurança, confiabilidade e
+coerência que uma especificação formal oferece, tornando-no mais fidedigno
 
-O FreeRTOS trata-se de um sistema de tempo real de código fonte pequeno,
-aproximadamente 2.242 linhas de código, e aberto. Além disso, ele é portável, 
-oficialmente, para cerca de 17 arquiteturas diferentes (8051, PIC, ARM, etc) e
-tem como principais características a sua acessabilidade, eficiência e
-portabilidade \cite{freertos}.
+O FreeRTOS é um sistema operacional de tempo real bastanten simple. Aprova disso
+está em seu código fonte, que é aberto e composto aproximadamente 2.242 linhas de
+código, número bastante pequeno para um sistema operacional. Além disso, ele é
+capaz de trabalhar em ambientes com quantidade de recursos limitada, como os
+microprocessadore, sendo, oficialmente\footnote{Existem também portas do FreeRTOS
+não oficias, disponibilizada pelos usuários, para várias outras arquiteturas
+diferentes}, portável para 17 arquiteturas de microprocessadores diferentes,
+entre ela as \textit{PIC}, \textit{ARM}, \textit{Zilog 80} e \textit{Cygnal
+8051}, arquiteturas bastante usada pelas industrias de microeletrónica
+\cite{freertos}.
 
 Seguindo esse contexto, o presente relatório tem como principal objetivo
-descrever uma modelagem inicial, feita em B, do STR FreeRTOS e, com isso,
-resolver parte do desafio proposto pelo Jim. Entretanto, por trata-se de uma
-especificação inicial, alguns conceitos do sistema de tempo real foram brevemente
-excluidos da modelagem, sendo os mesmo especificados em futuros refinamento.
-Assim, primordialmente foram especificados, em um alto nível de abstração,
-somente os conceitos e funcionalidades de tarefas e filas de mensagens, dando
-ênfase principalemente à caracteristica de estado de um tarefa e suas trocas.
+descrever uma modelagem inicial em B, do STR FreeRTOS e, com isso, iniciar a
+resolução do desafio proposto pelo Jim. Entretanto, por trata-se de uma
+especificação inicial, alguns conceitos desse sistema de tempo real foram
+brevemente abstraídos da modelagem, sendo que os mesmo serão tratados em futuros
+refinamento. 
+%Assim, primordialmente foram especificados, em um alto nível de
+%abstração, somente os conceitos e funcionalidades de tarefas e filas de
+%mensagens, dando ênfase principalemente à caracteristica de estado de um
+%tarefa e suas trocas.
 
 Para cumprir o seu objetivo, esse relatório foi divido da seguinte forma:
-Primeiramente tem-se uma introdução ao FreeRTOS, demonstrado os seus principais
-conceitos e características; em seguinda, é apresentado o plano de modelagem
-que foi seguido, na qual estão as funcionalidades das API que foram
-especificadas nessa modelagem inicial;..
+primeiramente tem-se uma introdução ao FreeRTOS, demonstrado as suas principais
+características e conceitos fundamentais; em seguinda, é apresentado o plano de
+modelagem seguido na realização da especificação, nele estão presente, junto com
+suas descrições, as funcionalidades e os conceitos das API escolhidos para serem
+desenvolvidos nessa modelagem inicial; após isso, na sessão \ref{sec:Modelling},
+é demonstrado como foi feita a modelagem do FreeRTOS, suas máquinas com seus
+estados e operações; e para encerrar, tem-se as considerações finais, onde
+estão as conclusões do trabalho, e os trabalhos futuros, falando como será
+feita a continuação desta modelagem.
+
 
 
 
@@ -172,44 +186,48 @@ especificadas nessa modelagem inicial;..
  
 O \textit{FreeRTOS} é um sistemas de tempo real projetado para ser pequeno,
 simples e fácil de usar. O seu código fonte é aberto e possui aproximadamente
-2.242 linhas de código, que estão basicamente distribuidas em três arquivos C,
-nas quais é implementado o seu núcleo duro. Além disso, outra característica
-importante desse STR é a sua portabilidade, sendo oficialmente portável para 17
-arquiteturas diferentes, entre elas a PIC, ARM, Zilog Z80 e PC, bastantes usadas
-pela industria eletrônica.
+2.242 linhas de código, que estão basicamente distribuidas em três arquivos
+(task.c, queue.c e list.c), nos quais são implementados seus principais conceitos
+e funcionalidades. Além disso, outra característica importante desse STR é a sua
+portabilidade, sendo oficialmente portável para 17 arquiteturas diferentes, entre
+elas a PIC, ARM, Zilog Z80 e PC, bastantes usadas pelas industrias de
+microeletrônica.
 
-O \textit{kernel} do \textit{FreeRTOS}, além de ser multiprocesso, suporta três
-tipo diferentes de configuração: preemptivo, cooperativo e híbrido. No tipo
-preemptivo, a processo em execução pode ser enterrompido a qualquer momento pelo
-escalonador, sendo em seguida substituido por outro processo. Direfente do
-preemptivo, no tipo cooperativo, o processo em execução é quem descide o momento
-de sua pausa, seguida sua substituição. E, no tipo híbrido, o escalonador
-funciona hora como preemptivo e hora como cooperativo.
+O seu \textit{kernel}, além de ser multiprocesso, suporta três tipo diferentes de
+configurações: preemptivo, cooperativo e híbrido. No tipo preemptivo, a processo
+em execução pode ser enterrompido a qualquer momento pelo escalonador, sendo em
+seguida substituido por outro processo. Diferentimente, no tipo cooperativo, o
+processo em execução é quem descide o momento de sua pausa, seguida da sua
+substituição. E por fim, no tipo híbrido, o escalonador funciona hora como
+preemptivo e hora como cooperativo.
 
-Outros conceitos importantes implementado pelo FreeRTOS e presente na maioria
-dos sistemas de tempo real são os de tarefa, co-rotina, fila de mensagem,
-semáforo e mutex. Eles basicamente formam todo o núcleo do FreeRTOS e devido a
-sua grande importância, serão detalhados a seguir
+Os conceitos fundamentais implementado pelo FreeRTOS e presente na maioria dos
+sistemas de tempo real são tarefa, co-rotina, fila de mensagem, semáforo e mutex.
+Eles junto com suas funcionalidades formam todo o núcleo do FreeRTOS, restanto
+para o usuário apenas a utilização dos mesmo para a criação de novos sistemas. A
+seguir, detalharemos as características e utilização de cada um desses conceitos.
 
 \subsection{Tarefa}
 \label{subsec:tarefa}
-Tarefas, similires a processo, são unidades de trabalho independentes que compoem
-um sistema multitarefas. No FreeRTOS, elas são implementadas através de um pilha
-que serve para armazenar o contexto de execução no momento que a tarefa é
-interrompida, uma prioridade que indica a sua importância para o sistema, um
-estado que desmonstra a atual situação da tarefa e uma função que é executado
-quando a tarefa assume o controle do processado \cite{Li:2003}. 
+Tarefas são unidades de trabalho independentes que compoem um sistema
+multitarefas. No FreeRTOS, uma tarefa é composta por: um pilha de contexto, que
+serve para armazenar o contexto de execução (estados dos registradores)  no
+momento que uma tarefa é interrompida; uma prioridade que serve para indicar a
+sua importância da tarefa para o sistema; um estado que desmonstra a atual
+situação da tarefa; e uma função que é executado quando a tarefa assume o
+controle do processado \cite{Li:2003}.
 
-Os estados que uma tarefa pode assumir no FreeRTOS são: executando, pronta,
-bloqueada e suspensa. O estado ``executando'' informa que a tarefa está em
+Os estados que uma tarefa pode assumir no FreeRTOS são: executando, pronto,
+bloqueado e suspenso. O estado ``executando'' informa que a tarefa está em
 execução, ou sejá, possui, atualmente, o controle do processador. Somente uma
-tarefa pode possuir o estado executando no FreeRTOS. O estado ``pronta'' informa
-que a tarefa está pronta para entrar, aguardando assumir o controle do
-processador. No estado bloqueada á tarefa encontra-se bloqueada a espera de algum
-evento necessáio para continuar a sua execução. E no estado ``suspensa'', a
-tarefa foi suspensa pelo escalonador através da chamada ao método vTaskSuspend(),
-disponível na API do FreeRTOS. O gráfico completo de transição de estado das
-tarefas do FreeRTOS pode ser visto na figura \ref{fig:tkstates}.
+tarefa pode possuir o estado executando no FreeRTOS. O estado ``pronto'' informa
+que a tarefa está pronta para entrar em execução, aguardando apenas assumir o
+controle do processador. No estado ``bloqueado'' a tarefa encontra-se bloqueada a
+espera de algum evento necessário para continuar a sua execução. E por último, no
+estado ``suspenso'', a tarefa foi suspensa pelo escalonador através da chamada ao
+método vTaskSuspend(), disponível na API do FreeRTOS. O gráfico completo de
+transição de estados que uma tarefa pode sofre é demonstrado na figura
+\ref{fig:tkstates}.
 
 \begin{figure}[H]
 \centering
@@ -218,15 +236,20 @@ tarefas do FreeRTOS pode ser visto na figura \ref{fig:tkstates}.
 \label{fig:tkstates}
 \end{figure}
 
-A prioridade de uma tarefa pode váriar de 0 a uma constante de prioridade máxima,
-indicada pelo o usuário. No FreeRTOS, as prioridades são usadas principalmente na
-política de escalonamento entre tarefas, a qual garante que as tarefas de maior
-prioridade no estado pronta ou executando, tem preferência sobre as tarefas de
-menor prioridade. Assim, a tarefa em execução deve ter prioridade maior ou igual
-as tarefas no estado pronto. Um exemplo de como funciona o escalonador do
-FreeRTOS para as tarefas pode ser visto na figura \ref{fig:scheduler}, na qual as
-tarefas de menores prioridades são sempre interrumpdas por tarefas de maiores
-prioridades quando essas assumem o estado de pronta.
+A prioridade de uma tarefa pode váriar de 0 até uma constante de prioridade
+máxima, definida pelo o usuário. No FreeRTOS, as prioridades servem para indicar
+a importância de uma tarefa para o sistema. Elas são usadas principalmente pela
+política de escalonamento entre tarefas. Nessa política, as tarefas de maior
+prioridade, tem preferência sobre as tarefas de menor prioridade do mesmo estado.
+Assim, para escolher a tarefa que irá entrar em execução, o escalonador percorre
+a lista de tarefas com o estado ``pronto'' selecionando aquela de maior
+prioridade. Um exemplo do  funcionamento do escalonador pode ser visto na na
+figura \ref{fig:scheduler}, na qual as tarefas de menores prioridades são
+interrompidas por tarefas de maiores prioridades quando estas assumem o estado
+``pronto''. Outro fator importante no funcionamento de escalonador que vale
+apena resalta, é que tarefas de mesma prioridade dividem o tempo de execução
+entre si. Com isso, se houver duas tarefas prontas e com a prioridade máxima,
+elas irão dividir o tempo de processamento em frações iguais.
 
 
 \begin{figure}[H]
@@ -249,101 +272,96 @@ prioridades quando essas assumem o estado de pronta.
 As co-rotinas são similares às tarefas, também possuem prioridade, estados e uma
 função que é executado no momento em que a co-rotina assume o controle do
 escalonador. Entranto, existem algumas diferenças importantes entre tarefas e
-co-rotinas. Uma delas é a pilha de contexto. Co-rotinas não possuem pilha de
-contexto e, conseguentemente, não possuem contexto próprio, ou seja, os valores
-armazenados nos registradores por uma co-rotinas, não são guardados no momento em
-que ela interrompe a sua execução. Assim uma co-rotina pode armazenar o valor
-três em um registrador antes de ser interrompida e quando retorna sua execução o
-valor dessa variável pode ou não ser o mesmo, pois outra co-rotina ao entrar em
-execução pode ter alterado o valor do registrado.
+co-rotinas, sendo a principal, a ausência da pilha de contexto. Co-rotinas não
+possuem pilha de contexto e, conseguentemente, não possuem contexto próprio, ou
+seja, os valores armazenados nos registradores por uma co-rotinas, não são
+guardados no momento em que ela interrompe a sua execução. Assim, uma co-rotina
+pode armazenar o valor três em um registrador, antes de interrompe-se, e, quando
+ela retorna a sua execução, o valor dessa variável pode ou não ser o mesmo, pois
+pode ter entrado em execução e alterado o valor do registrado.
 
-Outra diferença entre co-rotinas e tarefas está na quantidade de estado. As
-co-rotinas só possuem os estado ``executando'', ``pronto'' e ``bloqueada''
-diferente das tarefas, que possuem além dos três o ``suspensa''.
-Conseguentemente o gráfico de transição de estados de uma co-rotina também é
-diferente do gráfico de tarefas, sendo esse demonstrado na figura
+Outra diferença importante entre co-rotinas e tarefas está na quantidade de
+estado. As co-rotinas só possuem os estado ``executando'', ``pronto'' e
+``bloqueada'' diferente que, além dos três, possuem o estado ``suspenso''.
+Conseguentemente, o gráfico de transição de estados de uma co-rotina também é
+diferente do gráfico de tarefas, sendo esse demonstrado pela figura
 \ref{fig:cstates}
 
-As co-rotinas são gerenciada pelo FreeRTOS de forma coopertiva, ou seja, elas
-descidem o momento de interrupção da sua execução. Assim, resta apenas ao
-escalonador a tarefa de descidir qual co-rotina deve assumir o processador no
-momento que a co-rotina em execução interrompi-se. A política para essa
-escolha, assim como ocorre com as tarefas, é baseada na prioridade, sendo que a
-co-rotina pronta para entrar em execução de maior prioridade tem preferência
-sobre as demais de menores prioridade.
+As co-rotinas também possuem um gerenciamento diferente do de tarefas. Elas são
+escalonadas de forma coopertiva, ou seja, elas são quem descidem o momento da sua
+interrupção. Assim, resta apenas ao escalonador a tarefa de descidir qual
+co-rotina deve assumir o processador no momento em que a co-rotina em execução
+interrompe-se, sendo que a política usada para essa escolha é a mesma usadas
+pelas tarefas.
 
-%momento e que ocorre um troca de co-rotina. Devido a isso, deve-se tomar
-%cuidados especiais no uso das co-rotinas, pois valores armazenados na memória
-%por uma co-rótina podem ser alterados por outras no momento em que a primeira
-%interrompe a sua execução.
 
 \subsection{Fila de Mensagens}
 \label{subsec:fmensagem}
 Filas de mensagens são estruturas primitivas de comunicação entre tarefas. Elas
-funcionam como um túnel no qual tarefas enviam e recebem mensagem do mesmo. No
-FreeRTOS, as filas de mensagem possuem tamanho fixo defino pelo tamanho do ítem
-(mensagem) que ela pode receber e pela quantidade de ítens que podem ser
-armazenados. Assim, para uma tarefa enviar uma mensagem para uma fila,
-primeiramente a fila não pode estar cheia, caso contrário, a tarefa é bloqueada
-aguardando que sejá liberado um lugar na fila. O mesmo caso ocorre com quando uma
-tarefa tenta receber uma mensagem de uma fila, so que aqui a fila deve possuir
-pelo menos um item, para que esse seja lido, e, caso contrário, a tarefa é
-bloqueda aguardando a chegada de uma mensagem na fila.
+funcionam como um túnel no qual tarefas enviam e recebem mensagem. No FreeRTOS,
+as filas de mensagens possuem tamanho fixo defino pelo tamanho e quantidade de
+ítens (mensagem) que ela pode armazenados. Para uma tarefa enviar uma mensagem
+para uma fila, primeiramente a fila não pode estar cheia, caso contrário, a
+tarefa é bloqueada até que seja liberado um lugar na fila. O mesmo 
+ocorre quando uma tarefa tenta receber uma mensagem de uma fila, só que,
+nesse caso, a fila deve possuir pelo menos um item, para que esse seja lido,
+caso contrário, a tarefa é bloqueda até a chegada de um item na fila de
+mensagens.
 
-O FreeRTOS permite especificar o tempo máximo que uma tarefa pode ficar bloqueada
-esperado que ocorrar um evento(liberação de espaço ou chega de mensagem) em uma
-fila. E em casos de existerem mais de uma tarefa bloqueadas aguardando por uma
-fila, as tarefas de maior prioridade têm preferência sobre as de menor.
+No FreeRTOS, é possível definir o tempo máximo que uma tarefa pode ficar
+bloqueada esperado por um evento(liberação de espaço ou chega de mensagem) em
+uma fila. E no casos em que existerem mais de uma tarefa bloqueadas aguardando
+por um evento de uma fila, as tarefas de maior prioridade têm preferência sobre
+as demais.
 
 \subsection{Semâforos}
-Semâforos são mecanismo usados na sicronização entre tarefas. Ele funciona como
-uma chave que libera o uso de uma determinado recurso por uma tarefa. Assim
-quando uma tarefa deseja acessar um recurso comportilhado ela primeiramente deve
-tentar pegar o semâforo do recurso, caso ele está liberado, a tarefa tem a
-utilizar o recurso e, em seguida, libera o semâforo, caso contrário, a tarefa é
-bloqueada até que o semâforo sejá liberado.
+Semâforos são mecanismo usados na sicronização entre tarefas. Eles funcionam como
+uma chave que libera, ou não, o uso de um determinado recurso. Assim quando uma
+tarefa deseja acessar um recurso comportilhado, ela primeiramente deve solicitar
+o semâforo do recurso, caso esteja liberado, a tarefa tem a permição de utilizar
+o recurso e, em seguida, libera o semáforo, caso contrário, a tarefa é
+bloqueada até que o semáforo sejá liberado.
 
-No FreeRTOS os semâforo funcionam como uma fila de um único item. Assim, quando
-a fila estiver vazia indica que o semâforo está sendo usado e quando a fila
-estiver cheia indica que o semâforo está liberado. Desse modo, as tarefas que
-utilizam o semâforo não estão preocupadas com o conteúdo do item da fila, mas
-apenas com o estado da fila, se ela está cheia ou vazia.
+No FreeRTOS os semâforo funcionam como uma fila de mensagens com um único item.
+Assim, quando a fila estiver vazia, indica que o semáforo está sendo usado e,
+quando a fila estiver cheia, indica que o semâforo está liberado. Desse modo, as
+tarefas que utilizam essa fila não estão preocupadas com o conteúdo
+do item, mas apenas com o estado da fila, se ela está cheia ou vazia.
 
 
 \subsection{Mutex}
-Mutex são parecidos com o semâforo. A única diferênça entre os dois é que o mutex
-implementa o mecanismo de herança de prioridade, que impede que uma tarefa de
-maior prioridade fique bloqueada a espera de um semâforo ocupado por uma de menor
-prioridade que devido a sua baixa prioridade está aguardando para entrar em
-execução.
+Mutex são parecidos com o semáforo. A única diferênça entre os dois é que o mutex
+implementa o mecanismo de herança de prioridade, o qual impede que uma tarefa de
+maior prioridade fique bloqueada a espera de um semáforo ocupado por uma tarefa
+de menor prioridade, causando o que chamamos de inversão de prioridade.
 
-Para evitar esse problema, o mecanismo de inversão de prioridade, ao perceber
-que uma tarefa solicita o semâforo, verifica se a tarefa solicitante possui
-prioridade maior que a tarefa com o semâforo. Caso afirmativo, a tarefa que
+Para evitar esse problema, o mecanismo de herança de prioridade, ao perceber
+que uma tarefa solicita o semáforo, verifica se a tarefa solicitante possui
+prioridade maior que a tarefa com o semáforo. Caso afirmativo, a tarefa que
 retém o semâforo tem mometaneamente sua prioridade elevada, para que assim ela
-possar realizar a sua função sem interrupções e, conseguentemente, liberar
-rapidamente o semâforo.
+possar realizar a suas funções sem interrupções e, conseguentemente, liberar
+rapidamente o semáforo.
 
 \section{Projeto da Modelagem}
 \label{sec:project}
 
-Como demonstrado na sessão \ref{sec:freertos}, o FreeRTOS possui uma enorme
-quantidade de conceitos e funcionalidades. Devido a isso, antes de iniciar-se a
-sua especificação foi criado em \cite{sroute} um projeto de modelagem, no qual
-alguns do principais conceitos e funcionalidades do FreeRTOS foram escolhidos
-para serem modelados inicialmente, para o mesmo deu-se o nome de \textit{sheet
-route}. Nesse projeto também foram incluidos alguns parâmentros utilizados pela
-as funcionalidades da API. A lista de todos os parâmetros utilizados será
-mostrada em seguida, junto com a lista das funcionalidades.
+Como demonstrado na sessão anterior, o FreeRTOS possui uma grande quantidade de
+conceitos fundamentais. Devido a isso, antes de iniciar-se a sua especificação
+foi criado em \cite{sroute} um projeto de modelagem, no qual alguns dos
+principais conceitos fundamentais, junto com suas funcionalidades foram
+escolhidos para serem modelados inicialmente. Assim, o projeto de modelagem
+funcionou como um roteiro para a especificação, dizendo como o por onde começar a
+modelagem do FreeRTOS.
 
-Assim, devido a sua grande importância, os conceito inicialmente escolhidos pelo
-\textit{sheet route} foram: tarefa (sessão \ref{subsec:tarefa}) e fila de
-mensagem (sessão \ref{subsec:fmensagem}). E as funcionalidades da API que
-utilizam esses conceitos especificadas, para o melhor entendimento e
-gerenciamento, foram divididas em cinco conjuntos: criação de tarefa; controle
-de tarefa; controle do kernel; utilidades de tarefas e gerenciamento de fila. Em
-seguida, tem-se o detalhamento da composição de cada grupo como também uma
-lista com os parâmetros de configuracões especificados. 
+Devido a sua grande importância, os conceito fundamentais escolhidos no projeto
+de modelagem foram, tarefa (sessão \ref{subsec:tarefa}) e fila de mensagem
+(sessão \ref{subsec:fmensagem}), sendo que cada um desses conceito possui uma
+enorme quantidade de funcionalidades. Assim, para o melhor entendimento e
+gerenciamento, essas funcionalidades foram classificadas em cinco conjuntos
+diferentes: criação de tarefa; controle de tarefa; controle do kernel;
+utilidades de tarefas e gerenciamento de fila. A seguir, tem-se em detalhe
+a composição de cada um desses conjuntos grupo como também a descrição de cada
+funcionalidade que os compoem
 
 \subsection{Criação de tarefa}
 \label{subsec:tcreation}

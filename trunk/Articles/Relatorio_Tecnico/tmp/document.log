@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2008.11.3)  14 FEB 2009 17:53
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2008.11.3)  18 FEB 2009 14:28
 entering extended mode
  Source specials enabled.
  %&-line parsing enabled.
@@ -244,47 +244,47 @@ LaTeX Font Info:    Font shape `T1/ptm/bx/it' in size <12> not available
 (Font)              Font shape `T1/ptm/b/it' tried instead on input line 100.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <17.28> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 120.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 141.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 141.
  [1]
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 194.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 210.
 File: tkstate.eps Graphic file (type eps)
  <tkstate.eps> [2]
 File: scheduler.eps Graphic file (type eps)
  <scheduler.eps> [3]
 
-LaTeX Warning: Reference `fig:cstates' on page 4 undefined on input line 265.
+LaTeX Warning: Reference `fig:cstates' on page 4 undefined on input line 288.
 
 [4]
 
-LaTeX Warning: Citation `sroute' on page 5 undefined on input line 332.
+LaTeX Warning: Citation `sroute' on page 5 undefined on input line 350.
 
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 356.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 374.
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 356.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 374.
  [5] [6] [7]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 502.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 502.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 526.
+(Font)              <10.95> on input line 544.
  [8] [9]
 [10]
 
-LaTeX Warning: Citation `freertosb' on page 11 undefined on input line 742.
+LaTeX Warning: Citation `freertosb' on page 11 undefined on input line 760.
 
 
-Underfull \hbox (badness 1048) in paragraph at lines 746--758
+Underfull \hbox (badness 1048) in paragraph at lines 764--776
 \T1/ptm/m/n/12 dos vá-rios pa-râ-me-tros de fun-ção que se-rão uti-li-za-dos ap
 e-nas em fu-tu-ros re-fi-na-men-tos.
  []
 
 [11]
-Underfull \hbox (badness 7362) in paragraph at lines 834--844
+Underfull \hbox (badness 7362) in paragraph at lines 852--862
 \T1/ptm/m/n/12 cuja sua es-pe-ci-fi-ca-ção com-pleta é exi-bida na fi-gura 7[].
  Nela a pré-condição
  []
@@ -310,4 +310,4 @@ Here is how much of TeX's memory you used:
  637 hyphenation exceptions out of 8191
  32i,17n,26p,242b,362s stack positions out of 5000i,500n,6000p,200000b,5000s
 
-Output written on document.dvi (16 pages, 60408 bytes).
+Output written on document.dvi (16 pages, 61860 bytes).
