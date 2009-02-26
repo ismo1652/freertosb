@@ -348,7 +348,7 @@ rapidamente o semáforo.
 Como demonstrado na sessão anterior, o FreeRTOS possui uma grande quantidade de
 conceitos fundamentais. Devido a isso, antes de iniciar-se a sua especificação
 foi criado em \cite{sroute} um projeto de modelagem, no qual alguns dos
-principais conceitos fundamentais, junto com suas funcionalidades foram
+seus principais conceitos fundamentais, junto com suas funcionalidades foram
 escolhidos para serem modelados inicialmente. Assim, o projeto de modelagem
 funcionou como um roteiro para a especificação, dizendo como o por onde começar a
 modelagem do FreeRTOS.
@@ -366,20 +366,23 @@ funcionalidade que os compoem
 \subsection{Criação de tarefa}
 \label{subsec:tcreation}
 
-No grupo de Criação de tarefas, estão presente algumas funcionalidades
-responsáveis pela criação, exclusão e referênciamente de tarefas. Ele é
-composto pelas seguintes operações:
+No conjuto Criação de tarefas, estão presente algumas funcionalidades
+responsáveis pela criação, exclusão e referênciamente de uma tarefa. Ele é
+formado pelas seguintes operações:
 
 \begin{itemize}
-  \item{\textbf{xTaskCreate} - Cria uma nova tarefa que será gerenciada pelo
-  FreeRTOS} retornando uma referência para a mesma. Caso não haja espaço
-  suficiente para a criação da tarefa, uma referência para uma tarefa nula é
-  retornada.
-  \item{\textbf{xTaskDelete} - Remove uma tarefa da lista de tarefas
-  gerenciáveis pelo FreeRTOS. Entranto, a completa remoção da tarefa do
-  sistema, liberação da memória, é feita pela a tarefa de gerênciamento
-  \textit{idle task}, execultado quando o processador encontra-se ocioso}
-  \item {\textbf{xTaskHadle} - Estrutura de referênciamente a uma tarefa}
+  \item \textbf{xTaskCreate} - Cria uma nova tarefa que será gerenciada pelo
+  FreeRTOS, retornando uma referência para a tarefa criada. Caso a tarefa não
+  possa ser criada, uma referência nula é retornada no lugar da tarefa criada
+  
+  \item \textbf{xTaskDelete} - Remove uma tarefa do FreeRTOS. Entranto, os
+  espaço alocado pela tarefa só será liberando pela a tarefa ociosa
+  \footnote{Tarefa executada quando o processador estar ocioso (sem tarefas
+  para entrar em execução). Ela é responsável pela liberação da memória
+  alocada por determinadas estruturas (Tarefa, Fila de Mensagem, Co-rotina, etc)
+  no FreeRTOS}.
+  
+  \item \textbf{xTaskHadle} - Estrutura de referênciamento a uma tarefa
 \end{itemize}
 
 \subsection{Controle de tarefa}
@@ -389,84 +392,120 @@ tarefas presentes no FreeRTOS. Desse modo, as funcionalidades que forma esse
 grupo são:
 
 \begin{itemize}
-  \item{\textbf{uxTaskPriorityGet} - Informa a prioridade de uma tarefa}
-  \item{\textbf{vTaskSuspend} - Coloca uma tarefa no estado suspenso}
-  \item{\textbf{vTaskResume}- Retorna uma tarefa suspensa colocando no estado
-  pornto}
-  \item {\textbf{vTaskPrioritySet} - Altera a prioridade de uma tarefa}
-  \item {\textbf{vTaskDelay} - Coloca uma tarefa no estado bloqueada por uma
-  determinada quantidade de tempo. Esse método não é recomendado para tarefas
-  ciclicas, pois o intervalo entre um desbloquei e um novo bloqueio de uma
-  tarefa pode variar a cada nova chamada ao método}
-  \item {\textbf{vTaskDelayUntil} - Assim como o \textit{vTaskDelay}, esse
-  método também coloca uma tarefa no estado bloqueada por uma determinada
-  quantidade de tempo. Entretanto, a quantidade de tempo entre o desbloqueio e
-  o bloqueio de uma nova tarefa é sempre a mesma, sendo assim, recomendado para 
-  a utilização em tarefas cíclicas}
+  \item \textbf{uxTaskPriorityGet} - Informa a prioridade de uma tarefa
+  
+  \item \textbf{vTaskSuspend} - Coloca uma tarefa no estado ``suspenso''
+  
+  \item \textbf{vTaskResume}- Retorna uma tarefa suspensa colocando-a no estado
+  pronto
+  
+  \item \textbf{vTaskPrioritySet} - Altera a prioridade de uma tarefa
+  
+  % \NOTE - Pedir para o David ler essa parte
+  \item \textbf{vTaskDelay} - Bloqueia uma tarefa por uma determinada
+  quantidade de tempo. Nesse método, o tempo de desbloqueio de uma tarefa é
+  calculado com base no tempo de chamada ao mesmo, o que torna-no não
+  recomendável para a criação de tarefas cíclicas, pois outras tarefas e
+  interrupções podem influenciar no tempo em que o método será chamado
+  novamente.
+  
+  \item \textbf{vTaskDelayUntil} - Esse método, assim como o
+  \textit{vTaskDelay}, coloca uma tarefa no estado bloqueado por uma determinada
+  quantidade de tempo. Entretanto, diferentemente do método passado, o tempo de
+  desbloqueio de uma tarefa é calculado com base no instante do último
+  desbloqueio mesma. Assim é garantido que tempo entre o bloqueio e o
+  desbloqueio de uma tarefa será sempre o mesmo, o que torna esse método
+  recomendado para a criação de tarefas cíclicas.
+  
 \end{itemize}
 
 \subsection{Controle do kernel}
 \label{subsec:kcontrol}
-As funcionalidades presentes no gurpo Controle do kernel são responsáveis por
-gerênciar, iniciar, finalizar as atividades do kernel do FreeRTOS. Nesse grupo
-estão presentes as seguintes operações:
-\begin{itemize}
-  \item{\textbf{vTaskStartScheduler} - Inicia o escalonador colocando para o
-  estado executando e cria a \textit{idle task}, uma tarefa de gerênciamento do
-  FreeRTOS, resposánvel por liberar da memória tarefas, fila de mensagens,
-  co-rotinas, etc excluidas}
-  \item{\textbf{vTaskEndScheduler} - Finaliza as atividades do escalonador
-  colocando-lo para o estado não iniciado e excluido todas as tarefas, fila de 
-  mensagens, co-rotinas, etc, que estão sendo gerencidas pelo FreeRTOS }
-  \item{\textbf{vTaskSuspendAll}- Suspende temporariamente as atividades do
-  escalonador passando o seu estado para suspenso}
-  \item {\textbf{xTaskResumeAl} - Retorna as atividades do escalonador quando o
-  mesmo encontra-se suspenso, retornando o seu estado para rodando}
-\end{itemize}
+As funcionalidades presentes no conjunto Controle do kernel são responsáveis por
+gerênciar, iniciar e finalizar as atividades. Nesse grupo estão presentes as
+seguintes operações:
 
+\begin{itemize}
+  \item \textbf{vTaskStartScheduler} - Esse método primeiramente cria a tarefa
+  ociosa e em seguinda inicia as atividades do escalonador, colocando-o no
+  estado ``executando''\footnote{O escalonador do FreeRTOS possui três estados:
+  executando, que indica que o escalonador está em execução; não iniciado, que 
+ indica que o escalonador não foi inicializado ainda; e suspenso, que indica qu
+e a atividades do escalonador estão suspensas }. Caso, a tarefa ociosa não
+possa ser criada, o escalonador não será inicializado permanecendo no estado
+não iniciado.
+
+  \item \textbf{vTaskEndScheduler} - Finaliza as atividades do escalonador
+  colocando-o no estado não iniciado. Para isso ele primeiramente exclui todas as
+  estruturas (tarefas, filas de mensagens, co-rotinas, etc) criadas no FreeR
+ TOS e em seguida finaliza o escalonador.
+ 
+  \item \textbf{vTaskSuspendAll}- Suspende temporariamente todas atividades do
+  escalonador colocando-o no estado suspenso.
+  
+  \item \textbf{xTaskResumeAll}- Retorna todas as atividades do escalonador
+  quando esse encontra-se no estado suspenso.
+  
+\end{itemize}
 
 
 \subsection{Utilidades de tarefas}
 \label{subsec:tutilities}
-No grupo de utilidades de tarefas, encontram-se algumas operações responsáveis
-por dar informações úties sobre os estado do kernel do FreeRTOS. Assim, esse
-grupo é composto pelas seguintes funções:
+No grupo de utilidades de tarefas, encontram-se as operações responsáveis
+por fornecer informações úties sobre o estado do kernel. Esse grupo é composto
+pelas seguintes funções:
 
 \begin{itemize}
-  \item{\textbf{xTaskGetCurrentTaskHandle} - Retorna uma referência para a
-  tarefa que está em execução}
-  \item{\textbf{xTaskGetSchedulerState} - Informa o atual estado do
-  escalonador, podendo o mesmo estar em execução, suspenso ou não iniciado}
-  \item{\textbf{uxTaskGetNumberOfTasks} - Informa a quantidade de tarefas
-  tarefas estão sendo gerenciadas pelo FreeRTOS}
-  \item {\textbf{xTaskGetTickCount} - Informa a quantidade de tempo decorrido
-  desde de que o escalonador foi iniciado}
+  \item \textbf{xTaskGetCurrentTaskHandle} - Retorna a referência para a
+  tarefa em execução
+  \item \textbf{xTaskGetSchedulerState} - Informa o atual estado do
+  escalonador (executando, suspenso ou não iniciado).
+  \item \textbf{uxTaskGetNumberOfTasks} - Informa a atual quantidade de tarefas
+  tarefas do FreeRTOS.
+  \item \textbf{xTaskGetTickCount} - Informa a quantidade de tempo decorrido
+  desde a inicialização do escalonador 
 \end{itemize}
 
 \subsection{Gerenciamento das filas de mensagens}
 \label{subsec:fmanagemente}
-Por último, às operações presentes no grupo de Gerenciamento das filas de
-mensagens cabêm as funcionalidades de criar, excluir e gerenciar as filas de
-mensagens do FreeRTOS. Esse grupo é formado pela as seguintes funções:
+As funcionalidades presentes no grupo Gerenciamento das filas de mensagens cabêm
+as obrigações de gerenciar, criar eexcluir as filas de mensagens do FreeRTOS.
+Esse grupo é formado pela as seguintes funções:
 
 \begin{itemize}
-  \item{\textbf{xQueueCreate} - Cria uma nova fila de mensagem}
-  \item{\textbf{xQueueSend} - Envia uma nova mensagem para a fila, caso a fila
-  esteja cheia a tarefa remetente será bloqueada até que seja liberado um
-  espaço na fila}
-  \item{\textbf{xQueueSendToBack} - Envia uma nova mensagem para o final da
-  fila de mensagem, caso a fila esteja cheia a tarefa remetente será bloqueada
-  até que seja liberado um espaço na fila}
-  \item {\textbf{xQueueSendToFront} - Envia uma nova mensagem para o início da
-  fila de mensagem, caso a fila esteja cheia a tarefa remetente será bloqueada
-  até que seja liberado um espaço na fila}
-  \item {\textbf{xQueueReceive} - Ler e retira a mensagem contida no início da
-  fila de mensagens, caso a fila esteja vazia, a tarefa é bloqueada até que um 
-  item chegue na fila }
-  \item{\textbf{xQueuePeek} - Ler, sem retirar, uma mensagem da fila. Caso a
-  fila esteja vazia, a tarefa que solicitou a leitura é bloqueada até que um
-  item chegue na fila}
-  \item {\textbf{vQueueDelete} - Exclui uma fila de mensagem do FreeRTOS}
+  \item \textbf{xQueueCreate} - Cria uma nova fila de mensagem, retornando uma
+  referência para a mesma. Caso a fila de mensagem não possa ser criada, uma
+  referência de fila nula é retornada.
+  
+  \item \textbf{xQueueSend} - Método usado por uma tarefa para enviar uma
+  mensagem para uma fila de mensagens. Caso a fila esteja cheia e não possa
+  receber a mensagem, a tarefa é bloqueada até que seja liberado uma lugar na
+  fila.
+  
+  \item \textbf{xQueueSendToBack} - Esse método funciona do mesmo modo que o
+  \textit{xQueueSendToBack}. Ele envia uma mensagem para o final de uma fila de
+  uma fila de mensagem e caso essa esteja cheia, a tarefa que utilizou o método
+  é bloqueada até que seja liberando um lugar na fila.
+  
+  \item \textbf{xQueueSendToFront} - Método utilizado por uma tarefa para
+  enviar uma mensagem para o início de uma fila de mensagem. Caso a fila esteja
+  cheia, a tarefa é bloqueada até que seja liberado um espaço na fila de
+  mensagem
+  
+  \item \textbf{xQueueReceive} - Método utilizado por uma tarefa para ler e
+  retirar uma mensagem localizada no início da fila de mensagens. Caso a fila de
+  mensagens esteja vazia, a tarefa é bloqueada até que uma mensagem chegue na
+  fila.
+  
+  \item \textbf{xQueuePeek} -  Método utilizado por uma tarefa para ler sem
+  retirar uma mensagem localizada no início da fila de mensagens. Caso a fila de
+  mensagens esteja vazia, a tarefa é bloqueada até que uma mensagem chegue na
+  fila.
+  
+  \item \textbf{vQueueDelete} - Exclui uma fila de mensagens do FreeRTOS.
+  Entretando, o espaço oculpado pela a mesma só será liberado pela a tarefa
+  ociosa.
+  
 \end{itemize}
 
 \subsection{Parâmentros de configuração}
