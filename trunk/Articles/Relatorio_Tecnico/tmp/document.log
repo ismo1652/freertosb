@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2008.11.3)  26 FEB 2009 11:49
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2008.11.3)  28 FEB 2009 11:43
 entering extended mode
  Source specials enabled.
  %&-line parsing enabled.
@@ -277,48 +277,59 @@ te to-das ati-vi-da-des do es-ca-lo-na-dor
 
 [6] [7]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 583.
- [8] [9] [10]
+(Font)              <10.95> on input line 592.
+ [8] [9]
 
-LaTeX Warning: Citation `freertosb' on page 11 undefined on input line 799.
+LaTeX Warning: Citation `freertosb' on page 10 undefined on input line 761.
+
+[10] [11]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[12]
+
+LaTeX Warning: Reference `fig:sendItem' on page 13 undefined on input line 1008
+.
 
 
-Underfull \hbox (badness 1048) in paragraph at lines 803--815
+Underfull \hbox (badness 3701) in paragraph at lines 1003--1009
+[][]\T1/ptm/m/n/12 Depois da mo-de-la-gem do con-ceito de fila de men-sa-gens, 
+ainda ná má-quina
+ []
+
+[13]
+
+LaTeX Warning: Reference `fig:xQueueGenericSend' on page 14 undefined on input 
+line 1039.
+
+[14] [15]
+
+LaTeX Warning: Citation `freertosb' on page 16 undefined on input line 1129.
+
+
+Underfull \hbox (badness 1048) in paragraph at lines 1133--1145
 \T1/ptm/m/n/12 dos vá-rios pa-râ-me-tros de fun-ção que se-rão uti-li-za-dos ap
 e-nas em fu-tu-ros re-fi-na-men-tos.
  []
 
 
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-
-Underfull \hbox (badness 7362) in paragraph at lines 891--901
+Underfull \hbox (badness 7362) in paragraph at lines 1166--1176
 \T1/ptm/m/n/12 cuja sua es-pe-ci-fi-ca-ção com-pleta é exi-bida na fi-gura 7[].
  Nela a pré-condição
  []
 
-[11] [12] [13]
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-(./document.bbl [14]) [15] (./document.aux)
+[16] [17] [18] (./document.bbl) [19] (./document.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 2766 strings out of 94102
- 34551 string characters out of 1165833
+ 2769 strings out of 94102
+ 34600 string characters out of 1165833
  104198 words of memory out of 1500000
- 6000 multiletter control sequences out of 10000+50000
+ 6003 multiletter control sequences out of 10000+50000
  42471 words of font info for 63 fonts, out of 1200000 for 2000
  637 hyphenation exceptions out of 8191
  32i,17n,26p,242b,362s stack positions out of 5000i,500n,6000p,200000b,5000s
 
-Output written on document.dvi (16 pages, 63364 bytes).
+Output written on document.dvi (20 pages, 77740 bytes).
