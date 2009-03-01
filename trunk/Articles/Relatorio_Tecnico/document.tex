@@ -954,7 +954,7 @@ conceito de fila de mensagens.
 
 
 
-\begin{figure}[!b]
+\begin{figure}[!h]
 \begin{small}
 $$
 \begin{array}[t]{ccc}
@@ -1016,12 +1016,41 @@ uma mensagem da fila, pois a mensagem chegou e a tarefa não necessita mais
 aguardar por ela.
 
 
+
+\begin{figure}[!h]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\mathit{sendItem}( \mathit{pxQueue}, \mathit{pxItem}
+					\mathit{task},\mathit{copy\_position}) = \\
+\mathbf{PRE}\\
+\quad  \mathit{pxQueue} \in \mathit{queues} \land \\ 
+\quad  \mathit{pxItem} \in \mathit{ITEM} \land \\ 
+\quad  \mathit{task}\in \mathit{TASK} \land \\ 
+\quad  \mathit{copy\_position} \in \mathit{COPY\_POSITION} \land\\    
+\quad  \mathit{task} \in \mathit{queue\_receiving}(\mathit{pxQueue})\\
+\mathbf{THEN}\\
+\quad  \mathit{queue\_items}(\mathit{pxQueue}):=
+				\mathit{queue\_items}(\mathit{pxQueue}) \cup \{\mathit{pxItem}\}\parallel\\
+\quad  \mathit{queue\_receiving}(\mathit{pxQueue}) :=
+				\mathit{queue\_receiving}(\mathit{pxQueue}) - \{\mathit{task}\} \\
+\mathbf{END};
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Modelagem da operação $\mathit{sendItem}$}
+\label{fig:sendItem}
+\end{figure}
+
 \subsubsection{Operações Intermediárias}
 Durante a modelagem das funcionalidades que utilizam-se do conceito de fila de
 mensagem, percebeu-se que varios comportamentos se repetem entre essas
 funcionalidades. Assim para uma maior modularização e controle, antes da
 especificação das funcionalidades, foi criada uma máquina, denominada
-$\mathbf{QUEUE_BASIC}$ responsável por especificar comportamentos que se
+$\mathbf{QUEUE\_BASIC}$ responsável por especificar comportamentos que se
 repetem entre as funcionalidades que utilizam-se do conceito de fila de
 mensagens.
 
@@ -1036,160 +1065,64 @@ na fila, desbloquear uma tarefa que aguarda para enviar um item para fila, caso
 a mensagem seja retirada da fila com sucesso, e retornar uma mensagem de erro,
 no caso de uma mensagem não poder ser recebida. 
 
-Na figura \ref{fig:xQueueGenericSend} tem-se a especificação da operação
-$\mathit{xQueueGenericSend}$. Nela,\ldots
+Na figura \ref{fig:xQueueGenericSend} tem-se a especificação dos três
+comportamentos possíveis para a operação $\mathit{xQueueGenericReceive}$. No
+primeiro comportamento, inicialmente é declarada uma tarefa que pertence ao
+conjunto de tarefas que aguardam por uma mensagem da fila. Em seguida, essa
+tarefa é passa como argumento, junto com a mensagem, $\mathit{pvItemToQueue}$,
+para o método $\mathit{sendItem}$ que envia a mensagem para a fila e retira a
+tarefa passada do conjunto de tarefas que aguardam por uma mensagem. No segundo
+comportamento, através do método $\mathit{insertTaskWaitingToSend}$, a tarefa
+corrente é adicionada no conjunto de tarefas que aguardam para enviar uma
+mensagem para a fila e após ela é bloqueada pelo método $\mathit{DelayTask}$.
+Por fim, no último comportamente, apenas uma messagem de erro é retornada,
+informando que a mensagem não pode ser enviada e nem a tarefa foi colocada na
+conjunto de tarefas que aguardam para enviar uma mensagem.
 
 
-\subsection{Modelagem das funcionalidades}
-\label{subsec:fun-modelling}
-A modelagem das funcionalidades e um pouco mais complexa que a modelagem dos
-conceitos.Por isso, primeiramente dividiremos as funcionalidades em dois grupos, 
-funcionalidades de tarefa, nas quais estão as funcionalidades relacionadas ao
-conceito de tarefa e funcinalidades das fila de mensagem, onde estão as
-funcionalidades relacionadas às filas de mensagens.
+\begin{figure}[!h]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}   	
+\ldots\\
+\quad \mathbf{ANY}\\
+\quad \quad \mathit{task}\\
+\quad \mathbf{WHERE}\\
+\quad \quad \mathit{task} \in \mathit{TASK} \land \\ 
+\quad \quad \mathit{task}\in \mathit{blocked} \land \\
+\quad  \quad \mathit{task}\in \mathit{queue_receiving}(\mathit{pxQueue})\\ 
+\quad \mathbf{THEN}\\
+\quad \quad \mathit{sendItem}(\mathit{pxQueue}
+			,\mathit{pvItemToQueue},\mathit{task,copy_position})\parallel\\
+\quad \quad \mathit{Unblock}(task)\parallel\\ 
+\quad \quad \mathit{return}:=\mathit{pdPASS}\\
+\quad \mathbf{END}\\        	
+\ldots\\
+\quad
+\mathit{insertTaskWaitingToSend}(\mathit{pxQueue},\mathit{running})\parallel \\
+\quad \mathit{DelayTask}(\mathit{xTicksToWait})\parallel\\
+\quad \mathit{return}:=\mathit{pdTRUE}\\
+\ldots\\
+\quad \mathit{return}:=\mathit{errQUEUE_FULL}\\
+\ldots
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Comportamentos da operação $\mathit{xQueueGenericReceive}$}
+\label{fig:xQueueGenericSend}
+\end{figure}
 
-\subsubsection{Funcinalidades de tarefa}
-\label{subsubsec:tutilities}
-Esse grupo grupo é composto pelo o conjunto de  funcionalidades de criação de
-tarefa ( sessão \ref{subsec:tcreation}), controle de tarefa (sessão
-\ref{subsec:tcontrol}), utilidades de tarefa (sessão \ref{subsec:tutilities}) e
-controle do kernel (sessão \ref{subsec:kcontrol} ), sendo essas especificadas
-através das máquinas $\mathbf{TASK\_CORE}$ e $\mathbf{TASK\_BASIC}$. Na máquina
-$\mathbf{TASK\_CORE}$ além do conceito de tarefa, foram modeladas também
-operações básica que servem como suporte para a especificação das
-funcionalidades de tarefa. Nela estão presente as seguintes funções:
-\begin{itemize}
-\item{\textbf{Create} - Cria uma nova tarefa gerenciada pelo FreeRTOS, podendo
-as mesma possuir estado executando ou pronta, dependendo da prioridade da mesma.
-Entranto, como a característica prioridade foi abstraida dessa modelagem inicial,
-cabe ao refinamento que implementar tal característica descidir quando uma tarefa
-será criada com os estado pronto ou executando. Por isso esta, foi implementada
-recebendo uma prioridade como parâmetro, sendo que o mesmo não é usado
-inicialmente}
+\subsubsection{Funcionalidades}
+Após a criação das operações intermediárias, a máquina $\mathbf{QUEUE}$ foi
+criada para especificar as funcionalidades que utilizam o conceito de fila de
+mensagens. Nela estão presentens as funcionalidades do grupo gerenciamento de
+fila de mensagens, sendo que uma das principais funcinalidades desse grupo é a
+operação $\mathit{xQueueSend}$ responsável por enviar uma mensagem para uma
+fila. A especificação competa dessa funcionalidade pode ser vista na figura
+\ref{fig:xQueueSend}.
 
-\item{\textbf{Delete} - Exclui uma tarefa gerenciada pelo FreeRTOS. Se a tarefa
-que será excluida é a tarefa em execução, uma nova tarefa será escolhida, entre
-as tarefas de estado pronto, para entrar em execução.}
-
-\item{\textbf{Suspend} - Coloca uma tarefa no estado suspenso.No caso em que a
-tarefa suspensa será a tarefa em execução, uma nova tarefa deverá ser escolhida,
-entre as tarefas com estado pronto, para entrar em execução.}
-
-\item{\textbf{Resume} - Retorna uma tarefa que estava no estado suspenso
-colocando-a no estado pronto ou executando.}
-
-\item{\textbf{GetPriority} - Retorna a prioridade de uma determinada tarefa, mas como a característica
-prioridade não é especificada nessa modelagem inicial, essa operação retorna
-apenas um elemento que pertence ao conjunto abstrado denominado
-$\mathit{PRIORITIES}$, o quais representa as possíveis prioridades do FreeRTOS.}
-
-\item{\textbf{GetCurrent} - Retorna uma referência para a atual tarefa em
-execução}
-
-\item{\textbf{GetNumberOfTasks} - Retorna o número de tarefas que estão sendo gerenciadas pelo FreeRTOS, ou seja,
-retorna a cardinalidade do conjunto $\mathit{tasks}$ (sessão
-\ref{fig:task-modelling}).}
-
-\item{\textbf{DelayTask} - Coloca a tarefa em execução no estado boqueado por
-uma determinada quantidade de tempo.}
-
-\item{\textbf{Unblock}- Desboqueia uma tarefa que estava bloqueada, colocando-a
-no estado pronto ou executando.}
- 
-\item{\textbf{StartScheduler}- Cria a \textit{idle task} (sessão
-\ref{subsec:kcontrol}), podendo ela ser cirada com o estado executando ou com o estado pronto}
-
-\item{\textbf{EndScheduler} - Exclui todas as tarefas do FreeRTOS, zerando os
-conjunto de estado e colocando a referência de tarefa nula na variável da
-tarefa em execução.}
-
-\item{\textbf{ResumeAll} - Desbloqueia todas as tarefas que deveriam ser
-boqueadas enquanto o escalonador estava suspenso devido à chamada ao método $\mathit{vTaskSuspendAll}$ (sessão
-\ref{subsec:kcontrol}).}
-
-\end{itemize}
-
-Na máquina $\mathbf{TASK\_BASIC}$ é onde as funcionalidades são realmente
-especificadas. Para isso, além de utilizar do conceito de tarefa e
-funcionalidades básica da $\mathbf{TASK\_CORE}$, ela também especifica algumas
-características importantes para modelagem dessas funcionalidades, sendo elas
-tick \footnote{Unidade de tempo usada pelo FreeRTOS. Nele o tempo é medido
-através de pulso de clock decorridos. Assim para cada pulso de clock o tick do
-FreeRTOS é incrementado de uma unidade }, especificada através das variáveis
-$\mathit{tickCount}$ e $\mathit{tickMissed}$ que armazenam respectivamente a
-quantidade de ticks decorrido quando o escalonador estar em execução e quando ele
-estar suspenso, e estado do escalonador (sessão \ref{subsec:kcontrol}), definido
-através do conjunto $\mathit{SCHEDULER\_STATE}$ e pela variável
-$\mathit{scheduler}$, que representam os possíveis estados de um escalonador e o
-seu atual estado, respectivamente.
-
-Como visto inicialmente, existem várias funcionalidades que compoem o grupo
-funcionalidades de tarefa. Devido a isso nos iremos demonstrar apenas as
-principais operações de cada conjunto, ficando ao critério do leitor,
-verificar na especificação disponível em \cite{freertosb} a implementação das
-demais funcionalidades.
-
-\subsubsection*{Criação de tarefa} 
-A principal operação do conjunto de
-funcionalidades criação de tarefa é a $\mathit{xTaskCreate}$ (sesssão
-\ref{subsec:tcreation}), a qual tem sua especificação demonstrada na figura. Nela
-são declarados vários parâmetros de função que serão utilizados apenas em futuros
-refinamentos. O seu funcionamento resulme-se na criação ou não de uma tarefa.
-Assim, para realizar a criação de uma tarefa ela utiliza-se da função básica
-$\mathit{Create}$ ( comentada acima) e em seguida retorna a constante
-$\mathbf{pdPASS}$ informando que a tarefa foi criada com sucesso. E para caso da
-tarefa não ser criada, ela retorna as constantes $\mathbf{TASK\_NULL}$ e
-$\mathbf{errCOULD\_NOT\_ALLOCATE\_REQUIRED\_MEMORY}$, que representam
-respectivamente uma tarefa nula e o erro de não possuir memória suficiente para a
-criação da tarefa.
-
-
-
-\subsubsection*{Controle de tarefa} 
-
-No grupo controle de tarefa, a operação escolhida foi $\mathit{vTaskDelay}$,
-demonstrada na figura \ref{fig:vTaskDelay}. Para especificar o seu comportamento
-foi necessário a primeiramente criar-se a função $\mathit{TICK\_INCREMENT}$,
-usada para fazer uma soma entre dois tipos $\mathit{TICK}$. Assim para que a
-operação coloque a tarefa em execução no estado bloqueado durante uma determinada
-quantidade de tempo ela primeiramente soma a variável $\mathit{tickCount}$ com o
-quantidade de tempo desejado e, em seguida, utiliza-se da operção básica
-\textit{Delay}, que coloca uma tarefa no estado bloqueado até o \textit{tick}
-informado. Outro fator importante na especificação dessa funcionalidade é que
-como pré-condição aparece a restrição $\mathit{INCLUDE\_vTaskDelay} = 1$, a qual
-informa que o parâmetro de configuração $\mathit{INCLUDE\_vTaskDelay}$ deve estar
-preenchido com o valor um para que a operação seja realizada.
-
-
-
-
-\subsubsection*{Utilidades de tarefa} Na parte de utilidade de tarefa, as
-operações são bastante simples, pois elas apenas retornam informações importantes
-para o usuário sem fazer a alteração de qualquer estado da máquina. A operação
-escolhida para esse grupo foi $\mathit{xTaskGetCurrentTaskHandle}$, cuja sua
-especificação completa é exibida na figura \ref{fig:xTaskGetCurrentTaskHandle}.
-Nela a pré-condição $\mathit{INCLUDE\_xTaskGetCurrentTaskHandle} = 1$ exige que
-para que a sua utilização, o parâmetro de configuração
-$\mathit{INCLUDE\_xTaskGetCurrentTaskHandle}$ deve estar preenchido com o valor
-um e o seu funcionamento trata-se apenas da chamada à operação básica
-$\mathit{GetCurrent}$.
-
-
-
-
-
-\subsubsection*{Controle do kernel} Na parte de controle do kernel, existem
-várias operações importantes, entre elas está a $\mathit{vTaskStartSchedule}$ que
-é especificada como demonstra a figura \ref{fig:vTaskStartSchedule}. Ela inicia
-ou não as atividades do escalonador. Para iniciar as atividades do escalonador,
-primieramente deve-se criar a \textit{idle task}, o que é feito pela função
-$\mathit{StartScheduler}$, e em seguida deve-se colocar o estado do escalonador
-para iniciado, o que é feito na declaração
-$\mathit{scheduler}:=\mathbf{taskSCHEDULER\_RUNNING}$. Entretanto, antes de
-utilizar-se essa funcionalidade deve garantir que o escalonador está no estado
-não está em execução e que os conjuntos referentes as listas de tarefas estão
-vazios ou possuem somente a tarefa nula, no caso de $\mathit{tasks}$ e
-$\mathit{running}$.
 
 
 

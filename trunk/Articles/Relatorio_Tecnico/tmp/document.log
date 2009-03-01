@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2008.11.3)  28 FEB 2009 11:43
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2008.11.3)  1 MAR 2009 12:41
 entering extended mode
  Source specials enabled.
  %&-line parsing enabled.
@@ -288,8 +288,7 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 [12]
 
-LaTeX Warning: Reference `fig:sendItem' on page 13 undefined on input line 1008
-.
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
 Underfull \hbox (badness 3701) in paragraph at lines 1003--1009
@@ -297,39 +296,28 @@ Underfull \hbox (badness 3701) in paragraph at lines 1003--1009
 ainda ná má-quina
  []
 
-[13]
+[13] [14]
 
-LaTeX Warning: Reference `fig:xQueueGenericSend' on page 14 undefined on input 
-line 1039.
+LaTeX Warning: Reference `fig:xQueueSend' on page 15 undefined on input line 11
+24.
 
-[14] [15]
+[15]
 
-LaTeX Warning: Citation `freertosb' on page 16 undefined on input line 1129.
+LaTeX Warning: Reference `subsubsec:tutilities' on page 16 undefined on input l
+ine 1188.
 
-
-Underfull \hbox (badness 1048) in paragraph at lines 1133--1145
-\T1/ptm/m/n/12 dos vá-rios pa-râ-me-tros de fun-ção que se-rão uti-li-za-dos ap
-e-nas em fu-tu-ros re-fi-na-men-tos.
- []
-
-
-Underfull \hbox (badness 7362) in paragraph at lines 1166--1176
-\T1/ptm/m/n/12 cuja sua es-pe-ci-fi-ca-ção com-pleta é exi-bida na fi-gura 7[].
- Nela a pré-condição
- []
-
-[16] [17] [18] (./document.bbl) [19] (./document.aux)
+[16] (./document.bbl [17]) [18] (./document.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
  2769 strings out of 94102
- 34600 string characters out of 1165833
+ 34594 string characters out of 1165833
  104198 words of memory out of 1500000
  6003 multiletter control sequences out of 10000+50000
  42471 words of font info for 63 fonts, out of 1200000 for 2000
  637 hyphenation exceptions out of 8191
  32i,17n,26p,242b,362s stack positions out of 5000i,500n,6000p,200000b,5000s
 
-Output written on document.dvi (20 pages, 77740 bytes).
+Output written on document.dvi (19 pages, 70368 bytes).
