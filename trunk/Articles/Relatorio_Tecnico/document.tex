@@ -116,16 +116,15 @@ Operation real time system, FreeRTOS, Challenge, Method B
 \begin{resumo} 
 
 Este trabalho tem como principal objetivo iniciar a resolução do desafio,
-proposto por Jim, de especificar formalmente um sistema operacional de tempo
-real FreeRTOS, que devido a sua simplicidade, portabilidade e
-eficiência é largamente utilizado em vários tipos de aplicações. Para cumprir
-esse objetivo, foi criada, utilizando-se o método B, uma modelagem abstrata
-desse sistema, na qual alguns dos seus principais conceitos e funcionalidades
-foram especificados sendo os demais tratados em futuros refinamentos da
-modelagem. Assim, a modelagem aqui desenvolvida além de servir como 
-esforço inicial para a resolução do desafio de Jim, serve também como
-base de informação para futuros trabalhos que pretendem especificar formalmente
-o FreeRTOS.
+proposto por Jim, de especificar formalmente um sistema operacional de tempo real
+FreeRTOS, que devido a sua simplicidade, portabilidade e eficiência é largamente
+utilizado em vários tipos de aplicações. Para cumprir esse objetivo, foi criada,
+utilizando-se o método B, uma modelagem abstrata desse sistema, na qual alguns
+dos seus principais conceitos e funcionalidades foram especificados sendo os
+demais tratados em futuros refinamentos da modelagem. Assim, a modelagem aqui
+desenvolvida além de servir como esforço inicial para a resolução do desafio de
+Jim, serve também como base de informação para futuros trabalhos que pretendem
+especificar formalmente o FreeRTOS.
 \end{resumo}
 
 \begin{palavras-chave}
@@ -139,39 +138,36 @@ Sistema operacional de tempo real, FreeRTOS, Desafio, Método B
 
 
 Sistemas de Tempo Real (STR) são sistemas que tem como principal característica
-um rigoroso tempo de resposta aos eventos externos. Devido a isso, eles são bastante
-utilizados, pelas industrias, em aplicações críticas que possuem o tempo de
-resposta como um fator crucial. O monitoramento de paciente em hospitais, o controle de
-processos industriais e o controle de veículos (aeronaves, trens e automóveis)
-são apenas alguns exemplos de aplicações dos sistemas de tempo real.
+um rigoroso tempo de resposta aos eventos externos. Devido a isso, eles são
+bastante utilizados, pelas indústrias, em aplicações críticas que possuem o tempo
+de resposta como um fator crucial. O monitoramento de paciente em hospitais, o
+controle de processos industriais e o controle de veículos (aeronaves, trens e
+automóveis) são apenas alguns exemplos de aplicações dos sistemas de tempo real
 
-Em razão dessa  grande importância e utilização dos STR, foi proposto, por Jim,
-em \cite{jim:sbmf}, como um dos grandes desafios da ciência da computação, a
+Em razão dessa grande importância e utilização dos STR, foi proposto, por Jim, em
+\cite{jim:sbmf}, como um dos grandes desafios da ciência da computação, a
 especificação formal de um sistema operacional de tempo real, denominado
 FreeRTOS. Para assim, proporcionar ao mesmo a segurança, confiabilidade e
-coerência que uma especificação formal oferece, tornando-no mais fidedigno
+coerência que uma especificação formal oferece, tornando-o mais fidedigno
 
 O FreeRTOS é um sistema operacional de tempo real bastante simples. Aprova disso
 está em seu código fonte, que é aberto e composto aproximadamente 2.242 linhas de
 código, número bastante pequeno para um sistema operacional. Além disso, ele é
 capaz de trabalhar em ambientes com quantidade de recursos limitada, como os
-microprocessadores, sendo, oficialmente\footnote{Existem também portas do FreeRTOS
-não oficias, disponibilizada pelos usuários, para várias outras arquiteturas
-diferentes}, portável para 17 arquiteturas de microprocessadores diferentes,
-entre ela as \textit{PIC}, \textit{ARM}, \textit{Zilog 80} e \textit{Cygnal
-8051}, arquiteturas bastante usada pelas industrias de microeletrônica
-\cite{freertos}.
+microprocessadores, sendo, oficialmente\footnote{Existem também portas do
+FreeRTOS não oficias, disponibilizada pelos usuários, para várias outras
+arquiteturas diferentes}, portável para 17 arquiteturas de microprocessadores
+diferentes, entre ela as \textit{PIC}, \textit{ARM}, \textit{Zilog 80} e
+\textit{Cygnal 8051}, arquiteturas bastante usada pelas industrias de
+microeletrônica \cite{freertos}.
 
 Seguindo esse contexto, o presente relatório tem como principal objetivo
 descrever uma modelagem inicial em B \cite{Schn:01}, do sistema de tempo real
-FreeRTOS e, com isso, iniciar a resolução do desafio proposto pelo Jim. Entretanto, por trata-se de uma
-especificação inicial, alguns conceitos desse sistema de tempo real foram
-brevemente abstraídos da modelagem, sendo que os mesmo serão tratados em futuros
-refinamento. 
-%Assim, primordialmente foram especificados, em um alto nível de
-%abstração, somente os conceitos e funcionalidades de tarefas e filas de
-%mensagens, dando ênfase principalemente à caracteristica de estado de um
-%tarefa e suas trocas.
+FreeRTOS e, com isso, iniciar a resolução do desafio proposto pelo Jim.
+Entretanto, por trata-se de uma especificação inicial, alguns conceitos desse
+sistema de tempo real foram brevemente abstraídos da modelagem, sendo que os
+mesmo serão tratados em futuros refinamento
+
 
 Para cumprir o seu objetivo, esse relatório foi divido da seguinte forma:
 primeiramente tem-se uma introdução ao FreeRTOS, demonstrado as suas principais
@@ -180,26 +176,18 @@ modelagem seguido na realização da especificação, nele estão presente, junto com
 suas descrições, as funcionalidades e os conceitos das API escolhidos para serem
 desenvolvidos nessa modelagem inicial; após isso, na sessão \ref{sec:Modelling},
 é demonstrado como foi feita a modelagem do FreeRTOS, suas máquinas com seus
-estados e operações; e para encerrar, tem-se as considerações finais, onde
-estão as conclusões do trabalho, e os trabalhos futuros, falando como será
-feita a continuação desta modelagem.
+estados e operações; e para encerrar, tem-se as considerações finais, onde estão
+as conclusões do trabalho, e os trabalhos futuros, falando como será feita a
+continuação desta modelagem.
 
 
 
-
-%Para ser aceito para publicação, um Relatório Técnico deve ser avalisado por,
-%pelo menos um professor do INF. No caso de um professor ser autor ou co-autor
-%do relatório, poderá solicitar que um outro professor faça a avaliação do
-%mesmo. Neste caso, o nome deste professor avaliador deverá constar na seção de
-%agradecimentos (Seção \ref{sec:agrad}).
 
 
 
 \section{FreeRTOS}
 \label{sec:freertos}
-% [Uma introdução ao FreeRTOS demonstrando as suas funcionalidades (casos no qual
-% o FreeRTOS é utilizado), características(portabilidade, pouco código,ect) e
-% conceitos(tarefa,co-rotina, fila de mensagem, mutex, ect)]
+
  
 O \textit{FreeRTOS} é um sistemas de tempo real projetado para ser pequeno,
 simples e fácil de usar. O seu código fonte é aberto e possui aproximadamente
@@ -207,12 +195,12 @@ simples e fácil de usar. O seu código fonte é aberto e possui aproximadamente
 (task.c, queue.c e list.c), nos quais são implementados seus principais conceitos
 e funcionalidades. Além disso, outra característica importante desse STR é a sua
 portabilidade, sendo oficialmente portável para 17 arquiteturas diferentes, entre
-elas a PIC, ARM, Zilog Z80 e PC, bastantes usadas pelas industrias de
+elas a PIC, ARM, Zilog Z80 e PC, bastantes usadas pelas indústrias de
 microeletrônica.
 
 O seu \textit{kernel}, além de ser multitarefa, suporta três tipo diferentes de
-configurações: preemptivo, cooperativo e híbrido. No tipo preemptivo, a tarefa
-em execução pode ser interrompida a qualquer momento pelo escalonador, sendo em
+configurações: preemptivo, cooperativo e híbrido. No tipo preemptivo, a tarefa em
+execução pode ser interrompida a qualquer momento pelo escalonador, sendo em
 seguida substituída por outra tarefa. Diferentemente, no tipo cooperativo, o
 processo em execução é quem decide o momento de sua pausa, seguida da sua
 substituição. E por fim, no tipo híbrido, o escalonador funciona hora como
@@ -222,21 +210,21 @@ Os conceitos fundamentais implementado pelo FreeRTOS e presente na maioria dos
 sistemas de tempo real são tarefa, co-rotina, fila de mensagem, semáforo e mutex.
 Eles, junto com suas funcionalidades, formam todo o núcleo do FreeRTOS, restando
 para o usuário apenas a utilização desses conceitos para a criação de novos
-sistemas. A seguir, detalharemos as características e utilização de cada 
-conceito fundamental.
+sistemas. A seguir, detalharemos as características e utilização de cada conceito
+fundamental.
 
 \subsection{Tarefa}
 \label{subsec:tarefa}
 Tarefas são unidades de trabalho independentes que compõem um sistema
-multitarefas. No FreeRTOS, uma tarefa é composta por: um pilha de contexto, que
+multitarefa. No FreeRTOS, uma tarefa é composta por: um pilha de contexto, que
 serve para armazenar o ambiente de execução (estados dos registradores)  no
 momento que uma tarefa é interrompida; uma prioridade que serve para indicar a
-importância da tarefa para o sistema; um estado que demonstra a atual
-situação da tarefa; e uma função que é executado quando a tarefa assume o
-controle do processado \cite{Li:2003}.
+importância da tarefa para o sistema; um estado que demonstra a atual situação da
+tarefa; e uma função que é executado quando a tarefa assume o controle do
+processado \cite{Li:2003}.
 
 Os estados que uma tarefa pode assumir no FreeRTOS são: executando, pronto,
-bloqueado e suspenso. O estado ``executando'' informa que a tarefa está em
+bloqueado e suspenso. O estado `executando'' informa que a tarefa está em
 execução, ou seja, possui, atualmente, o controle do processador. Somente uma
 tarefa pode possuir o estado executando em um determinado momento. O estado
 ``pronto'' informa que a tarefa está pronta para entrar em execução, aguardando
@@ -246,6 +234,7 @@ execução. E por último, no estado ``suspenso'', a tarefa foi suspensa pelo
 escalonador através da chamada ao método vTaskSuspend(), disponível na API do
 FreeRTOS. O gráfico completo de transição de estados que uma tarefa pode sofre é
 demonstrado na figura \ref{fig:tkstates}.
+
 
 \begin{figure}[H]
 \centering
@@ -258,16 +247,16 @@ A prioridade de uma tarefa pode variar de 0 (zero)até uma constante de prioridad
 máxima, definida pelo o usuário. No FreeRTOS, as prioridades servem para indicar
 a importância de uma tarefa para o sistema. Elas são usadas principalmente pela
 política de escalonamento entre tarefas. Nessa política, as tarefas de maiores
-prioridades, tem preferência sobre as tarefas de menores prioridades do mesmo
-estado. Assim, para escolher a tarefa que irá entrar em execução, o escalonador percorre
-a lista de tarefas de estado ``pronto'' selecionando aquela de maior
-prioridade. Um exemplo do  funcionamento do escalonador pode ser visto na na
-figura \ref{fig:scheduler}, na qual as tarefas de menores prioridades são
-interrompidas por tarefas de maiores prioridades quando estas assumem o estado
-``pronto''. Outro fator importante no funcionamento de escalonador que vale apena
-ressaltar, é que tarefas de mesma prioridade dividem o tempo de execução entre si.
-Com isso, se houver duas tarefas prontas e com a prioridade máxima, elas irão
-dividir tempo de processamento em frações iguais entre si.
+prioridades têm preferência sobre as tarefas de menores prioridades do mesmo
+estado. Assim, para escolher a tarefa que irá entrar em execução, o escalonador
+percorre a lista de tarefas de estado ``pronto'' selecionando aquela de maior
+prioridade. Um exemplo do  funcionamento do escalonador pode ser visto na figura
+\ref{fig:scheduler}, na qual as tarefas de menores prioridades são interrompidas
+por tarefas de maiores prioridades quando estas assumem o estado ``pronto''.
+Outro fator importante no funcionamento de escalonador que vale apena ressaltar,
+é que tarefas de mesma prioridade dividem o tempo de execução entre si. Com isso,
+se houver duas tarefas prontas e com a prioridade máxima, elas irão dividir tempo
+de processamento em frações iguais entre si.
 
 
 \begin{figure}[H]
@@ -285,8 +274,8 @@ As co-rotinas são similares às tarefas, também possuem prioridade, estados e uma
 função que é executada no momento em que a co-rotina assume o controle do
 escalonador. Entretanto, existem algumas diferenças importantes entre tarefas e
 co-rotinas, sendo a principal delas, a ausência da pilha de contexto. Co-rotinas
-não possuem pilha de contexto e, consequentemente, não possuem contexto próprio, ou
-seja, os valores armazenados nos registradores por uma co-rotinas, não são
+não possuem pilha de contexto e, consequentemente, não possuem contexto próprio,
+ou seja, os valores armazenados nos registradores por uma co-rotina, não são
 guardados no momento em que ela interrompe a sua execução. Assim, uma co-rotina
 pode armazenar o valor três em um registrador, antes de interrompe-se, e, quando
 ela retorna a sua execução, o valor dessa variável pode ou não ser o mesmo, pois
@@ -295,9 +284,10 @@ outra tarefa pode ter entrado em execução e alterado o valor do registrado.
 Outra diferença importante entre co-rotinas e tarefas está na quantidade de
 estado. As co-rotinas só possuem os estado ``executando'', ``pronto'' e
 ``bloqueado'' diferente das tarefas que, além desses três estados, possuem o
-estado ``suspenso''. Consequentemente, o gráfico de transição de estados de uma
+estado ``suspenso''. Conseqüentemente, o gráfico de transição de estados de uma
 co-rotina também é diferente do gráfico de tarefas, sendo esse demonstrado pela
 figura \ref{fig:crstates}
+
 
 \begin{figure}[!h]
 \centering
@@ -321,24 +311,25 @@ funcionam como um túnel no qual tarefas enviam e recebem mensagem. No FreeRTOS,
 as filas de mensagens possuem tamanho fixo, defino pelo tamanho e quantidade de
 itens (mensagem) que ela pode armazenados. Para uma tarefa enviar uma mensagem
 para uma fila, primeiramente a fila não pode estar cheia, caso contrário, a
-tarefa é bloqueada até que seja liberado um lugar na fila. O mesmo 
-ocorre quando uma tarefa tenta receber uma mensagem de uma fila, só que,
-nesse caso, a fila deve possuir pelo menos uma mensagem, para que essa seja
-lida, caso contrário, a tarefa é bloqueada até a chegada de uma mensagem na fila.
+tarefa é bloqueada até que seja liberado um lugar na fila. O mesmo ocorre quando
+uma tarefa tenta receber uma mensagem de uma fila, só que, nesse caso, a fila
+deve possuir pelo menos uma mensagem, para que essa seja lida, caso contrário, a
+tarefa é bloqueada até a chegada de uma mensagem na fila.
 
 No FreeRTOS, é possível definir o tempo máximo que uma tarefa pode ficar
-bloqueada esperado por um evento(liberação de espaço ou chega de mensagem) em
-uma fila. E no casos em que existem mais de uma tarefa bloqueadas aguardando
-por um evento de uma fila, as tarefas de maior prioridade têm preferência sobre
-as demais.
+bloqueada esperado por um evento(liberação de espaço ou chega de mensagem) em uma
+fila. E no caso em que existem mais de uma tarefa bloqueadas aguardando por um
+evento de uma fila, as tarefas de maior prioridade têm preferência sobre as
+demais.
+
 
 \subsection{Semáforos}
-Semáforos são mecanismo usados na sincronização entre tarefas. Eles funcionam como
-uma chave que libera, ou não, o uso de um determinado recurso. Assim quando uma
-tarefa deseja acessar um recurso compartilhado, ela primeiramente deve solicitar
-o semáforo do recurso, caso este esteja liberado, a tarefa tem a premiss o de
-utilizar o recurso e, em seguida, libera o semáforo, caso contrário, a tarefa é
-bloqueada até que o semáforo seja liberado.
+Semáforos são mecanismos usados na sincronização entre tarefas. Eles funcionam
+como uma chave que libera, ou não, o uso de um determinado recurso. Assim quando
+uma tarefa deseja acessar um recurso compartilhado, ela primeiramente deve
+solicitar o semáforo do recurso, caso este esteja liberado, a tarefa tem a
+permissão de utilizar o recurso e, em seguida, libera o semáforo, caso contrário,
+a tarefa é bloqueada até que o semáforo seja liberado.
 
 No FreeRTOS os semáforo funcionam como uma fila de mensagens com um único item.
 Assim, quando a fila estiver vazia, indica que o semáforo está sendo usado e,
@@ -346,6 +337,7 @@ quando a fila estiver cheia, indica que o semáforo está liberado. Desse modo, as
 tarefas que utilizam uma fila de mensagens como semáforo não estão preocupadas
 com o conteúdo da mensagem, mas apenas com o estado da fila, se ela está cheia ou
 vazia.
+
 
 
 \subsection{Mutex}
@@ -358,16 +350,16 @@ Para evitar esse problema, o mecanismo de herança de prioridade, ao perceber que
 uma tarefa solicita o semáforo, verifica se a tarefa solicitante possui
 prioridade maior que a tarefa com o semáforo. Caso afirmativo, a tarefa que retém
 o semáforo tem, momentaneamente, a sua prioridade elevada, para que assim ela
-possar realizar a suas funções sem interrupções e, consequentemente, liberar mais
-rapidamente o semáforo.
+possa realizar a suas funções sem interrupções e, conseqüentemente, liberar mais
+rapidamente o semáforo. .
 
 \section{Projeto da Modelagem}
 \label{sec:project}
 
 Como demonstrado na sessão anterior, o FreeRTOS possui uma grande quantidade de
 conceitos fundamentais. Devido a isso, antes de iniciar-se a sua especificação
-foi criado em \cite{project} um projeto de modelagem, no qual alguns dos
-seus principais conceitos fundamentais, junto com suas funcionalidades foram
+foi criado em \cite{project} um projeto de modelagem, no qual alguns dos seus
+principais conceitos fundamentais, junto com suas funcionalidades foram
 escolhidos para serem modelados inicialmente. Assim, o projeto de modelagem
 funcionou como um roteiro para a especificação, dizendo como o por onde começar a
 modelagem do FreeRTOS.
@@ -377,21 +369,22 @@ de modelagem foram, tarefa (sessão \ref{subsec:tarefa}) e fila de mensagem
 (sessão \ref{subsec:fmensagem}), sendo que cada um desses conceito possui uma
 enorme quantidade de funcionalidades. Assim, para o melhor entendimento e
 gerenciamento, essas funcionalidades foram classificadas em cinco conjuntos
-diferentes: criação de tarefa; controle de tarefa; controle do kernel;
-utilidades de tarefas e gerenciamento de fila. A seguir, tem-se em detalhe
-a composição de cada um desses conjuntos grupo como também a descrição de cada
-funcionalidade que os compõem
+diferentes: criação de tarefa; controle de tarefa; controle do kernel; utilidades
+de tarefas e gerenciamento de fila. A seguir, tem-se em detalhe a composição de
+cada um desses conjuntos grupo como também a descrição de cada funcionalidade que
+os compõem
+
 
 \subsection{Criação de tarefa}
 \label{subsec:tcreation}
 
-No conjunto Criação de tarefas, estão presente algumas funcionalidades
+No conjunto Criação de tarefas, estão presentes algumas funcionalidades
 responsáveis pela criação, exclusão e referenciamento de uma tarefa. Ele é
 formado pelas seguintes funções:
 
 \begin{itemize}
   \item \textbf{xTaskCreate} - Cria uma nova tarefa que será gerenciada pelo
-  FreeRTOS, retornando uma referência para a tarefa criada. Caso a tarefa não
+  FreeRTOS, retornando uma referência para a tarefa criada. Caso a tarefa não 
   possa ser criada, uma referência nula é retornada no lugar da tarefa criada
   
   \item \textbf{xTaskDelete} - Remove uma tarefa do FreeRTOS. Entretanto, os
@@ -422,19 +415,18 @@ grupo são:
   
   % \NOTE - Pedir para o David ler essa parte
   \item \textbf{vTaskDelay} - Bloqueia uma tarefa por uma determinada
-  quantidade de tempo. Nesse método, o tempo de desbloqueio de uma tarefa é
-  calculado com base no tempo de chamada ao mesmo, o que torna-no não
-  recomendável para a criação de tarefas cíclicas, pois outras tarefas e
-  interrupções podem influenciar no tempo em que o método será chamado
-  novamente.
+  quantidade de tempo. Nesse método, o tempo de desbloqueio de uma tarefa  é
+  calculado com base no tempo de chamada ao mesmo, o que o torna não 
+  recomendável para a criação de tarefas cíclicas, pois outras tarefas  e
+  interrupções  podem influenciar no tempo em que o método será chamado novamente.
   
   \item \textbf{vTaskDelayUntil} - Esse método, assim como o
-  \textit{vTaskDelay}, coloca uma tarefa no estado bloqueado por uma determinada
-  quantidade de tempo. Entretanto, diferentemente do método passado, o tempo de
-  desbloqueio de uma tarefa é calculado com base no instante do último
-  desbloqueio mesma. Assim é garantido que tempo entre o bloqueio e o
-  desbloqueio de uma tarefa seja sempre o mesmo, o que torna esse método
-  recomendado para a criação de tarefas cíclicas.
+  \textit{vTaskDelay}, coloca uma tarefa no estado bloqueado por uma
+  determinada  quantidade de tempo. Entretanto, diferentemente do método
+  passado,  o tempo de desbloqueio de uma tarefa é calculado com base no
+  instante  do último desbloqueio mesma. Assim é garantido que tempo entre o 
+  bloqueio e o desbloqueio de uma tarefa seja sempre o mesmo, o que torna esse
+  método recomendado para a criação de tarefas cíclicas.
   
 \end{itemize}
 
@@ -531,7 +523,7 @@ Esse grupo é formado pela as seguintes funções:
 \label{subsec:config}
 Por último, tem-se um grupo que não trata das funcionalidades da API do FreeRTOS,
 mas de seus parâmetros de configuração. Esses parâmetros são atributos que
-permitem ao Kernel uma configuração sob medida para cada aplicação em
+permitem ao kernel uma configuração sob medida para cada aplicação em
 particular. Assim, eles funcionam basicamente como um indicativo para o kernel dizendo quais
 os conceitos e funcionalidade que a aplicação ira utilizar. A lista completa de
 todos os parâmetros utilizados no projeto de modelagem pode ser encontrada a
@@ -575,10 +567,10 @@ A modelagem em B do FreeRTOS pode ser divida em dois grupos principais, o grupo
 de tarefa e o grupo de fila de mensagens, os quais são responsáveis pela a
 especificação dos conceitos, juntos com suas funcionalidades, de mesmo nome. Ao
 todo foram criados 7 máquinas, das quais 2 pertencem ao grupo de tarefas e 3
-pertencem ao grupo de fila de mensagens, restando 1 máquina para os parâmetros
-de configuração e outra para a definição de tipos utilizados na modelagem. A
-composição e explicação da modelagem realizada em cada grupo pode ser vista nas
-sessão a seguir.
+pertencem ao grupo de fila de mensagens, restando 1 máquina para os parâmetros de
+configuração e outra para a definição de tipos utilizados na modelagem. A
+composição e explicação da modelagem realizada em cada grupo podem ser vista nas
+sessões a seguir.
 
 \subsection{Tarefas}
 \subsubsection{Conceitos}
@@ -669,8 +661,8 @@ Após modelado o conceito de tarefa , foram criadas na máquina
 $\mathbf{TASK\_CORE}$ operações básicas que manipulam os estados de uma tarefa e
 servem como suporte para a especificação das funcionalidades da API do FreeRTOS
 que utilizam o conceito de tarefa. Ao todo, foram criadas 12 operações, entre
-elas a operação Create, responsável pela criação de uma nova tarefa e
-especificada como mostra a figura \ref{fig:Create}.
+elas a operação $\mathit{Create}$, responsável pela criação de uma nova
+tarefa e especificada como mostra a figura \ref{fig:Create}.
 
 \begin{figure}[!t]
 \begin{small}
@@ -723,7 +715,7 @@ $\mathit{PRIORITIES}$. Entretanto, esse parâmetro não é utilizado na
 especificação da operação, pois a característica prioridade não é tratada nessa
 modelagem inicial. Assim, o parâmetro declarado no cabeçalho da função será usado
 apenas por futuros refinamentos da operação para decidir o estado inicial da
-tarefa criada. A lista completa de todas operações da máquina
+tarefa criada. A lista completa de todas as operações da máquina
 $\mathbf{TASK\_CORE}$, junto com suas descrições, pode ser vista a seguir:
 
 \begin{itemize}
@@ -771,23 +763,23 @@ boqueadas enquanto o escalonador estava suspenso.
 \end{itemize}
 \subsubsection{Funcionalidades}
 Feita a modelagem do conceito de tarefa, junto com as suas operações básicas,
-resta apenas especificar as funcionalidades da API que utilizam-se desse
+resta apenas especificar as funcionalidades da API que se utilizam desses
 conceitos. A especificação dessas funcionalidades é feita através da máquina
 $\mathbf{TASK\_CORE}$, onde estão presente as funcionalidades dos grupos de
 criação de tarefa, controle de tarefa, utilidades de tarefa e controle do kernel.
 Assim, para uma boa e resumida compreensão da modelagem, será demonstrado aqui,
-apenas uma funcionalidade importante de cada grupo, sendo que as demais podem
-ser vistas no repositório da modelagem em \cite{repository}.
+apenas uma funcionalidade importante de cada grupo, sendo que as demais podem ser
+vistas no repositório da modelagem em \cite{repository}.
 
 
 \subsubsection* {Criação de tarefa} 
 
 A funcionalidade escolhida como principal para o grupo criação de tarefa foi a
 $\mathit{xTaskCreate}$. Nela, uma nova tarefa pode ser criada ou não, dependendo
-da disponibilidade de memória, característica não tratada nessa modelagem inicial.
-Assim, a especificação dessa funcionalidade foi feita como demonstra a figura
-\ref{fig:xTaskCreate}, onde são especificados os dois comportamentos possíveis
-para a função. Ou a tarefa é criada através da chamada ao método
+da disponibilidade de memória, característica não tratada nessa modelagem
+inicial. Assim, a especificação dessa funcionalidade foi feita como demonstra a
+figura \ref{fig:xTaskCreate}, onde são especificados os dois comportamentos
+possíveis para a função. Ou a tarefa é criada através da chamada ao método
 $\mathit{Create}$ e uma referência para a nova tarefa criada, junto com a
 mensagem sucesso, é retornada, ou, a tarefa não é criada e uma referência nula,
 junto com a mensagem de erro, é retornada.
@@ -831,7 +823,7 @@ $$
 
 Para o grupo controle de tarefa, vale apena demonstrar a modelagem da
 funcionalidade $\mathit{xTaskDelay}$, responsável pelo bloqueio de uma tarefa
-durante um determinado tempo. Essa funcionalidade é especifica como demostra a
+durante um determinado tempo. Essa funcionalidade é especifica como demonstra a
 figura \ref{fig:vTaskDelay}. Nela, a função recebe como parâmetro o tempo no qual
 a tarefa deve permanecer bloqueada e, em seguida, utiliza-se desse valor para
 calcular o tempo em que a mesma deve ser desbloqueada, incrementando ao tempo
@@ -959,7 +951,7 @@ filas de mensagens e suas mensagens que podem ser gerenciados pelo FreeRTOS. Em
 seguida, a variáveis $\mathit{queues}$ é criadas para armazenar todas as filas de
 mensagens gerenciadas pelo FreeRTOS. E por fim, são criados as relações
 $\mathit{queue\_items}$, $ \mathit{queue\_sending}$ e
-$\mathit{queue\_receiving}$, reponsáveis por ligar uma fila de mensagens a um
+$\mathit{queue\_receiving}$, responsáveis por ligar uma fila de mensagens a um
 conjunto de itens, a um conjunto de tarefas que esperam para enviar uma mensagem
 para a fila e a um conjunto de tarefa que aguardam para ler uma mensagem da
 fila, respectivamente.
@@ -1085,7 +1077,7 @@ máquina $\mathbf{QUEUE\_CORE}$ podem ser vistas na lista a seguir:
 
 \subsubsection{Operações Intermediárias}
 Durante a modelagem das funcionalidades que utilizam-se do conceito de fila de
-mensagem, percebeu-se que vários comportamentos se repetem entre essas
+mensagens, percebeu-se que vários comportamentos se repetem entre essas
 funcionalidades. Assim para uma maior modularização e controle, antes da
 especificação das funcionalidades, foi criada uma máquina, denominada
 $\mathbf{QUEUE\_BASIC}$ responsável por especificar comportamentos que se
@@ -1207,13 +1199,13 @@ mensagens.
 	
 \section{Considerações finais}
 \label{sec:consideracoes} 
-Para chegar-se a essa modelagem inicial foram feitas várias outra especificações
+Para chegar-se a essa modelagem inicial foram feitas várias outras especificações
 sem sucesso. O fracasso das demais especificações deu-se principalmente devido a
-dificuldades com as obrigações de prova, pois sempre que tentava-se fazer uma
-modelagem mais complexa não conseguia-se provar todas as obrigações de provas
+dificuldades com as obrigações de prova, pois sempre que se tentava fazer uma
+modelagem mais complexa não se conseguia provar todas as obrigações de provas
 geradas pela modelagem.
 
-Como consequência das dificuldades com as obrigações de prova, foi necessário
+Como conseqüência das dificuldades com as obrigações de prova, foi necessário
 refazer toda a especificação inicial com um nível maior de abstração. Nessa
 reformulação foi decidido que várias características, anteriormente tratadas pela
 modelagem, como prioridade e tamanho de uma fila de mensagem, seriam excluídas da
@@ -1228,15 +1220,15 @@ tarefas do FreeRTOS. Com isso, o formalismo sugerido para tratar da concorrência
 no FreeRTOS, sem a perda da especificação inicial criada, seria o Event B, um
 formalismo capaz de especificar sistemas complexo e de natureza concorrente.
 
-Em suma, a especificação inicial do FreeRTOS foi realizada através de 7
-máquinas, $\mathbf{Task\_Core}$, $\mathbf{Task\_Basic}$,
-$\mathbf{FreeRTOSConfig}$ $\mathbf{Queue}$, $\mathbf{Queue\_Basic}$,
-$\mathbf{Queue\_Core}$ e $\mathbf{Types}$. No total, foram 
-foram geradas 226 obrigações de provas, sendo que 208 dessas foram provadas
-automaticamente através da ferramenta utilizada para especificação, AtelierB,
-restando apenas 18, que foram provadas através de uma simples interação com o
-provador da ferramenta. O quadro completo de todas as provas geradas das
-principais máquinas pode ser visto na tabela \ref{tab:obp}
+Em suma, a especificação inicial do FreeRTOS foi realizada através de 7 máquinas,
+$\mathbf{Task\_Core}$, $\mathbf{Task\_Basic}$, $\mathbf{FreeRTOSConfig}$
+$\mathbf{Queue}$, $\mathbf{Queue\_Basic}$, $\mathbf{Queue\_Core}$ e
+$\mathbf{Types}$. No total, foram geradas 226 obrigações de provas, sendo que 208
+dessas foram provadas automaticamente através da ferramenta utilizada para
+especificação, Atelier B, restando apenas 18, que foram provadas através de uma
+simples interação com o provador da ferramenta. O quadro completo de todas as
+provas geradas das principais máquinas pode ser visto na tabela \ref{tab:obp}
+
 
 \begin{table*}[h]
 \centering
@@ -1266,7 +1258,7 @@ O formalismo adotado para os futuros refinamentos será o Event B, para que
 assim, as características de concorrência presente no FreeRTOS possam ser
 devidamente especificadas. Além disso, com a utilização do formalismo Event B,
 parte da modelagem inicial feita em B pode ser aproveitada, pois existe uma
-semelhança muito grande entre os dois formalismo B.
+semelhança muito grande entre os dois formalismos B.
 
 Contudo, esse trabalho trata-se apenas da inicialização da modelagem do
 sistema operacional de tempo real FreeRTOS, sendo assim possível que sejam
