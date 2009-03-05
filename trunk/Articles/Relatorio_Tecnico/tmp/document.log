@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2008.11.3)  1 MAR 2009 12:41
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=latex 2008.11.3)  5 MAR 2009 14:44
 entering extended mode
  Source specials enabled.
  %&-line parsing enabled.
@@ -243,46 +243,45 @@ LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <12> not available
 LaTeX Font Info:    Font shape `T1/ptm/bx/it' in size <12> not available
 (Font)              Font shape `T1/ptm/b/it' tried instead on input line 100.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <17.28> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 120.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 137.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 141.
+(Font)              <12> on input line 158.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 141.
+(Font)              <6> on input line 158.
  [1]
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 210.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 228.
+ [2]
 File: tkstate.eps Graphic file (type eps)
- <tkstate.eps> [2]
+ <tkstate.eps>
 File: scheduler.eps Graphic file (type eps)
  <scheduler.eps> [3]
+File: crstate.eps Graphic file (type eps)
+ <crstate.eps> [4] [5]
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 393.
 
-LaTeX Warning: Reference `fig:cstates' on page 4 undefined on input line 288.
-
-[4]
-
-LaTeX Warning: Citation `sroute' on page 5 undefined on input line 350.
-
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 374.
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 374.
- [5]
-Underfull \hbox (badness 7047) in paragraph at lines 443--445
-[][]\T1/ptm/b/n/12 vTaskSuspendAll\T1/ptm/m/n/12 - Sus-pende tem-po-ra-ri-a-men
-te to-das ati-vi-da-des do es-ca-lo-na-dor
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 393.
+ [6]
+Underfull \hbox (badness 3601) in paragraph at lines 462--464
+[][]\T1/ptm/b/n/12 vTaskSuspendAll \T1/ptm/m/n/12 - Sus-pende tem-po-ra-ri-a-me
+nte to-das ati-vi-da-des do es-ca-lo-na-dor
  []
 
-[6] [7]
+[7] [8]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 592.
- [8] [9]
+(Font)              <10.95> on input line 611.
+ [9] [10]
+Underfull \hbox (badness 1215) in paragraph at lines 785--794
+[][]\T1/ptm/m/n/12 A fun-ci-o-na-li-dade es-co-lhida como prin-ci-pal para o gr
+upo cri-a-ção de ta-refa foi a
+ []
 
-LaTeX Warning: Citation `freertosb' on page 10 undefined on input line 761.
-
-[10] [11]
+[11]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
@@ -290,34 +289,26 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-
-Underfull \hbox (badness 3701) in paragraph at lines 1003--1009
+[13]
+Underfull \hbox (badness 3701) in paragraph at lines 1022--1028
 [][]\T1/ptm/m/n/12 Depois da mo-de-la-gem do con-ceito de fila de men-sa-gens, 
 ainda ná má-quina
  []
 
-[13] [14]
 
-LaTeX Warning: Reference `fig:xQueueSend' on page 15 undefined on input line 11
-24.
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[15]
-
-LaTeX Warning: Reference `subsubsec:tutilities' on page 16 undefined on input l
-ine 1188.
-
-[16] (./document.bbl [17]) [18] (./document.aux)
-
-LaTeX Warning: There were undefined references.
-
- ) 
+[14] [15] [16] [17]
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <8> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 1247.
+ (./document.bbl [18]) [19] (./document.aux) ) 
 Here is how much of TeX's memory you used:
- 2769 strings out of 94102
- 34594 string characters out of 1165833
- 104198 words of memory out of 1500000
- 6003 multiletter control sequences out of 10000+50000
- 42471 words of font info for 63 fonts, out of 1200000 for 2000
+ 2773 strings out of 94102
+ 34607 string characters out of 1165833
+ 106198 words of memory out of 1500000
+ 6006 multiletter control sequences out of 10000+50000
+ 44167 words of font info for 64 fonts, out of 1200000 for 2000
  637 hyphenation exceptions out of 8191
  32i,17n,26p,242b,362s stack positions out of 5000i,500n,6000p,200000b,5000s
 
-Output written on document.dvi (19 pages, 70368 bytes).
+Output written on document.dvi (20 pages, 75780 bytes).
