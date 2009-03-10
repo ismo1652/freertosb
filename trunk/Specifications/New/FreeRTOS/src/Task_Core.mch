@@ -1,13 +1,3 @@
-/*
-Notas para o relatório:
-	
-	A principal preocupação desse módulo inicial foi implementar de forma abstrata como ocorre 
-	a mudança de estado de uma tarefa no FreeRTOS. Para isso, nele, foram especificados princi-
-	palmente os conceitos de tarefa e sua característica de estado. Além disso, no Task_Core, 
-	também foram criadas funções responsáveis pela mudança de estado de um tarefa, sendo
-	essas utilizadas como funções base na implementação da API Task em Task.mch
-*/
-
 /* Task_Core
 
  \brief Core definitions for task support in FreeRTOS.
@@ -36,6 +26,7 @@ SETS
     TASK;		/** tasks */	    
 	STACK;		/** stack of task**/
 	TASK_CODE  /* pointer to code of task*/
+     
     
 CONSTANTS 
     PRIORITY,	/** task priorities */
@@ -65,11 +56,13 @@ VARIABLES
 	running, /** task current*/
 	ready, /** set of ready task*/
 	suspended /** set of suspend task*/
+
 	
 	    
 INVARIANT
 	tasks : FIN(TASK) &
-	tasks /= {} &
+	/*tasks /= {} &*/
+	{TASK_NULL} <: tasks &
 	
 	blocked : FIN(TASK) &
 	blocked <: tasks &
@@ -85,12 +78,17 @@ INVARIANT
 	running/:ready &
 	running/:blocked &
 	running/:suspended & 
+	
+	TASK_NULL /: suspended &
+	TASK_NULL/:ready &
+	TASK_NULL/:blocked &
+	
 
 	ready/\blocked = {} & 
 	blocked/\suspended = {}&
 	suspended/\ready= {} &	
 	
-	tasks = {running}\/ suspended \/ blocked\/ ready
+	tasks = {running}\/ suspended \/ blocked\/ ready\/{TASK_NULL}
  	
 INITIALISATION
     
@@ -104,21 +102,19 @@ OPERATIONS
 		\brief Task creation
 	
 		\do 
-			This method create a new task. The task created can have the state ready or running. This choice 
-			depend both of the priorities of the tasks in ready state and the priority of the new task created
-			and will be implement in future refinement. The parameter priority is declared but not used.
-					
+			This method create a new task.
+			
 		\parameters
-		
-			priority - The priority of the task
-	
+			priority - The priority of the task.
+			
 		\note 
 			The actual function takes the handled as a parameter passed by reference.
 			
 	**/
-	result <-- Create (priority) =
+	result <-- t_create (priority) =
 	PRE
-	    priority : PRIORITY
+	    priority : PRIORITY &
+	    running=TASK_NULL
 	THEN	
 	  	ANY
     	    task
@@ -127,12 +123,7 @@ OPERATIONS
             task /: tasks 
     	THEN     	    
         	tasks := { task } \/ tasks ||
-        	CHOICE        	    
-        	    ready := {running} \/ ready ||        	    
-    	   	   	running := task
-			OR
-			   	ready :=  { task } \/ ready
-        	END||
+        	ready :=  { task } \/ ready||
         	result := task
         END                  
 	END;
@@ -153,27 +144,34 @@ OPERATIONS
 		    	R - the handle to idle task is not visible for user
 			when the task that gonna delete is the unique task in tasks, what do it do?
 				R- I don't allow this. The handle for idle task can't be take.
+		\warning
+			I don't know what the system do when the currenty task is delete and the set ready is empty. 
+
 			
 	**/
-	Delete (atask)=
+	t_delete (atask)=
 	PRE
 	    atask : TASK &
    		atask : tasks &
-   		atask /= TASK_NULL &
-   		not(tasks={ atask })
+   		atask /= TASK_NULL & 
+   		tasks/={atask} 
+   		
 	THEN
-    	tasks := tasks - { atask } || 	
+    	tasks := tasks - { atask }|| 	
     	IF atask = running	THEN
-        	ANY
-        	    task
-	        WHERE 
-    	        task : TASK &
-    	        task : ready
-    	    THEN
-    	        running := task ||
-    	        ready := ready - { task }
-			END		
-		
+    	    CHOICE
+        		ANY
+        	    	task
+	        	WHERE 
+    	        	task : TASK &
+    	        	task : ready
+    	    	THEN
+    	        	running := task ||
+    	        	ready := ready - { task }
+				END		
+			OR
+			    running:=TASK_NULL /*Warning*/
+			END
 		ELSIF atask : ready  THEN
 		    ready := ready - { atask }
 		ELSIF atask : blocked  THEN
@@ -194,21 +192,26 @@ OPERATIONS
 			atask- Task that will be suspend
 						
 	**/
-	Suspend (atask)=
+	t_suspend (atask)=
 	PRE
 		atask : TASK &
 		atask : tasks &
-		atask /: suspended
+		atask /: suspended &
+		atask /= TASK_NULL
 	THEN
        	IF atask = running THEN
-           	ANY
-           	    task 
-	        WHERE
-	            task : TASK &
-	            task : ready
-	        THEN
-				running := task ||
-				ready := ready - { task }
+       	    IF ready={} THEN
+           		ANY
+           	    	task 
+	        	WHERE
+	            	task : TASK &
+	            	task : ready
+	        	THEN
+					running := task ||
+					ready := ready - { task }
+        		END
+        	ELSE
+        	    running:=TASK_NULL
         	END
 	    ELSIF atask : ready THEN
 	        ready := ready - { atask }
@@ -229,15 +232,19 @@ OPERATIONS
 			atask - Task that will be resume
 			
 	**/
-	Resume (atask) =
+	t_resume (atask) =
 	PRE 
 	    suspended /= {} & 
     	atask : TASK & 
-    	atask : suspended
+    	atask : suspended 
 	THEN    
     	CHOICE
-    	    ready := ready \/ { running } ||
-    	    running := atask
+    	    IF running = TASK_NULL THEN
+    	        running:= atask
+    	    ELSE
+    	    	ready := ready \/ { running } ||
+    	    	running := atask
+    	    END
     	OR
     		ready := ready \/ { atask }
     	END ||
@@ -258,7 +265,7 @@ OPERATIONS
 			priority - a priority belong of Priority set
 			
 	**/
-	priority <-- GetPriority(atask)=
+	priority <-- t_getPriority(atask)=
 	PRE
     	atask : tasks
 	THEN 
@@ -275,7 +282,7 @@ OPERATIONS
 			result - The currently running task
 			
 	**/
-	result <-- GetCurrent =
+	result <-- t_getCurrent =
     BEGIN
         result := running
 	END;
@@ -290,7 +297,7 @@ OPERATIONS
 			numberOfTasks -  number of tasks managed by the FreeRTOS
 			
 	**/
-	result <-- GetNumberOfTasks =
+	result <-- t_getNumberOfTasks =
 	BEGIN
     	result := card(tasks)
 	END;
@@ -307,19 +314,28 @@ OPERATIONS
 			tick - The tick that the task should be unbloked. Is declared but no used here
 			
 	**/
-	DelayTask (ticks)=
+	t_delayTask (ticks)=
 	PRE
-    	ticks:TICK & not(ticks = 0) 
-	THEN
-    	ANY
-    	    task 
-    	WHERE
-    	    task : TASK &
-    	    task : ready
-   		THEN
-   		    blocked := blocked \/ { running } ||
-   		    running := task ||
-   		    ready := ready - { task } 
+    	ticks:TICK & 
+    	not(ticks = 0) &
+    	running/=TASK_NULL
+	THEN  
+	    
+	    IF ready={} THEN
+	    	blocked := blocked \/ { running }||
+	    	running := TASK_NULL
+	    ELSE
+	    	ANY
+    	    	task 
+    		WHERE
+    	    	task : TASK &
+    	    	task : ready
+   			THEN
+   		    	blocked := blocked \/ { running } ||
+   		    	ready := ready - { task } ||
+   		    	running := task
+   		    
+     		END
      	END
 	END;
 	
@@ -332,9 +348,10 @@ OPERATIONS
 		\return 
 			
 	**/
-	StartScheduler = 
-	BEGIN
-		
+	t_startScheduler = 
+	PRE
+	    running=TASK_NULL
+	THEN
    	    ANY
    	       	idle_name, 
    	       	idle_task 
@@ -343,18 +360,24 @@ OPERATIONS
            	idle_task : TASK & 
            	idle_task /: tasks 
    	    THEN
-           	tasks := tasks \/ { idle_task }||
-           	CHOICE
-           	    ready:=ready \/ {idle_task}
-           	OR
-				ready:=ready \/ {running}||           	    
+   	        tasks := tasks \/ { idle_task }||
+           	IF ready ={} THEN
            	    running:=idle_task
+           	ELSE
+           	    ANY 
+           	        task
+           	    WHERE
+           	        task:ready
+           	    THEN
+           	        running:=task||           	        
+           	        ready:=(ready\/{ idle_task })-{task} 
+           	    END
+           	    
            	END
            	
 		END
         
- 	END
- 	;
+ 	END;
 	
 	/**
 		\brief	End Scheduler
@@ -362,7 +385,7 @@ OPERATIONS
 		\do	
 			End the task of schuler
 	**/
-	EndScheduler =
+	t_endScheduler =
 	BEGIN
     	tasks := {TASK_NULL} ||
     	running := TASK_NULL ||
@@ -377,7 +400,7 @@ OPERATIONS
 			Method used for resume the scheduler. It increment the tick with missed ticks and verify the list of 
 			blocked tasks to unblock the tasks with expired timers.
 	**/
-	ResumeAll (tick) = 
+	t_resumeAll (tick) = 
 	PRE
 		tick : TICK
 	THEN
@@ -394,11 +417,16 @@ OPERATIONS
        	  			task : TASK &
       				task : unblocked 
    				THEN
-					CHOICE
-       	    			running := task ||
-       	    			ready := ready \/ { running } \/ (unblocked - { task })
-					OR
-				    	ready := ready \/ unblocked
+   				    IF running =TASK_NULL THEN
+   				        running:=task||
+   				        ready := ready \/ (unblocked - { task })
+   				    ELSE
+						CHOICE
+       	    				running := task ||
+       	    				ready := ready \/ { running } \/ (unblocked - { task })
+						OR
+				    		ready := ready \/ unblocked
+						END
 					END
    				END ||
    				blocked := blocked - unblocked
@@ -413,17 +441,21 @@ OPERATIONS
 			Unblock the given task
 			
 	**/
-	Unblock(task)=
+	t_unblock(task)=
 	PRE
 		task : TASK &
 		task : blocked
 	THEN
-		CHOICE
-		    running := task ||
-		    ready := ready \/ { running }
-    	OR
-        	ready := ready \/ { task }
-		END ||
-		blocked := blocked - { task }
+	    IF running=TASK_NULL THEN
+	        running:=task
+	    ELSE
+			CHOICE
+		    	running := task ||
+		    	ready := ready \/ {running}
+    		OR
+        		ready := ready \/ {task}
+			END 
+		END||	blocked := blocked - {task}
 	END
+	
 END

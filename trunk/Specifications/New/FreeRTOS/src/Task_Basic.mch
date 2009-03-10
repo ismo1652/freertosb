@@ -34,19 +34,17 @@ INCLUDES
     Task_Core,
     Queue_Core
 SETS
-    SCHEDULER_STATE = {taskSCHEDULER_NOT_STARTED, taskSCHEDULER_RUNNING, taskSCHEDULER_SUSPENDED} /** states of the scheduler */
+    SCHEDULER_STATE = {taskSCHEDULER_NOT_STARTED, taskSCHEDULER_RUNNING, taskSCHEDULER_SUSPENDED}
     
 VARIABLES
     
 	tickCount,		/** total tick count */
-	tickMissed,		/** count of missed ticks */
-   
-	scheduler		/** state of scheduler*/
+	tickMissed,
+	scheduler
    
 INVARIANT
 	tickCount: TICK &
 	tickMissed:TICK &
-	
 	scheduler: SCHEDULER_STATE
 
 INITIALISATION
@@ -86,7 +84,7 @@ OPERATIONS
     	uxPriority : PRIORITY
 	THEN 
 	    CHOICE 
-        	handle <-- Create (uxPriority) ||
+        	handle <-- t_create (uxPriority) ||
         	result := pdPASS
 		OR
         	result, handle := errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY, TASK_NULL
@@ -114,7 +112,7 @@ OPERATIONS
    		not(tasks = {pxTaskToDelete})
    		
 	THEN
-    	Delete (pxTaskToDelete)||
+    	t_delete (pxTaskToDelete)||
     	removeFromEventListQueue(pxTaskToDelete)
 	END;
 	
@@ -140,7 +138,7 @@ OPERATIONS
     	pxTaskToSuspend /= TASK_NULL
 	THEN
     	IF pxTaskToSuspend /: suspended	THEN
-        	Suspend (pxTaskToSuspend) ||
+        	t_suspend (pxTaskToSuspend) ||
 	    	rr := pdTRUE	    
 		ELSE 
 	    	rr := pdFALSE   
@@ -165,7 +163,7 @@ OPERATIONS
     	pxTaskToResume : TASK & 
     	pxTaskToResume : suspended
 	THEN    
-    	Resume (pxTaskToResume)	
+    	t_resume (pxTaskToResume)	
 	END;
 	
 	/**
@@ -185,7 +183,7 @@ OPERATIONS
 	PRE
     	pxTask : tasks & INCLUDE_uxTaskPriorityGet = 1 
 	THEN 
-	    priority <-- GetPriority (pxTask)
+	    priority <-- t_getPriority (pxTask)
 	END;
 	
 	/**
@@ -202,7 +200,7 @@ OPERATIONS
 	PRE
     	INCLUDE_xTaskGetCurrentTaskHandle = 1
 	THEN
-    	cTask <-- GetCurrent
+    	cTask <-- t_getCurrent
 	END;
 	
 	/**
@@ -217,7 +215,7 @@ OPERATIONS
 	**/
 	numberOfTasks <-- uxTaskGetNumberOfTasks =
 	BEGIN
-    	numberOfTasks <-- GetNumberOfTasks
+    	numberOfTasks <-- t_getNumberOfTasks
 	END;
 	
 	/**
@@ -253,9 +251,10 @@ OPERATIONS
 	PRE
     	xTicksToDelay : TICK & 
     	INCLUDE_vTaskDelay = 1 &
+    	running /= TASK_NULL &
     	not(TICK_INCREMENT (tickCount, xTicksToDelay)=0)
 	THEN
-    	DelayTask (TICK_INCREMENT (tickCount, xTicksToDelay))
+    	t_delayTask (TICK_INCREMENT (tickCount, xTicksToDelay))
 	END;
 	
 	/**
@@ -274,12 +273,13 @@ OPERATIONS
 	PRE
     	pxPreviousWakeTime : TICK & 
     	xTimeIncrement : TICK & 
+    	running /= TASK_NULL &
     	INCLUDE_vTaskDelayUntil = 1
 	THEN
 	    SELECT
 	        TICK_INCREMENT (pxPreviousWakeTime, xTimeIncrement) /= 0
 	    THEN
-		    DelayTask (TICK_INCREMENT (pxPreviousWakeTime, xTimeIncrement))
+		    t_delayTask (TICK_INCREMENT (pxPreviousWakeTime, xTimeIncrement))
     	ELSE
         	skip
     	END
@@ -316,7 +316,7 @@ OPERATIONS
     	blocked = {} & suspended = {} & ready = {}  	
 	THEN
 	    CHOICE
-	        StartScheduler||
+	        t_startScheduler||
 	        scheduler:=taskSCHEDULER_RUNNING
     	OR
         	skip
@@ -333,7 +333,7 @@ OPERATIONS
 	PRE
     	scheduler = taskSCHEDULER_RUNNING
 	THEN
-	    EndScheduler ||
+	    t_endScheduler ||
     	scheduler := taskSCHEDULER_NOT_STARTED
 	END;
 	
@@ -366,7 +366,7 @@ OPERATIONS
 	THEN
 	    CHOICE
     		scheduler := taskSCHEDULER_RUNNING ||
-	    	ResumeAll (TICK_INCREMENT(tickCount, tickMissed)) ||
+	    	t_resumeAll (TICK_INCREMENT(tickCount, tickMissed)) ||
     		tickCount := TICK_INCREMENT(tickCount, tickMissed)
     	OR
     	    skip
@@ -389,7 +389,7 @@ OPERATIONS
     	    tickMissed := TICK_INCREMENT(tickCount, 1)
     	END ||
     	
-    	ResumeAll (TICK_INCREMENT(tickCount, 1)) 
+    	t_resumeAll (TICK_INCREMENT(tickCount, 1)) 
 	END
 	
 	
