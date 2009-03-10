@@ -1,0 +1,381 @@
+/* Task_CoreR
+
+ \brief Refinement of Task Core .
+ 
+ Module responsible for specific the features priority in the task concepts.
+ 
+ 
+ Author: Stephenson Galvao, David Deharbe
+ Creation date: Sun Mar 8 2009
+ Universidade Federal do Rio Grande do Norte
+ Departamento de Informatica e Matematica Aplicada
+ Programa de Pos-Graduacao em Sistemas e Computacao
+ Formal Methods and Languages Laboratory
+ 
+*/
+REFINEMENT
+	Task_CoreR
+REFINES
+	Task_Core
+
+SEES
+	FreeRTOSConfig ,
+	Types
+   
+CONSTANTS
+	max_prt,
+	IDLE_PRIORITY
+	
+    
+PROPERTIES
+   PRIORITY = 0..(configMAX_PRIORITIES-1)&
+   
+   IDLE_PRIORITY : PRIORITY &
+   IDLE_PRIORITY = 0 &
+   
+   max_prt: PRIORITY * PRIORITY --> PRIORITY &
+   max_prt = %(tmp_mprt_ready,t_prt).(tmp_mprt_ready:PRIORITY & t_prt: PRIORITY | max({tmp_mprt_ready,t_prt}))
+
+ABSTRACT_VARIABLES
+   tasks ,
+   blocked ,
+   running ,
+   ready ,
+   suspended,
+   t_priority
+  
+INVARIANT
+   t_priority : TASK +-> PRIORITY & 
+   dom(t_priority)=tasks &
+   !tt.(tt:ready & ready/={} & running/=TASK_NULL => t_priority(running)>=t_priority(tt) ) 
+   
+   	
+ASSERTIONS
+    running : dom(t_priority)
+
+INITIALISATION
+   tasks := { TASK_NULL } ||
+   running := TASK_NULL ||
+   t_priority:= {TASK_NULL|->0} ||
+   blocked , ready , suspended := {},{},{}
+   
+OPERATIONS
+/**	
+		\brief Task creation
+	
+		\do 
+			This method create a new task. The task created can have the state ready or running. This choice 
+			depend both of the priorities of the tasks in ready state and the priority of the new task created
+			and will be implement in future refinement. The parameter priority is declared but not used.
+					
+		\parameters
+		
+			priority - The priority of the task
+	
+		\note 
+			The actual function takes the handled as a parameter passed by reference.
+			
+	**/
+	result <-- t_create (priority) =
+	BEGIN	
+	  	ANY
+    	    task
+        WHERE
+            task : TASK &
+            task /: tasks
+    	THEN     	    
+        	tasks := { task } \/ tasks ||
+        		t_priority:= t_priority \/ {task|->priority}||
+        	ready := {task} \/ ready ||
+        	result := task
+        END                  
+	END;
+
+	/**
+		\brief Delete Task
+		
+		\do	
+			Delete a task managed by FreeRTOS. If the task that will be delete is the current task, a ready 
+			task will became the running task. The NULL task can't be deleted. 
+			 
+		\parameters 
+			aTask - Task that will be deleted
+			
+		\question
+		    can it delete the idle task?
+		    	R - the handle to idle task is not visible for user
+			when the task that gonna delete is the unique task in tasks, what do it do?
+				R- I don't allow this. The handle for idle task can't be take.
+			
+	**/
+	t_delete (atask)=
+	BEGIN
+    	tasks := tasks - { atask } || 	
+    	t_priority:= { atask } <<|t_priority||
+    	IF atask = running	THEN
+    	    CHOICE
+        		ANY
+        	    	task
+	        	WHERE 
+    	        	task : TASK &
+    	        	task : ready &
+    	        	t_priority(task)=max(t_priority[ready])
+    	    	THEN
+    	        	running := task ||
+    	        	ready := ready - { task }
+				END		
+			OR
+			    running:=TASK_NULL /*Warning*/
+			END
+		ELSIF atask : ready  THEN
+		    ready := ready - { atask }
+		ELSIF atask : blocked  THEN
+		    blocked := blocked - { atask }
+		ELSIF atask : suspended THEN
+		    suspended := suspended - { atask }
+		END
+	END;
+	
+	/**
+		\brief Suspend Task
+		
+		\do	
+			This method suspend the passed task. If the task that will be suspend is 
+			the current task, a task with the state ready will choice to be the current task.
+			 
+		\parameters 
+			atask- Task that will be suspend
+						
+	**/
+	t_suspend (atask)=
+	BEGIN
+       	IF atask = running THEN
+       	    IF ready={} THEN
+           		ANY
+           	    	task 
+	        	WHERE
+	            	task : TASK &
+	            	task : ready &
+	            	t_priority(task)=max(t_priority[ready])
+	        	THEN
+					running := task ||
+					ready := ready - { task }
+        		END
+        	ELSE
+        	    running:=TASK_NULL
+        	END
+	    ELSIF atask : ready THEN
+	        ready := ready - { atask }
+	    ELSIF atask : blocked THEN
+	        blocked := blocked - { atask }
+	    END ||
+		suspended := suspended \/ { atask }
+	END;
+	
+	/**
+		\brief	Resume Task
+		
+		\do	
+			This method resume a suspended tasks. The resumed task can go to ready or running state depend 
+			the priority of resumed tasks (this choice will be specific in future refinement)
+			 
+		\parameters 
+			atask - Task that will be resume
+			
+	**/
+	t_resume (atask) =
+	BEGIN   
+    	IF t_priority(atask) >= t_priority(running) THEN
+    	    IF running = TASK_NULL THEN
+    	        running:= atask
+    	    ELSE
+    	    	ready := ready \/ { running } ||
+    	    	running := atask
+    	    END
+    	ELSE
+    		ready := ready \/ { atask }
+    	END ||
+    	suspended := suspended - { atask }	
+	END;
+	
+	/**
+		\brief	Get Task Priority
+		
+		\do	
+			This method get the priority of the task passed, but here this only return a priority available. 
+			It will implement in future refinement.
+						 
+		\parameters 
+			atask - Task that will be returned the priority
+			
+		\returns
+			priority - a priority belong of Priority set
+			
+	**/
+	priority <-- t_getPriority(atask)=
+	BEGIN
+	    priority :: PRIORITY
+	END;
+	
+	/**
+		\brief	Get Current Task
+		
+		\do	
+			Return the currently running task
+			
+		\returns
+			result - The currently running task
+			
+	**/
+	result <-- t_getCurrent =
+    BEGIN
+        result := running
+	END;
+	
+	/**
+		\brief	Get Number of Task
+		
+		\do	
+			Get the number of tasks managed by the FreeRTOS
+			 			
+		\returns
+			numberOfTasks -  number of tasks managed by the FreeRTOS
+			
+	**/
+	result <-- t_getNumberOfTasks =
+	BEGIN
+    	result := card(tasks)
+	END;
+	
+	/**
+		\brief	Delay Task
+		
+		\do	
+			Change the state of the current task for the blocked state during the number tick passed. 
+			But here it only change the state of task leaving the feature time of block for the next refinement
+			
+			
+		\paramenters
+			tick - The tick that the task should be unbloked. Is declared but no used here
+			
+	**/
+	t_delayTask (ticks)=
+	BEGIN
+	    blocked := blocked \/ { running } ||
+    	ANY
+    	    task 
+    	WHERE
+    	    task : TASK &
+    	    task : ready & 
+    	    t_priority(task) = max(t_priority[ready])    	    
+   		THEN   		    
+   		    running := task ||
+   		    ready := ready - { task } 
+     	END
+	END;
+	
+	/**
+		\brief	Start Scheduler
+		
+		\do	
+			Start the scheduler and create the idle task		
+				
+		\return 
+			
+	**/
+	t_startScheduler = 
+	BEGIN
+		
+   	    ANY
+   	       	idle_name, 
+   	       	idle_task 
+        WHERE
+           	idle_name : NAME & 
+           	idle_task : TASK & 
+           	idle_task /: tasks 
+   	    THEN
+           	tasks := tasks \/ { idle_task }||
+           	t_priority:= t_priority \/ { idle_task|-> IDLE_PRIORITY}||
+           	IF t_priority[ready]={} THEN 
+           	    running:= idle_task
+           	ELSIF IDLE_PRIORITY >= max(t_priority[ready]) THEN
+           	    ready:=ready \/ {running}||           	    
+           	    running:=idle_task
+            ELSE
+				ready:=ready \/ {idle_task}
+           	END
+           	
+		END
+        
+ 	END
+ 	;
+	
+	/**
+		\brief	End Scheduler
+		
+		\do	
+			End the task of schuler
+	**/
+	t_endScheduler =
+	BEGIN
+	    tasks := { TASK_NULL } ||
+	    running := TASK_NULL ||
+   		/*max_prt_ready:=0||*/
+   		t_priority:= {TASK_NULL|->0}||
+   		blocked , ready , suspended := {},{},{}
+	END;
+	
+
+	/**
+		\brief	Resume All
+		
+		\do	
+			Method used for resume the scheduler. It increment the tick with missed ticks and verify the list of 
+			blocked tasks to unblock the tasks with expired timers.
+	**/
+	t_resumeAll (tick) = 
+	BEGIN
+	    ANY
+	        unblocked
+	    WHERE
+	        unblocked : FIN(TASK) &
+			unblocked <: blocked
+	   	THEN
+   		    IF unblocked /= {} THEN
+   	    		ANY
+   	        		task
+   	    		WHERE
+       	  			task : TASK &
+      				task : unblocked &
+      				t_priority(task)>= t_priority(running)
+   				THEN
+					CHOICE
+       	    			running := task ||
+       	    			ready := ready \/ { running } \/ (unblocked - { task })
+					OR
+				    	ready := ready \/ unblocked
+					END
+   				END ||
+   				blocked := blocked - unblocked
+   			END
+   		END
+	END;
+	
+	/**
+		\brief	Remove From Block List
+		
+		\do
+			Unblock the given task
+			
+	**/
+	t_unblock(task)=
+	BEGIN
+		IF t_priority(task)>= t_priority(running) THEN
+		    running := task ||
+		    ready := ready \/ { running }
+    	ELSE
+        	ready := ready \/ { task }
+		END ||
+		blocked := blocked - { task }
+	END
+END
