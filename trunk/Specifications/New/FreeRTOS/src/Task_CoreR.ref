@@ -186,12 +186,8 @@ OPERATIONS
 	t_resume (atask) =
 	BEGIN   
     	IF t_priority(atask) >= t_priority(running) THEN
-    	    IF running = TASK_NULL THEN
-    	        running:= atask
-    	    ELSE
-    	    	ready := ready \/ { running } ||
-    	    	running := atask
-    	    END
+    	    ready := ready \/ { running } ||
+    	    running := atask
     	ELSE
     		ready := ready \/ { atask }
     	END ||
@@ -285,8 +281,7 @@ OPERATIONS
 	**/
 	t_startScheduler = 
 	BEGIN
-		
-   	    ANY
+		ANY
    	       	idle_name, 
    	       	idle_task 
         WHERE
@@ -294,15 +289,21 @@ OPERATIONS
            	idle_task : TASK & 
            	idle_task /: tasks 
    	    THEN
-           	tasks := tasks \/ { idle_task }||
-           	t_priority:= t_priority \/ { idle_task|-> IDLE_PRIORITY}||
-           	IF t_priority[ready]={} THEN 
-           	    running:= idle_task
-           	ELSIF IDLE_PRIORITY >= max(t_priority[ready]) THEN
-           	    ready:=ready \/ {running}||           	    
+   	        tasks := tasks \/ { idle_task }||
+   	        t_priority := t_priority\/{idle_task|->0}||
+           	IF ready ={} THEN
            	    running:=idle_task
-            ELSE
-				ready:=ready \/ {idle_task}
+           	ELSE
+           	    ANY 
+           	        task
+           	    WHERE
+           	        task:ready &
+           	        t_priority(task)=max(t_priority[ready])
+           	    THEN
+           	        running:=task||           	        
+           	        ready:=(ready\/{ idle_task })-{task}
+           	    END
+           	    
            	END
            	
 		END
@@ -342,19 +343,24 @@ OPERATIONS
 			unblocked <: blocked
 	   	THEN
    		    IF unblocked /= {} THEN
-   	    		ANY
-   	        		task
-   	    		WHERE
-       	  			task : TASK &
-      				task : unblocked &
-      				t_priority(task)>= t_priority(running)
-   				THEN
-					CHOICE
+   		        IF max(t_priority[unblocked])>=t_priority(running) THEN
+   		            
+   	    			ANY
+   	        			task
+   	    			WHERE
+       	  				task : TASK &
+      					task : unblocked &
+						task : tasks &
+						t_priority(task)>= t_priority(running)&
+						t_priority(task)=max(t_priority[unblocked])
+
+   					THEN
        	    			running := task ||
        	    			ready := ready \/ { running } \/ (unblocked - { task })
-					OR
-				    	ready := ready \/ unblocked
-					END
+       	    		END
+ 
+				ELSE
+				    ready := ready \/ unblocked
    				END ||
    				blocked := blocked - unblocked
    			END

@@ -236,15 +236,12 @@ OPERATIONS
 	PRE 
 	    suspended /= {} & 
     	atask : TASK & 
-    	atask : suspended 
+    	atask : suspended &
+    	running /= TASK_NULL
 	THEN    
     	CHOICE
-    	    IF running = TASK_NULL THEN
-    	        running:= atask
-    	    ELSE
-    	    	ready := ready \/ { running } ||
-    	    	running := atask
-    	    END
+    	    ready := ready \/ { running } ||
+    	    running := atask
     	OR
     		ready := ready \/ { atask }
     	END ||
@@ -370,7 +367,7 @@ OPERATIONS
            	        task:ready
            	    THEN
            	        running:=task||           	        
-           	        ready:=(ready\/{ idle_task })-{task} 
+           	        ready:=(ready\/{ idle_task })-{task}
            	    END
            	    
            	END
@@ -402,7 +399,8 @@ OPERATIONS
 	**/
 	t_resumeAll (tick) = 
 	PRE
-		tick : TICK
+		tick : TICK &
+		running /=TASK_NULL
 	THEN
 	    ANY
 	        unblocked
@@ -411,23 +409,19 @@ OPERATIONS
 			unblocked <: blocked
 	   	THEN
    		    IF unblocked /= {} THEN
-   	    		ANY
-   	        		task
-   	    		WHERE
-       	  			task : TASK &
-      				task : unblocked 
-   				THEN
-   				    IF running =TASK_NULL THEN
-   				        running:=task||
-   				        ready := ready \/ (unblocked - { task })
-   				    ELSE
-						CHOICE
-       	    				running := task ||
-       	    				ready := ready \/ { running } \/ (unblocked - { task })
-						OR
-				    		ready := ready \/ unblocked
-						END
-					END
+   		        CHOICE
+   	    			ANY
+   	        			task
+   	    			WHERE
+       	  				task : TASK &
+       	  				task : tasks &
+      					task : unblocked 
+   					THEN
+       	    			running := task ||
+       	    			ready := ready \/ { running } \/ (unblocked - { task })
+       	    		END
+				OR
+				    ready := ready \/ unblocked
    				END ||
    				blocked := blocked - unblocked
    			END
