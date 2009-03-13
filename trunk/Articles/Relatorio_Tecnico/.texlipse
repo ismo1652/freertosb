@@ -1,13 +1,13 @@
 #TeXlipse project settings
-#Thu Mar 05 16:26:03 BRT 2009
-builderNum=0
+#Thu Mar 05 23:37:06 BRT 2009
+builderNum=2
 outputDir=
 makeIndSty=
 bibrefDir=
-outputFormat=dvi
+outputFormat=pdf
 tempDir=tmp
 mainTexFile=document.tex
-outputFile=document.dvi
+outputFile=document.pdf
 langSpell=pt_BR
 markDer=true
 srcDir=

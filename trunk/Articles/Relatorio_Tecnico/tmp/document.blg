@@ -5,36 +5,36 @@ Database file #1: UFRN-DIMAp-2006-100-RT.bib
 You've used 6 entries,
             2129 wiz_defined-function locations,
             536 strings with 4430 characters,
-and the built_in function-call counts, 1258 in all, are:
-= -- 110
+and the built_in function-call counts, 1387 in all, are:
+= -- 119
 > -- 60
 < -- 0
 + -- 25
 - -- 18
 * -- 73
 := -- 250
-add.period$ -- 18
+add.period$ -- 21
 call.type$ -- 6
 change.case$ -- 25
 chr.to.int$ -- 0
 cite$ -- 6
-duplicate$ -- 52
-empty$ -- 93
+duplicate$ -- 55
+empty$ -- 126
 format.name$ -- 18
-if$ -- 237
+if$ -- 282
 int.to.chr$ -- 0
 int.to.str$ -- 6
 missing$ -- 4
-newline$ -- 33
+newline$ -- 36
 num.names$ -- 12
-pop$ -- 19
+pop$ -- 40
 preamble$ -- 1
 purify$ -- 21
 quote$ -- 0
-skip$ -- 28
+skip$ -- 31
 stack$ -- 0
 substring$ -- 31
-swap$ -- 12
+swap$ -- 15
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
@@ -42,4 +42,4 @@ type$ -- 20
 warning$ -- 0
 while$ -- 12
 width$ -- 7
-write$ -- 61
+write$ -- 67
