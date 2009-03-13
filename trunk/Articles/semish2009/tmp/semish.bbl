@@ -1,0 +1,37 @@
+\begin{thebibliography}{}
+
+\bibitem[Dantas et~al. 2008]{semish:08}
+Dantas, B., Déharbe, D., Galvão, S., Moreira, A.~M., and Jr., V.~M. (2008).
+\newblock Proposta e avaliação de uma abordagem de desenvolvimento de software
+  fidedigno por construção com o método b.
+\newblock In {\em Anais do XXXV Seminário Integrado de Software e Hardware
+  (SEMISH 2008)}.
+
+\bibitem[FreeRTOS ]{freertos:2008}
+FreeRTOS.
+\newblock Freertos:designed for microcontrollers.
+\newblock \url{http://www.freertos.org}, último acesso em Fevereiro de 2008.
+\newblock Site de informações sobre o sistema.
+
+\bibitem[Li and Yao 2003]{li:03}
+Li, Q. and Yao, C. (2003).
+\newblock {\em Real Time Concepts for Embedded Systems}.
+\newblock CMP Books.
+
+\bibitem[S.B.C 2006]{sbc:2006}
+S.B.C (2006).
+\newblock Grandes desafios da pesquisa em computação no brasil 2006-2016.
+\newblock Technical report, Sociedade Brasileira de Computação.
+
+\bibitem[Schneider 2001]{schn:01}
+Schneider, S. (2001).
+\newblock {\em The B-Method: An Introduction}.
+\newblock Palgrave.
+
+\bibitem[Woodcock 2008]{jim:sbmf}
+Woodcock, J. (2008).
+\newblock Grand challenge in software verification.
+\newblock Slides da sua aprensentação no Simpósio Brasileiro de Métodos Formais
+  - SBMF 2008.
+
+\end{thebibliography}
