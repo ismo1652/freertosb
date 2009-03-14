@@ -91,14 +91,15 @@ Assim, o esforço relatado nesse trabalho pretende apenas inicializar a resolução
 dos desafios comentados acima, os quais teram sua completa solução formada pela
 união de esforços de vários trabalhos.
 
-Para essa inicialização, foi criada, utilizando-se o método B \cite{schn:01}, uma
-modelagem abstrata do sistema, na qual, algumas das suas principais propriedades
-são especificadas e comprovadas. O método B servirá assim, como a abordagem
-utilizada para o rigoroso desenvolvimento da ferramenta, pois ele inspirado em
-técnicas de especificação, como VDM e Z, e na teoria de refinamento proporciona
-um rígido desenvolvimento de sistemas, que se inicia na modelagem abstrata de
-um sistema vai até o nível de algoritmo, podendo este último ser estendido para o
-nível de assemblagem do microprocessador alvo \cite{semish:08}.
+Para essa inicialização, foi criada, utilizando-se o método B
+\cite{schn:01}\cite{abrial:96}, uma modelagem abstrata do sistema, na qual,
+algumas das suas principais propriedades são especificadas e comprovadas. O
+método B servirá assim, como a abordagem utilizada para o rigoroso
+desenvolvimento da ferramenta, pois ele inspirado em técnicas de especificação,
+como VDM e Z, e na teoria de refinamento proporciona um rígido desenvolvimento de
+sistemas, que se inicia na modelagem abstrata de um sistema vai até o nível de
+algoritmo, podendo este último ser estendido para o nível de assemblagem do
+microprocessador alvo \cite{semish:08}.
 
 Assim para iniciar essa especificação, primeiramente foi desenvolvido um projeto
 de modelagem com a finalidade de estudar o sistema e identificar os seus
@@ -148,9 +149,6 @@ de entrada e saída, tornando assim o desenvolvimento das aplicações de tempo rea
 mais simples e prático, pois o usuário necessita apenas procupar-se com as
 funcionalidades do sistema deixando os demais detalhes de \textit{hardware} para
 o FreeRTOS. 
-
-[Acho que poderia ser demonstrado um exemplo de como é feita uma aplicação
-utilizando o FreeRTOS]
 
 \begin{figure}[!htb]
 \begin{minipage}[b]{0.45\linewidth}
@@ -262,10 +260,182 @@ disponibilidade ou não do semáforo.
 
 
 \section{O método B} \label{sec:metodob}
+O método B trata-se de uma abordagem orientada a modelos para a especificação
+de componentes de \textit{softwares}. Através dele é possível criar-se sistemas
+coerentes e seguros que comprovadamente realizam as funcionalidades descritas
+em sua especificação. Para isso ele utiliza-se da lógica de primeira ordem e da
+teoria dos conjunto, as quais fornecem base teórica suficiente para suas
+especificações possam ser provadas como coerentes.
 
-[Esta sessão deve obrigatoriamente falar sobre conceitos de substituição,
-modularização e refinamento, como também utilizar um exemplo simples que
-esteja ligado ao contexto do artigo]
+Por ser uma abordagem orientada a modelos, o componente principal da sua
+especificação é o módulo, também chamado de maquina (\textit{Machine} em inglês).
+Esses módulos são criados através de uma notação denominada Notação de Máquina
+Abstrata, na qual os aspectos do sistema são descritos através de partes bem
+definidas da especificação. Por exemplo, a figura~\ref{fig:tarefas_maquina},
+mostra o módulo \textit{Kernel} responsável por especificar um simples sistema que armazena e
+exclui tarefas. Nesse módulo, podemos ver que o mesmo está dividido em seis
+partes bem definidas \textit{MACHINE}, \textit{SETS}, \textit{VARIABLES}, \textit{INVARIANT},
+\textit{INITIALISATION} e \textit{OPERATIONS}
+
+\begin{figure}[!ht]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\MACHINE\\
+\quad \mathit{Kernel}\\
+    
+\SETS\\
+\quad \mathit{TASK}\\
+    
+\VARIABLES\\
+\quad \mathit{tasks}\\
+    
+\INVARIANT\\
+\quad \mathit{tasks} \in \pow(\mathit{TASK}) \land \\
+\quad \mathbf{card}(\mathit{tasks})\leq 10\\
+    
+\INITIALISATION\\
+\quad \mathit{tasks}:=\emptyset\\
+    
+\end{array}
+\begin{array}[t]{l}
+\OPERATIONS\\\\
+\mathit{task\_add}(\mathit{task}) = \\
+\quad \PRE \\
+\quad\quad \mathit{task}\in \mathit{TASK} \land \\
+\quad\quad \mathit{task}\not\in \mathit{tasks} \land\\
+\quad\quad \mathit{card}(\mathit{tasks})<10\\
+\quad \THEN\\
+\quad\quad \mathit{tasks}:=\mathit{tasks}\cup \{\mathit{task}\}\\
+\quad   \END;\\
+
+\end{array}
+
+\begin{array}[t]{l}
+\ldots\\
+\mathit{task\_delete}(\mathit{task})=\\
+\quad \PRE\\
+\quad \quad \mathit{task}\in \mathit{tasks}\\
+\quad \THEN\\
+\quad \quad \mathit{tasks}:=\mathit{tasks}-\{\mathit{task}\}\\
+\quad \END\\
+	
+\END\\
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Maquina abstrata de tarefas}
+\label{fig:tarefas_maquina}
+\end{figure}
+
+A parte \textit{MACHINE} informa que o arquivo é do tipo \textit{Machine}, ou,
+Modulo\footnote{Em B, além do tipo módulo um arquivo pode ser do tipo Refinamento
+ou Implementação}, e o seu nome é $\mathit{Kernel}$. Após isso, tem-se as parte
+\textit{SETS}, onde são definidos os conjuntos abstratos utilizados pelo módulo,
+nesse caso, o conjunto $\mathit{TASK}$, que simboliza o conjunto universo de
+todas as tarefas que podem ser manuseadas pelo sistema. Em, seguida nas partes
+\textit{VARIABLES} e \textit{INVARIANT} são definidos respectivamente os
+estados armazenados pelo sistema, conhecidos como variáveis, e suas restrições.
+Assim, nesse exemplo temos a variável, $\mathit{tasks}$, responsável por
+armazenar as tarefas adicionadas ao sistema, sendo que sua capacidade máxima é
+definida como dez tarefas. E por fim temos as partes de \textit{INITIALISATION},
+onde são colocados os estado iniciais do módulo, e \textit{OPERATIONS}, onde são
+descritas as funcionalidades realizadas pelo sistema denominadas operação. È
+através das operações que o usuário manipula os estados do módulo, no nosso caso,
+incluem e excluem tarefas no sistema.
+
+Agora para garantir a corretude dessa especificação é necessário provar que as
+partes que compõem o módulo estão coerente entre si, ou seja, nunca uma operação
+da máquina ira quebra as restrições impostas ao estado $\mathit{tasks}$. Essa
+coerência é garantida através das obrigações de prova geradas apartir do modelo.
+Um exemplo de uma obrigação de prova desse modelo pode ser visto a seguir, nela
+\textit{INVARIANT} da máquina, presente na parte de baixo da prova, deve ser
+mantido quando a operação $\mathit{tasks}:=\mathit{tasks}\cup \{\mathit{task}\}$
+for executada. Sendo essa facilmente provada.
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\forall \mathit{task}.(\mathit{task} \in \mathit{TASKS} \land
+\mathbf{card}(\mathit{tasks}) < 10 \land
+\mathit{task} \not\in  \mathit{tasks}
+\Rightarrow \\
+\lceil \mathit{tasks}:=\mathit{tasks}\cup \{\mathit{task}\} \rceil
+(\mathit{task}\in \mathit{TASK} \land 
+\mathit{task}\not\in \mathit{tasks} \land
+\mathit{card}(\mathit{tasks})<10)  
+)
+\begin{array}[t]{l}
+\end{array}
+\end{array}
+$$
+\end{small}
+
+
+Entratanto, modelos abstratos são difíceis de serem transformados em código fonte
+executáveis. Para que uma especificação torne-se mais detalhada e mais perto de
+uma especificação implementação o método B proporciona o mecanismo de
+refinamento. Nesse mecanismo, a especificação abstrata é refinada até nível de
+algoritmo, podendo esse também ser refinado para o nível de assembler da máquina
+alvo. Assim cada refinamento adcionas detalhes a especificação abstrata que a
+torma mais próxima do implementável. Um exemplo de refinamento da nossa máquina
+de criar tarefas pode ser visto na figura \ref{fig:tarefas_maquina_r}. Nela a
+variável de tarefas $\mathit{tasks}$ representada por $\mathit{tasksR}$, não é
+mais tratada como um conjunto de tarefa, e sim como uma sequência de tarefas,
+estrutura mais fácil de ser implementada do que um conjunto.
+
+\begin{figure}[!ht]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\mathbf{REFINEMENT}\\
+\quad \mathit{Kernel\_r}\\
+   
+\REFINES\\
+\quad \mathit{Kernel}\\
+   
+\VARIABLES\\
+\quad \mathit{tasks\_r}\\
+\end{array}
+
+    
+
+\begin{array}[t]{l}
+\INVARIANT\\
+\quad \mathit{tasks\_r} \in \mathbf{seq}(\mathit{TASK}) \land \\
+\quad \mathgf{ran}(\mathit{tasks\_r})=\mathit{tasks}\\
+    
+\INITIALISATION\\
+\quad \mathit{tasks\_r}:=[]\\
+\end{array}
+
+
+\begin{array}[t]{l}
+\OPERATIONS\\
+\mathit{task\_add}(\mathit{task}) = \\
+\quad \BEGIN\\
+\quad \quad \mathit{tasks\_r}:=\\
+\quad\quad\quad\quad\mathit{task} \to \mathit{tasks\_r}\\
+\quad \END\\
+    
+\END
+\end{array}
+
+\end{array}
+$$
+\end{small}
+\caption{Refinamento da maquina abstrata de tarefas}
+\label{fig:tarefas_maquina_r}
+\end{figure}
+
+É seguindo esse raciocínio que o método B especifica constrói sistemas de uma
+forma mais segura e coerente. Ele será o formalismo utilizado para especificar
+ferramenta FreeRTOS tornando-a coerente com sua funcionalidade, proporcionando
+assim uma ferramenta capaz de construir sistemas de tempo real mais fidedignos.
 
 \section{Projeto da modelagem}\label{sec:projeto}
 Antes de iniciar a modelagem abstrata de qualquer sistema é necessário
