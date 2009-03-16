@@ -143,26 +143,26 @@ código, que são essencialmente distribuídas em quatro arquivos:
 \texttt{list.c}. Uma outra característica marcante desse sistema está
 na sua portabilidade, sendo o mesmo oficialmente disponível para 17
 arquiteturas diferentes, entre elas a PIC, ARM e Zilog Z80, as quais
-são bastantes difundidas em produtos comerciais através de sistemas
+são amplamente difundidas em produtos comerciais através de sistemas
 computacionais embutidos.
 
-A funcionalidade primordial do FreeRTOS é provê acesso a recursos de
-\textit{hardware}, permitindo o desenvolvimento de sistemas concorrentes de
-tempo-real. Assim, ele funciona como uma camada de abstração, que tem como papel
-esconder dos desenvolvedores de aplicações os detalhes do hardware que será
-utilizado. Mais precisamente, o FreeRTOS fornece para os seus usuários serviços
-de gerenciamento de tarefa, de comunicação e sincronização entre tarefas, de
-memória, de tempo-real e de controle dos dispositivos de entrada e saída. Vale
-salientar que o FreeRTOS assume que a arquitetura alvo possui um único
-processador.
+O FreeRTOS provê acesso a recursos de \textit{hardware}, permitindo o
+desenvolvimento de sistemas concorrentes de tempo-real. Assim, o FreeRTOS
+fornece uma camada de abstração, que tem como papel esconder dos
+desenvolvedores de aplicações os detalhes do hardware que será
+utilizado. Mais precisamente, o FreeRTOS fornece para os seus usuários
+serviços de gerenciamento de tarefa, de comunicação e sincronização
+entre tarefas, de memória, de tempo-real e de controle dos
+dispositivos de entrada e saída. Vale salientar que o FreeRTOS assume
+que a arquitetura alvo possui um único processador.
 
-Para o usuário ter acesso aos seus recursos o FreeRTOS disponibiliza
-funcionalidades sob a forma de uma biblioteca de tipos e funções que são
-linkeditada com o código da aplicação a ser desenvolvida. Tipicamente esse código
-é divido em duas partes: na primeira parte é criado o código das tarefas que
-serão executadas durante a operação do sistema, e na segunda, um código
-responsável pela inicialização do sistema, o qual deverá cadastrar as tarefas e
-dar início ao escalonador, é criado.
+O FreeRTOS disponibiliza esses serviços sob a forma de uma biblioteca
+de tipos e funções que deve ser linkeditada com o código da aplicação
+a ser desenvolvida. Tipicamente esse código é divido em duas partes: a
+primeira contem o código das tarefas que serão executadas durante a
+operação do sistema, e a segunda o código responsável pela
+inicialização do sistema, o qual deverá cadastrar as tarefas e então
+dar início ao escalonador.
 
 Em seguida, são detalhados os principais serviços disponibilizados
 pelo FreeRTOS que serão relevantes para a continuidade do trabalho,
@@ -181,27 +181,25 @@ formada por:
 \item uma prioridade que varia de zero até uma constante de prioridade
   máxima definida pelo o usuário e serve para indicar a importância da
   tarefa para o sistema; e
-\item uma pilha na qual é armazeno o ambiente de execução
-  (estados dos registradores) da tarefa quado está é interrompida;
-  %% DD->DH: NO FREERTOS AS TAREFAS TEM UMA PILHA PARA ARMAZENAR O SEU CONTEXTO
-  %% ACHO QUE FUI INFELIZ EM BOTAR UM NOME PARA A PILHA. A EXPLICAÇÃO DE TAL
-  %% PILHA ESTÁ EM http://www.freertos.org/taskandcr.html 
-
+\item a pilha de execução, na qual também é armazeno o ambiente de
+  execução da tarefa (estados dos registradores) quando está é
+  interrompida.
 \end{itemize}
 
 O FreeRTOS, além de permitir a execução de aplicações multitarefa, dá suporte a
 três tipos de configurações diferentes de gerenciamento de tarefas: preemptivo,
 cooperativo ou híbrido.
 
-Na configuração preemptiva, a tarefa em execução pode ser interrompida a qualquer
-momento pelo escalonador e consequentemente substituída por uma outra tarefa de
-acordo com a política de escalonamento, a qual é baseada em prioridades. Na
-configuração cooperativa, a tarefa em execução não é interrompida pelo
-escalonador, pois ela própria decide o momento de sua pausa seguida da sua
-substituição, que será feita de acordo com a política de escalonamento. E por
-fim, na configuração híbrida, o escalonador funciona hora como preemptivo e hora
-como cooperativo, sendo que um grupo de tarefas faz o escalonamento cooperativo
-entre si e as demais realizam o gerenciamento preemptivo.
+Na configuração preemptiva, a tarefa em execução pode ser interrompida
+a qualquer momento pelo escalonador e consequentemente substituída por
+uma outra tarefa de acordo com a política de escalonamento, a qual é
+baseada em prioridades. Na configuração cooperativa, a tarefa em
+execução não é interrompida pelo escalonador, pois ela própria decide
+o momento de sua pausa seguida da sua substituição, que será feita de
+acordo com a política de escalonamento. E por fim, na configuração
+híbrida, o escalonador funciona hora como preemptivo e hora como
+cooperativo, sendo que um grupo de tarefas faz o escalonamento
+cooperativo entre si e as demais realizam o gerenciamento preemptivo.
 
 %% DD->SG: QUAL A RELACAO COM CO-ROTINAS?
 
@@ -232,8 +230,8 @@ envia uma mensagem para uma fila, e está não estiver cheia, a mensagem é inserid
 na fila, caso contrário, a tarefa permanece bloqueada até que seja liberado um
 lugar na fila. O mesmo ocorre quando uma tarefa deseja ler uma mensagem da fila.
 Se a fila possuir pelo menos uma mensagem, a leitura é realizada (retornando para
-a tarefa a mensagem mais antiga na fila).Entretanto, se a fila estiver vazia, a
-tarefa será bloquada até uma mensagem chegue à fila.
+a tarefa a mensagem mais antiga na fila). Entretanto, se a fila estiver vazia, a
+tarefa será bloquada até que uma mensagem seja inserida na fila.
 
 No FreeRTOS, os semáforos formam o principal serviço de sincronização para o
 acesso a recursos compartilhados. Eles são implementados como uma fila de
@@ -269,7 +267,7 @@ especificação, deve-se efetuar etapas de \emph{refinamento}. Em um
 refinamento, cria-se um novo módulo que deve ser compatível com o
 módulo imediatamente anterior mas que introduz detalhes de
 implementação adicionais. Essa compatibilidade também é determinada
-usando a análise estática. Finalmente as diferentes etapas de
+usando análise estática. Finalmente as diferentes etapas de
 refinamento devem levar a um módulo expresso em uma linguagem
 algorítmica que pode ser traduzida automaticamente em alguma linguagem
 de programação imperativa. No caso do método B, existe tradutores para
@@ -362,7 +360,7 @@ $$
 \label{fig:tarefas_maquina}
 \end{figure}
 
-qA análise estática dessa máquina demanda que seja verificado que ela é
+A análise estática dessa máquina demanda que seja verificado que ela é
 implementável (ou seja que existe alguma solução para ela) e que todos
 os estados alcançáveis sejam estados válidos. Essa análise estática
 é feita através da verificação de condições lógicas. No método B, essas
@@ -463,10 +461,10 @@ $$
 \label{fig:tarefas_maquina_r}
 \end{figure}
 
-É seguindo esse raciocínio que o método B constrói sistemas de uma forma mais
-segura e coerente. Ele será o formalismo utilizado para desenvolver uma
-especificação formal do FreeRTOS. O modelo assim obtido poderá ser usado das
-seguintes formas:
+É seguindo esse raciocínio que o método B permite construir sistemas
+de uma forma mais segura e coerente. Ele será o formalismo utilizado
+para desenvolver uma especificação formal do FreeRTOS. O modelo assim
+obtido poderá ser usado das seguintes formas:
 \begin{itemize}
 \item ser o ponto inicial para o desenvolvimento rigoroso de uma
   implementação das funcionalidades do FreeRTOS.
@@ -478,6 +476,23 @@ seguintes formas:
 
 \section{Projeto da modelagem}\label{sec:projeto}
 
+A modelagem de um sistema complexo com o método B pode ser facilitada
+se usamos táticas como: 
+\begin{enumerate}
+\item Partes dos requisitos podem ser abstraídos da especificação
+  inicial. Os requisitos assim abstraídos podem ser especificados
+  ulteriormente através de refinamentos. Para implantar essa tática,
+  devemos identificar uma seqüência de etapas de modelagem, tendo em
+  cada etapa modelado um número cada vez maior de entidades e
+  funcionalidades do FreeRTOS. Essas diferentes etapas estão descritas
+  no resto dessa seção.
+\item Se não há uma interdependência entre requisitos, eles podem ser
+  especificados em módulos distintos. Esses módulos são então
+  relacionados usando mecanismos de composição do método B (como
+  inclusão, visão, etc.) A estrutura modular da modelagem é
+  apresentada na seção~\ref{sec:modelagem}.
+\end{enumerate}
+
 Em geral, especificações formais são realizadas nas etapas
 preliminares de um projeto. No caso reportado neste artigo, o sistema
 já existe, as funcionalidades já foram elencadas e implementadas. O
@@ -487,17 +502,19 @@ informação estavam disponíveis: a documentação do FreeRTOS, em
 linguagem natural, e o próprio código fonte, já que o sistema é
 distribuído de forma aberta.
 
-A modelagem formal do FreeRTOS foi precedida de uma etapa de estudo 
-visando ganhar familiaridade com o sistema. Nessa etapa, observou-se
-que a estruturação dos tipos e funções da biblioteca permitiria um
-desenvolvimento incremental dessa modelagem. 
+A modelagem formal do FreeRTOS foi então precedida de uma etapa de
+estudo visando ganhar familiaridade com o sistema. Nessa etapa,
+observou-se que a estruturação dos tipos e funções da biblioteca
+permitiria um desenvolvimento incremental dessa modelagem.
 
 As principais entidades do FreeRTOS são: tarefa, fila de mensagens,
 co-rotina, semáforo e mutex. Cada uma dessas entidades possui uma gama
 de funções associadas. No entanto, através do estudo da documentação e
 do código fonte do FreeRTOS, observamos que semáforo e mutex nada mais
-são que casos particulares de filas de mensagens e que tarefa é a entidade
-fundamental do sistema
+são que casos particulares de filas de mensagens e que tarefa é a
+entidade fundamental do sistema
+
+
 
 Assim, para elaborar um primeiro modelo formal do FreeRTOS, foram
 elencadas duas entidades apenas: tarefas e filas de mensagens. Vale
@@ -505,14 +522,15 @@ salientar que a composição dessas duas entidades já resulte em um
 núcleo completo de sistema operacional. De fato, a entidade ``tarefa''
 é essencial, pois ela é responsável pela execução do código da
 aplicação. Em complemento, a entidade ``fila de mensagens'' permite
-não só a comunicação entre tarefas, mas também a sua sincronização
-no acesso a recursos compartilhados.
+não só a comunicação entre tarefas, mas também a sua sincronização no
+acesso a recursos compartilhados.
 
 \subsection{Tarefa}
 
-Dois tipos de funções manipulam a entidade tarefas: gerenciamento de tarefa e
-controle do escalonador. A seguir tem-se a listagem e descrição de cada uma das
-funcionalidades desses grupos escolhidas para fazerem parte da modelagem inicial.
+Dois tipos de funções manipulam a entidade tarefas: gerenciamento de
+tarefa e controle do escalonador. A seguir tem-se a listagem e
+descrição de cada uma das funcionalidades desses grupos escolhidas
+para fazerem parte da modelagem inicial.
 
 As funções de gerenciamento de tarefas são responsáveis por criar,
 excluir e manusear o conceito de tarefa. Tem no total 10 funções,
@@ -565,8 +583,8 @@ sistema em geral. Foram selecionadas as seguintes funções:
 
 \subsection{Fila de mensagens}
 
-Para a manipulação da entidade de fila de mensagens existem as seguintes
-funções:
+Para a manipulação da entidade de fila de mensagens, o FreeRTOS
+disponibiliza as seguintes funções:
 
 \begin{itemize}
   \item{xQueueCreate:} cria uma nova fila de mensagem;
@@ -583,49 +601,45 @@ funções:
 \end{itemize}
 
 \subsection{Níveis de abstração e Próximas funcionalidades}
-Após determinadas as funcionalidades básicas do sistema foi definidos os vários
-níveis de abstração em que essas podem ser especificadas. Assim para uma
-modelagem progressiva e gerenciável do FreeRTOS, os níveis de abstração foram
-organizados da seguinte maneira:
+
+Uma vez determinadas as funcionalidades básicas do sistema, foram
+definidos os vários níveis de abstração em que essas podem ser
+especificadas. Assim para uma modelagem progressiva e gerenciável do
+FreeRTOS, os níveis de abstração foram organizados da seguinte
+maneira:
 
 \begin{enumerate}
-  \item \textbf{Estado de tarefa:} Nesse nível é levando em consideração
-  principalmente o comportamento das funcionalidades em relação ao estado de
-  uma tarefa. Nele também são especificados os estados do escalonador assim
-  como o conceito de tempo, tratado como tick no FreeRTOS
-  \item \textbf{Prioridade:} Através dessasabstração a característica de
-  prioridade é adicionada ao sistema. Procupando-se principalmente em garantir
-  que a tarefa em execução possui prioridade maior ou igual as tarefas de
-  estado pronto
-  \item \textbf{Capacidade da Fila de Mensagens:} Nessa abstração será
-  acrescentada ao modelo o tamanho de uma fila de mensagem, podendo assim
-  quando um tarefa pode ser ou não bloqueada por uma fila.
-  \item \textbf{Troca dos conjuntos por sequência:} Para finalizar a abstração
-  das funcionalidades básicas os estados implementados como conjunto serão
-  substuidos por sequências de elemento, podem assim criar uma ordenação para
-  os elementos do mesmo.
+
+\item \textbf{Estado de tarefa:} Nesse nível é levado em consideração
+  principalmente o comportamento das funcionalidades em relação ao
+  estado de uma tarefa. Nele também são especificados os estados do
+  escalonador assim como o conceito de tempo que, no FreeRTOS, é 
+  tratado como ``tick''.
+
+\item \textbf{Prioridade:} Nesse segundo nível, a característica de
+  prioridade é adicionada ao sistema, procurando-se notadamente em
+  estabelecer a propriedade de que a tarefa em execução possui
+  prioridade maior ou igual as tarefas de estado pronto.
+
+\item \textbf{Capacidade da fila de mensagens:} Nessa abstração será
+  acrescentada ao modelo o tamanho de uma fila de mensagem, podendo
+  assim quando um tarefa pode ser ou não bloqueada por uma fila.
+
+\item \textbf{Adição dos conceitos não elementares:} Semáforos e mutex
+  são especializações de filas de mensagens e a modelagem das
+  funcionalidades associadas será efetuada em última instância,
+  devendo ela ser realizada com base a modelagem de conceitos já
+  disponíveis nessa fase.
+
 \end{enumerate}
 
-Tendo um nível de abstração satisfatória para a verificação de várias do
-sistema em relação as suas funcionalidades classificadas como básica e
-necessário agora acrescentar ao sistema nova funcionalidades. Assim começará
-acrecentando o conceito de semáforo e suas funcionalidades, sendo que tal
-funcionalidades lista a seguir:
-
-\begin{itemize}
-\item \textbf{vSemaphoreCreateBinary:} Criar um semáforo
-\item \textbf{xSemaphoreTake:} Solicita um semáforo
-\item \textbf{xSemaphoreGive:} Libera o semáforo
-\end{itemize} 
-
-Assim o projeto de modelagem segue nesse sentido, definindo níveis de
-refinamentos entre as funcionalidades e quando necessário acrescenta novas
-funcionalidades ao modelo até que uma especificação sólida do FreeRTOS possa
-ser feito e utilizada.
+Uma vez modeladas as diferentes entidades e funcionalidades do
+FreeRTOS, passará-se à fase de construção da implementação, a qual
+consistirá principalmente em mapear as variáveis de estados para
+estruturas de dados concretas como vetores, listas encadeadas, etc.
 
 \section{Modelagem}
 \label{sec:modelagem}
-
 
 A modelagem de um sistema complexo com o método B pode ser facilitada
 se usamos técnicas como: 
@@ -640,12 +654,15 @@ se usamos técnicas como:
 \end{enumerate}
 
 No caso da modelagem do FreeRTOS, usamos ambas táticas para construir
-a especificação. Assim, essa especificação inicial foi divida em vários módulos
-que serão explicados no decorrer da modelagem, ficando a arquitutera básica
-dessas modelagem inicial organizada como mostra a
-figura~\ref{fig:arquitetura_modulos} na qual temos o módulos básico Task\_Core e
-Queue\_Core que são utilizados por módulos mais complexos como Task\_Basic e
-Queue\_Basic, sendo esse último base para o módulo Queue.
+a especificação. Assim, essa especificação inicial foi divida em
+vários módulos que serão explicados no decorrer da modelagem, ficando
+a arquitetra básica dessas modelagem inicial organizada como mostra a
+figura~\ref{fig:arquitetura_modulos}. Os módulos \textbf{Task\_Core} e
+\textbf{Queue\_Core} definam as entidades tarefa e fila de mensagens e
+operações básicas sobre essas entidades. São utilizados por módulos
+mais complexos \textbf{Task\_Basic} e \textbf{Queue\_Basic}, sendo
+esse último usado para definr módulo \textbf{Queue}. 
+%% DD->SG: Explique essa divisão de Queue_Basic e Queue.
 
 \begin{figure}[!h]
 \centering
@@ -654,26 +671,25 @@ Queue\_Basic, sendo esse último base para o módulo Queue.
 \label{fig:arquitetura_modulos}
 \end{figure}
 
-
-Assim, com o intuito de iniciar a modelagem do
-FreeRTOS utilizando a notação de máquina abstrata, foi desenvolvida
-uma especificação abstrata dos conceitos e funcionalidades propostos
-pelo projeto de modelagem.  Nessa especificação abstrata o principal
-objetivo foi modelar os aspectos do sistema relacionados com o
-gerenciamento de tarefas. Assim, as variáveis de estado do modelo
-inicial tem como objetivo representar as tarefas criadas e cadastradas
-no sistema e o estado de cada uma dessas tarefas. Cada função do
-FreeRTOS relacionada com o tratamento de tarefas foi modelada através
-de uma operação na máquina B.
+Assim, com o intuito de iniciar a modelagem do FreeRTOS utilizando a
+notação de máquina abstrata, foi desenvolvida uma especificação
+abstrata dos conceitos e funcionalidades propostos pelo projeto de
+modelagem.  Nessa especificação abstrata o principal objetivo foi
+modelar os aspectos do sistema relacionados com o gerenciamento de
+tarefas. Assim, as variáveis de estado do modelo inicial tem como
+objetivo representar as tarefas criadas e cadastradas no sistema e o
+estado de cada uma dessas tarefas. Cada função do FreeRTOS relacionada
+com o tratamento de tarefas foi modelada através de uma operação na
+máquina B.
 
 Com isso, nessa primeira etapa da especificação inicial, as
-funcionalidades e conceitos do FreeRTOS propostos na sessão
+funcionalidades e conceitos do FreeRTOS propostos na seção
 \ref{sec:projeto} foram especificados apenas com informações
 relevantes para os estados de uma tarefa e suas mudanças de estado.
 
 É importante destacar que, nesse modelo inicial, a modelagem do
 escalonador foi propositalmente simplificada. Para cada função do
-FreeRTOs em que uma nova tarefa podia ser escalonada para se executar,
+FreeRTOS em que uma nova tarefa podia ser escalonada para se executar,
 a operação correspondente no modelo B determina a tarefa escolhida de
 forma não determinística entre todas as tarefas prontas. Assim, o
 conceito de prioridade de tarefas foi totalmente abstraído na
