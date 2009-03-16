@@ -25,7 +25,7 @@ Desenvolvimento de Sistemas de Tempo Real Fidedignos}
   Universidade Federal do Rio Grande do Norte\\
   Campo Universitário, Lagoa Nova\\
   59078-970, Natal, RN, Brasil \\
-  \email{\{stepgalvao,david,junior,anamaria\}@consiste.dimap.ufrn.br}
+  \email{\{stepgalvao,david\}@consiste.dimap.ufrn.br}
 }
 
 \begin{document} 
@@ -248,10 +248,8 @@ associada ao mutex, a tarefa proprietária do mutex tem momentaneamente a sua
 prioridade elevada (herda) ao nível da tarefa solicitante. Essa tarefa,
 momentaneamente promovida, tem assim acesso ao processodor facilitado, o que pode
 garantir uma liberação mais rápida do mutex. Esse mecanismo permite evitar o
-fenômeno de intertravamento de tarefas chamado de inversão de prioridade.
-
-%% DD->SG: INCLUIR REFERENCIA BIBLIOGRAFICA SOBRE PRIORIDADE DE
-%% INVERSAO
+fenômeno de intertravamento de tarefas chamado de inversão de
+prioridade\cite{li:03}.
 
 \section{O método B} \label{sec:metodob}
 
@@ -518,8 +516,8 @@ entidade fundamental do sistema
 
 Assim, para elaborar um primeiro modelo formal do FreeRTOS, foram
 elencadas duas entidades apenas: tarefas e filas de mensagens. Vale
-salientar que a composição dessas duas entidades já resulte em um
-núcleo completo de sistema operacional. De fato, a entidade ``tarefa''
+salientar que a composição dessas duas entidades já resulta em um
+núcleo completo do sistema operacional. De fato, a entidade ``tarefa''
 é essencial, pois ela é responsável pela execução do código da
 aplicação. Em complemento, a entidade ``fila de mensagens'' permite
 não só a comunicação entre tarefas, mas também a sua sincronização no
@@ -532,73 +530,64 @@ tarefa e controle do escalonador. A seguir tem-se a listagem e
 descrição de cada uma das funcionalidades desses grupos escolhidas
 para fazerem parte da modelagem inicial.
 
-As funções de gerenciamento de tarefas são responsáveis por criar,
-excluir e manusear o conceito de tarefa. Tem no total 10 funções,
-sendo que oito foram elencadas para fazer parte do modelo inicial.
-São elas:
 
-\begin{description}
-  
-\item{xTaskCreate:} cria uma nova tarefa;
-\item{xTaskDelete:} remove uma tarefa do FreeRTOS;
-\item{uxTaskPriorityGet:} informa a prioridade de uma tarefa;
-\item{vTaskSuspend:} coloca uma tarefa no estado ``suspenso'';
-\item{vTaskResume:} retorna uma tarefa suspensa colocando-a no estado
+\subsubsection*{Gerenciamento de tarefa}
+\begin{description}  
+\item{\textbf{xTaskCreate:}} cria uma nova tarefa;
+\item{\textbf{xTaskDelete:}} remove uma tarefa do FreeRTOS;
+\item{\textbf{uxTaskPriorityGet:}} informa a prioridade de uma tarefa;
+\item{\textbf{vTaskSuspend:}} coloca uma tarefa no estado ``suspenso'';
+\item{\textbf{vTaskResume:}} retorna uma tarefa suspensa colocando-a no estado
   pronto;
-\item{vTaskPrioritySet:} altera a prioridade de uma tarefa;
-\item{vTaskDelay:} bloqueia uma tarefa por uma determinada
+\item{\textbf{vTaskPrioritySet:}} altera a prioridade de uma tarefa;
+\item{\textbf{vTaskDelay:}} bloqueia uma tarefa por uma determinada
   quantidade de tempo, levando em consideração o instante em que o método foi
   chamada;
-\item{vTaskDelayUntil:} bloqueia uma tarefa por uma determinada
+\item{\textbf{vTaskDelayUntil:}} bloqueia uma tarefa por uma determinada
   quantidade de tempo, levando em consideração o instante em que essa
   foi desbloqueada.
 \end{description}
 
-
-As funcionalidades de controle do escalonador são responsáveis por
-iniciar, finalizar, suspender, retornar e fornecer informações úteis
-sobre as atividades do escalonador em particular, e do núcleo do
-sistema em geral. Foram selecionadas as seguintes funções:
-
-\begin{itemize}
-\item{xTaskGetCurrentTaskHandle:} retorna uma referência para a
+\subsubsection*{Controle do escalonador}
+\begin{description}
+\item{\textbf{xTaskGetCurrentTaskHandle:}} retorna uma referência para a
   tarefa em execução;
-\item{xTaskGetSchedulerState:} informa o atual estado do escalonador
+\item{\textbf{xTaskGetSchedulerState:}} informa o atual estado do escalonador
   (executando, suspenso ou não inicializado);
-\item{uxTaskGetNumberOfTasks:} informa a atual quantidade de tarefas
+\item{\textbf{uxTaskGetNumberOfTasks:}} informa a atual quantidade de tarefas
   tarefas do FreeRTOS;
-\item{xTaskGetTickCount:} informa o tempo decorrido apartir da
+\item{\textbf{xTaskGetTickCount:}} informa o tempo decorrido apartir da
   inicialização do escalonador;
-\item{vTaskStartScheduler:} esse método primeiramente cria a tarefa
+\item{\textbf{vTaskStartScheduler:}} esse método primeiramente cria a tarefa
   ociosa e, em seguida, inicia as atividades do escalonador;
-\item{vTaskEndScheduler:} finaliza as atividades do escalonador
+\item{\textbf{vTaskEndScheduler:}} finaliza as atividades do escalonador
   colocando-o no estado não inicializado; para isso, ele primeiramente
   exclui todas as estruturas (tarefas, filas de mensagens, co-rotinas,
   etc) criadas no FreeRTOS e em seguida finaliza o escalonador;
-\item{vTaskSuspendAll:} suspende temporariamente todas atividades do
+\item{\textbf{vTaskSuspendAll:}} suspende temporariamente as atividades do
   escalonador colocando-o no estado suspenso;
-\item{xTaskResumeAll:} retorna todas as atividades do escalonador
+\item{\textbf{xTaskResumeAll:}} retorna todas as atividades do escalonador
   quando este encontra-se no estado suspenso.
-\end{itemize}
+\end{description}
 
 \subsection{Fila de mensagens}
 
 Para a manipulação da entidade de fila de mensagens, o FreeRTOS
 disponibiliza as seguintes funções:
 
-\begin{itemize}
-  \item{xQueueCreate:} cria uma nova fila de mensagem;
-  \item{xQueueSend:} enviar uma mensagem para uma fila de mensagens;
-  \item{xQueueSendToBack:} envia uma mensagem para o final de uma
+\begin{description}
+  \item{\textbf{xQueueCreate:}} cria uma nova fila de mensagem;
+  \item{\textbf{xQueueSend:}} enviar uma mensagem para uma fila de mensagens;
+  \item{\textbf{xQueueSendToBack:}} envia uma mensagem para o final de uma
   fila de uma fila de mensagens.;
-  \item{xQueueSendToFront:} envia uma mensagem para o início de uma
+  \item{\textbf{xQueueSendToFront:}} envia uma mensagem para o início de uma
   fila de mensagem;
-  \item{xQueueReceive:} ler e retirar a mensagem localizada no início
+  \item{\textbf{xQueueReceive:}} ler e retirar a mensagem localizada no início
   da fila de mensagens;
-  \item{xQueuePeek:} ler sem retirar a mensagem localizada no início da
+  \item{\textbf{xQueuePeek:}} ler sem retirar a mensagem localizada no início da
   fila de mensagens;
-  \item{vQueueDelete} Exclui uma fila de mensagens do FreeRTOS.
-\end{itemize}
+  \item{\textbf{vQueueDelete}} Exclui uma fila de mensagens do FreeRTOS.
+\end{description}
 
 \subsection{Níveis de abstração e Próximas funcionalidades}
 
@@ -653,20 +642,23 @@ se usamos técnicas como:
   inclusão, visão, etc.)
 \end{enumerate}
 
-No caso da modelagem do FreeRTOS, usamos ambas táticas para construir
-a especificação. Assim, essa especificação inicial foi divida em
-vários módulos que serão explicados no decorrer da modelagem, ficando
-a arquitetra básica dessas modelagem inicial organizada como mostra a
-figura~\ref{fig:arquitetura_modulos}. Os módulos \textbf{Task\_Core} e
-\textbf{Queue\_Core} definam as entidades tarefa e fila de mensagens e
-operações básicas sobre essas entidades. São utilizados por módulos
-mais complexos \textbf{Task\_Basic} e \textbf{Queue\_Basic}, sendo
-esse último usado para definr módulo \textbf{Queue}. 
-%% DD->SG: Explique essa divisão de Queue_Basic e Queue.
+No caso da modelagem do FreeRTOS, usamos ambas táticas para construir a
+especificação. Assim, essa especificação inicial foi divida em vários módulos que
+serão explicados no decorrer da modelagem, ficando a arquitetra básica dessas
+modelagem inicial organizada como mostra a figura~\ref{fig:arquitetura_modulos}.
+Os módulos \textbf{Task\_Core} e \textbf{Queue\_Core} definem as entidades tarefa
+e fila de mensagens e operações básicas sobre essas entidades. São utilizados por
+módulos mais complexos \textbf{Task\_Basic} e \textbf{Queue\_Basic}. No primeiro
+são especificadas as função do FreeRTOS referentes a entidade tarefa. E no
+segundo as operações de \textbf{Queue\_Core} são agrupadas em operações mais
+complexa que estão presentes no comportamento da maioria das funções do grupo
+de fila de mensagens, sendo assim esse módulo utilizado pela máquina
+\textbf{Queue} para especificar tais funções. 
+
 
 \begin{figure}[!h]
 \centering
-\includegraphics[scale=0.7]{figuras/arquitetura.jpg}
+\includegraphics[scale=0.6]{figuras/arquitetura.jpg}
 \caption{Organização dos módulos da especificação}
 \label{fig:arquitetura_modulos}
 \end{figure}
@@ -1140,7 +1132,6 @@ especificação do sistema usando outro tipo de formalismo, no qual o
 mais recomendadopara aproveitar a especificação aqui inicializada
 seria o Event B, considerado como uma extensão do método B, para a
 especificação com propriedades concorrentes.
-
 
 \bibliographystyle{sbc}
 \bibliography{sbc-template}
