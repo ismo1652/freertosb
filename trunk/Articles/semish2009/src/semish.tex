@@ -630,31 +630,37 @@ estruturas de dados concretas como vetores, listas encadeadas, etc.
 \section{Modelagem}
 \label{sec:modelagem}
 
-A modelagem de um sistema complexo com o método B pode ser facilitada
-se usamos técnicas como: 
-\begin{enumerate}
-\item Partes dos requisitos podem ser abstraídos da especificação
-  inicial. Os requisitos assim abstraídos podem ser especificados
-  ulteriormente através de refinamentos.
-\item Se não há uma interdependência entre requisitos, eles podem ser
-  especificados em módulos distintos. Esses módulos são então
-  relacionados usando mecanismos de composição do método B (como
-  inclusão, visão, etc.)
-\end{enumerate}
+Essa seção apresenta as duas primeiras etapas do projeto de modelagem
+do FreeRTOS usando o método B: estado de tarefa e prioridade. O primeiro
+nível de modelagem portanto especifica as funcionalidades elementares
+relacionadas com tarefas e filas de mensagens, sem levar em conta o
+aspecto da prioridade.
 
-No caso da modelagem do FreeRTOS, usamos ambas táticas para construir a
-especificação. Assim, essa especificação inicial foi divida em vários módulos que
-serão explicados no decorrer da modelagem, ficando a arquitetra básica dessas
-modelagem inicial organizada como mostra a figura~\ref{fig:arquitetura_modulos}.
-Os módulos \textbf{Task\_Core} e \textbf{Queue\_Core} definem as entidades tarefa
-e fila de mensagens e operações básicas sobre essas entidades. São utilizados por
-módulos mais complexos \textbf{Task\_Basic} e \textbf{Queue\_Basic}. No primeiro
-são especificadas as função do FreeRTOS referentes a entidade tarefa. E no
-segundo as operações de \textbf{Queue\_Core} são agrupadas em operações mais
-complexa que estão presentes no comportamento da maioria das funções do grupo
-de fila de mensagens, sendo assim esse módulo utilizado pela máquina
-\textbf{Queue} para especificar tais funções. 
+% No caso da modelagem do FreeRTOS, usamos ambas táticas para construir a
+% especificação. Assim, essa especificação inicial foi divida em vários módulos que
+% serão explicados no decorrer da modelagem, ficando a arquitetra básica dessas
+% modelagem inicial organizada como mostra a figura~\ref{fig:arquitetura_modulos}.
+% Os módulos \textbf{Task\_Core} e \textbf{Queue\_Core} definem as entidades tarefa
+% e fila de mensagens e operações básicas sobre essas entidades. São utilizados por
+% módulos mais complexos \textbf{Task\_Basic} e \textbf{Queue\_Basic}. No primeiro
+% são especificadas as função do FreeRTOS referentes a entidade tarefa. E no
+% segundo as operações de \textbf{Queue\_Core} são agrupadas em operações mais
+% complexa que estão presentes no comportamento da maioria das funções do grupo
+% de fila de mensagens, sendo assim esse módulo utilizado pela máquina
+% \textbf{Queue} para especificar tais funções. 
 
+A modelagem inicial foi realizada de forma modular, sendo composta de
+diversas máquinas que serão detalhadas no decorrer dessa seção,
+ficando a arquitetura básica organizada conforme mostra a
+figura~\ref{fig:arquitetura_modulos}:
+\begin{itemize}
+\item A máquina $\mathit{Task\_Core}$ define a entidade tarefa e operações
+básicas sobre essa entidade.
+\item Similarmente, a máquina $\mathit{Queue\_Core}$ define a entidade fila de mensagens e operações básicas associadas.
+\item $\mathit{Task\_Basic}$ %% DD -> SG complemente
+\item $\mathit{Queue\_Basic}$ %% DD -> SG complemente
+\item $\mathit{Queue}$ %% DD -> SG complemente
+\end{itemize}
 
 \begin{figure}[!h]
 \centering
@@ -663,61 +669,18 @@ de fila de mensagens, sendo assim esse módulo utilizado pela máquina
 \label{fig:arquitetura_modulos}
 \end{figure}
 
-Assim, com o intuito de iniciar a modelagem do FreeRTOS utilizando a
-notação de máquina abstrata, foi desenvolvida uma especificação
-abstrata dos conceitos e funcionalidades propostos pelo projeto de
-modelagem.  Nessa especificação abstrata o principal objetivo foi
-modelar os aspectos do sistema relacionados com o gerenciamento de
-tarefas. Assim, as variáveis de estado do modelo inicial tem como
-objetivo representar as tarefas criadas e cadastradas no sistema e o
-estado de cada uma dessas tarefas. Cada função do FreeRTOS relacionada
-com o tratamento de tarefas foi modelada através de uma operação na
-máquina B.
+\subsection{Tarefas}
 
-Com isso, nessa primeira etapa da especificação inicial, as
-funcionalidades e conceitos do FreeRTOS propostos na seção
-\ref{sec:projeto} foram especificados apenas com informações
-relevantes para os estados de uma tarefa e suas mudanças de estado.
-
-É importante destacar que, nesse modelo inicial, a modelagem do
-escalonador foi propositalmente simplificada. Para cada função do
-FreeRTOS em que uma nova tarefa podia ser escalonada para se executar,
-a operação correspondente no modelo B determina a tarefa escolhida de
-forma não determinística entre todas as tarefas prontas. Assim, o
-conceito de prioridade de tarefas foi totalmente abstraído na
-especificação do comportamento das operações \emph{nessa modelagem
-  inicial}.
-
-Porém, observamos na seção~\ref{sec:freertos} que, no FreeRTOS, a
-tarefa em execução tinha que ter uma prioridade maior ou igual às das
-tarefas prontas. A modelagem inicial que desenvolvemos claramente não
-permite garantir isto. Foi então o propósito do nosso primeiro
-refinamento introduzir restrições adicionais quanto à prioridade das
-tarefas.
-
-\subsection{Modelagem da característica de estado de uma tarefa}
-
-A modelagem abstrata dos conceitos e funcionalidades do sistema
-baseada na característica de estado de uma tarefa pode, assim como no
-projeto de modelagem, ser dividida em dois grupos, grupo de tarefa e grupo
-de fila de mensagens. No grupo de tarefa, como o próprio nome já diz,
-estão presentes os modulos que especificam o conceito de tarefa e suas
-funcionalidades e no grupo de fila de mensagens estão os módulos
-responsáveis pelo conceito de fila de mensagens e suas
-funcionalidades.
-
-\subsubsection{Tarefa}
-
-A modelagem mais abstrata do conceito de tarefas foi realizado na
-máquina, $\mathit{Task\_Core}$ (seus trechos os mais relevantes estão
-na figura~\ref{fig:tarefa_especificacao}). Nela, o conjunto abstrato
-$\mathit{TASK}$ representa o tipo da entidade ``tarefa'' do FreeRTOS.
-A variável de estado $\mathit{tasks}$ representa o conjunto de tarefas
-que estão sendo gerenciadas pelo sistema. Além disso, são
-identificados os conjuntos de tarefa $\mathit{running}$,
-$\mathit{ready}$, $\mathit{blocked}$ e $\mathit{suspended}$, os quais
-representam as tarefas que estão respectivamente no estado executando,
-pronto, bloqueado e suspenso. 
+As definições de base relacionadas com tarefas foram realizadas na
+máquina $\mathit{Task\_Core}$ (veja os trechos mais relevantes na
+figura~\ref{fig:tarefa_especificacao}). Nela, $\mathit{TASK}$
+representa o tipo da entidade ``tarefa'' do FreeRTOS.  A variável de
+estado $\mathit{tasks}$ representa o conjunto de tarefas que estão
+sendo gerenciadas pelo sistema. Além disso, são identificados os
+conjuntos de tarefa $\mathit{running}$, $\mathit{ready}$,
+$\mathit{blocked}$ e $\mathit{suspended}$, os quais representam as
+tarefas que estão respectivamente no estado executando, pronto,
+bloqueado e suspenso.
 
 \begin{figure}[!ht]
 \begin{small}
@@ -781,17 +744,16 @@ Uma tarefa deve estar em um único estado, o que é expresso no
 invariante da máquina, usando uma formulação simples na teoria dos
 conjuntos.
 
-Uma vez determinada, de forma bastante abstrata, o tipo dos estados e
-caracterizado aqueles considerados válidos, foram especificadas
-algumas operações básicas responsáveis por alterar as características
-de uma tarefa, acrescentar ou eliminar uma tarefa, etc. Essas
-operações básicas também estão presentes na máquina
-$\mathit{Task\_Core}$, e são usadas para especificar as funcionaliades
-do FreeRTOS relacionadas com o conceito de tarefas. Ao todo, foram
-criadas 12 operações, das quais iremos observar apenas a operação
-$\mathit{t\_create}$, responsável pela criação de uma nova
-tarefa\footnote{O leitor interessado nas demais operações está
-  convidado a visitar o repositório no endereço
+Essas definições caracterizam, de forma abstrata, a parte do estado
+relacionada com as tarefas de qualquer instância do FreeRTOS. Além
+disso, a máquina $\mathit{Task\_Core}$ define operações básicas
+responsáveis por alterar as características de uma tarefa, acrescentar
+ou eliminar uma tarefa, etc. Essas operações serão usadas para
+especificar as funcionaliades do FreeRTOS relacionadas com o conceito
+de tarefas. Ao todo, foram criadas 12 operações, das quais iremos
+observar apenas a operação $\mathit{t\_create}$, responsável pela
+criação de uma nova tarefa\footnote{O leitor interessado nas demais
+  operações está convidado a visitar o repositório no endereço
   \texttt{http://code.google.com/p/freertosb}.}
 
 A operação $\mathit{t\_create}$ é apresentada na
@@ -803,10 +765,12 @@ aplicada quando não houver tarefa em execução. A criação é
 especificada através da substituição não determinística
 $\mathit{ANY}$, onde é definido que a nova tarefa, nomeada
 $\mathit{task}$, é qualquer valor do tipo $\mathit{TASK}$ que não
-esteja elemento do conjunto $\mathit{tasks}$, sendo, em seguida,
-armazenada na variável $\mathit{task}$. Esse valor é resultado da
-operação e as variáveis de estado $\mathit{tasks}$ e $\mathit{ready}$
-são alteradas para também incluir esse valor.
+esteja elemento do conjunto $\mathit{tasks}$. Assim garantimos que
+$\mathit{task}$ não representa uma tarefa já existente no sistema.
+Esse valor é resultado da operação e as variáveis de estado
+$\mathit{tasks}$ e $\mathit{ready}$ são alteradas para também incluir
+esse valor: no FreeRTOS, quando uma tarefa é criada, esta é
+considerada pronta para ser escalonada.
 
 \begin{figure}[!h]
 \begin{small}
@@ -845,24 +809,38 @@ $$
 \label{fig:t_create}
 \end{figure} 
 
-\subsubsection*{Funcionalidades} 
-
-Feita a modelagem das operações básicas do conceito de tarefa, resta
-apenas especificar as funcionalidades que se utilizam desse
-conceito. A especificação dessas funcionalidades é feita através da
-máquina $\mathit{Task\_Core}$, na qual estão prensentes as
-funcionalidades dos conjuntos controle de tarefa e controle do kernel
-da sessão \ref{subsubsec:tarefa_funcionalidades}. Entretanto aqui
-demonstraremos apenas a especificação da funcionalidade
+Uma vez especificados o conceito de tarefa no FreeRTOS assim como
+operações elementares para acessar e alterar o atual conjunto de
+tarefas, pode se realizar a especificação das funcionalidades que são
+disponibilizados para os usuários do FreeRTOS. A especificação dessas
+funcionalidades é feita através da máquina $\mathit{Task\_Core}$, na
+qual estão presentes as funções de controle de tarefa, mas também do
+escalonador \ref{subsubsec:tarefa_funcionalidades}. Essa seção
+limita-se a apresentar a especificação da função
 $\mathit{xTaskCreate}$, a qual utiliza-se da operação básica
 $\mathit{t\_create}$ para criar uma nova tarefa que sera gerenciada
-pelo FreeRTOS. Assim, a especificação dessa funcionalidade foi feita
-como demonstra a figura \ref{fig:xTaskCreate}, onde são identificados
-dois comportamentos possíveis para a função: ou a tarefa é criada
-através da chamada ao método $\mathit{t\_create}$ e uma referência
-para a nova tarefa é retornada, junto com a mensagem de sucesso; ou, a
-tarefa não é criada e uma referência nula, junto com a mensagem de
-erro, é retornada.
+pelo FreeRTOS. A especificação de $\mathit{xTaskCreate}$ é apresentada
+na figura \ref{fig:xTaskCreate}, onde são identificados dois
+comportamentos possíveis para a função: ou a tarefa é criada através
+da chamada ao método $\mathit{t\_create}$ e uma referência para a nova
+tarefa é retornada, junto com a mensagem de sucesso; ou, a tarefa não
+é criada e uma referência nula, junto com a mensagem de erro, é
+retornada.
+
+Os parâmetros da operação correspondem aos parâmetros da função do
+FreeRTOS modelada, embora não estejam usados neste nível de abstração.
+Essa inclusão é necessária para garantir compatibilidade com os
+refinamentos futuros.
+
+Um outro detalhe operacional é que, na implementação do FreeRTOS,
+quando a função \texttt{xTaskCreate} é aplicada, o gancho para a
+tarefa criada é obtido pelo usuário através de um parâmetro de tipo
+ponteiro (técnica clássica para simular uma passagem de parâmetro por
+referência). Na notação de máquina abstrata, não há ponteiros, nem
+parâmetros por referência, mas as operações podem retornar múltiplos
+resultados. A modelagem apresentada utiliza então esse recurso para
+especificar parâmetros ponteiros de funções FreeRTOS que são usados
+para retornar valores.
 
 \begin{figure}[!h]
 \begin{small}
@@ -907,25 +885,30 @@ $$
 \label{fig:xTaskCreate}
 \end{figure}
 
-\subsubsection{Fila de mensagens}
+\subsection{Fila de mensagens}
 
-Independente de qualquer abstração, para iniciar-se a especificação do
-conceito de fila de mensagens é necessário que essa possua um conjunto
-capaz de armazenar as mensagens que serão enviadas para a fila. Com
-base nisso e na necessidade de preocupar-se como a característica de
-estado de uma tarefa, o conceito de fila de mensagens foi especificado
-pelo módulo $\mathit{Queue\_Core}$ como demonstra a
-figura~\ref{fig:fila_especificacao}. Nela, inicialmente tem-se os
-conjuntos abstratos $\mathit{QUEUE}$ e $\mathit{ITEM}$, que simbolizam
-respectivamente o conjunto universo das filas de mensagens e suas
-mensagens. Em seguida, a variáveis $\mathit{queues}$ é criadas para
-armazenar as filas de mensagens que estão sendo gerenciadas pelo
-FreeRTOS. E por fim, são criadas as relações $\mathit{queue\_items}$,
-$ \mathit{queue\_sending}$ e $\mathit{queue\_receiving}$, responsáveis
-por ligar uma fila de mensagens a um conjunto de itens, a um conjunto
-de tarefas que esperam para enviar uma mensagem para a fila e a um
-conjunto de tarefa que aguardam para ler uma mensagem da fila,
-respectivamente.
+Como no caso das tarefas, a especificação dos elementos do FreeRTOS
+relacionados com filas de mensagens é estruturada em diversos módulos.
+Na base, existe um módulo, identificado como $\mathit{QUEUE\_CORE}$, e
+apresentado na figura~\ref{fig:fila_especificacao}, que agrupa a
+especificação das entidades de base, dos componentes de estado do
+FreeRTOS relacionados com essas entidades, e das operações elementares
+para acessar e manipular esses componentes.
+
+Nela, são declarados os tipos $\mathit{QUEUE}$ e $\mathit{ITEM}$, que
+representam respectivamente filas de mensagens e suas mensagens.  A
+variável de estado $\mathit{queues}$ representa o conjunto das filas
+de mensagens que estão sendo gerenciadas pelo FreeRTOS. As demais
+variáveis de estado representam relacionamentos entre os diferentes
+tipos de entidades:
+\begin{itemize}
+\item $\mathit{queue\_items}$ modela o conteúdo das filas de
+  mensagens. 
+\item $\mathit{queue\_sending}$ e $\mathit{queue\_receiving}$ associam
+  respectivamente a cada fila o conjunto de tarefas que esperam para
+  enviar uma mensagem nessa fila e o conjunto de tarefas que aguardam
+  para ler uma mensagem dessa fila.
+\end{itemize}
 
 \begin{figure}[!h]
 \begin{small}
@@ -975,41 +958,52 @@ $$
 Assim como ocorreu na modelagem do conceito de tarefa, após
 especificar-se o conceito de fila de mensagens foram criadas também,
 na máquina $\mathit{Queue\_Core}$, algumas operações básica
-responsáveis por manipular as características do conceito. Com isso
-foram implementadas o total de seis operações, nas quais são feitas as
-inclusões e exclusões de mensagens e tarefas nos conjuntos que formam
-o conceito de fila de mensagens. E para finalizar essa especificação
-abstrata, após a criação das operações básicas, as funcionalidades que
-utilizam o conceito de fila de mensagens (funcionalidades do grupo
-gerenciamento de fila de mensagens) foram especificadas pela máquina
-$\mathit{Queue}$.
+responsáveis por manipular as características do conceito. 
+
+Com isso foram implementadas o total de seis operações, nas quais são
+feitas as inclusões e exclusões de mensagens e tarefas nos conjuntos
+que formam o conceito de fila de mensagens. 
+
+%% DD->SG
+%% Colocar um exemplo
+
+E para finalizar essa
+especificação abstrata, após a criação das operações básicas, as
+funcionalidades que utilizam o conceito de fila de mensagens
+(funcionalidades do grupo gerenciamento de fila de mensagens) foram
+especificadas pela máquina $\mathit{Queue}$.
   
-\subsection{Modelagem da característica de prioridade de uma tarefa}
+%% DD->SG
+%% Colocar um exemplo
+
+\subsection{Prioridades de tarefa}
 
 Para adicionar a característica de prioridade de uma tarefa à
 modelagem inicial, foi necessário apenas fazer o refinamento do
 conceito de tarefa e suas operações básicas, ou seja, o refinamento da
 máquina $\mathit{Task\_Core}$. Essa simplicidade é consequência direta
 da modularição realizada na primeira etapa da especificação, pois as
-demais máquinas que se utilizam do conceito de tarefa fazem esse uso
+demais máquinas que utilizam o conceito de tarefa fazem esse uso
 através do módulo $\mathit{Task\_Core}$, sendo necessário apenas o
 refinamento do mesmo para que a característica de prioridade seja
-adicionada a modelagem. Esse refinamento é feito através da máquina
+adicionada a modelagem. Esse refinamento é feito através do módulo
 $\mathit{Task\_CoreR}$ no qual os estados e operações do módulo
 $\mathit{Task\_Core}$ são refinados de acordo com os comportamentos
 exigidos pela característica de prioridade.
 
-\subsubsection{Refinamento do conceito de tarefa}
-
 A nova especificação do conceito de tarefa ficou refinada como
 demonstra a figura~\ref{fig:tarefa_refinamento}. Nela foram
-adicionadas a definição do conjunto de prioridade,
-$\mathit{PRIORITY}$, que até o momento tratava-se de um conjunto
-abstrato, a variável $\mathit{t\_priority}$, usada para ligar uma
-tarefa a sua prioridade e a restrição presente nas seis últimas linhas
-do $\mathit{INVARIANT}$ a qual especifica que, após inicializado o
-funcionamento do sistema a tarefa em execução deve possui prioridade
-maior ou igual às tarefas de estado pronto.
+introduzidas:
+\begin{itemize}
+\item a definição do conjunto de prioridade, $\mathit{PRIORITY}$ o
+  qual, no nível anterior, tinha sido deixado abstrato, 
+\item uma variável $\mathit{t\_priority}$, que é uma função que
+  associa a uma tarefa a sua prioridade,
+\item e a restrição no invariante usado para especificar que os
+  estados válidos devem garantir que, uma vez inicializado o
+  escalonador, não há tarefa pronta com prioridade maior que a
+  tarefa em execução.
+\end{itemize}
 
 \begin{figure}[!ht]
 \begin{small}
