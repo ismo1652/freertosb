@@ -649,17 +649,28 @@ aspecto da prioridade.
 % de fila de mensagens, sendo assim esse módulo utilizado pela máquina
 % \textbf{Queue} para especificar tais funções. 
 
-A modelagem inicial foi realizada de forma modular, sendo composta de
-diversas máquinas que serão detalhadas no decorrer dessa seção,
-ficando a arquitetura básica organizada conforme mostra a
-figura~\ref{fig:arquitetura_modulos}:
+A modelagem inicial foi realizada de forma modular, sendo composta de diversas
+máquinas que serão detalhadas no decorrer dessa seção, ficando a arquitetura
+básica organizada conforme mostra a figura~\ref{fig:arquitetura_modulos}:
 \begin{itemize}
 \item A máquina $\mathit{Task\_Core}$ define a entidade tarefa e operações
 básicas sobre essa entidade.
-\item Similarmente, a máquina $\mathit{Queue\_Core}$ define a entidade fila de mensagens e operações básicas associadas.
-\item $\mathit{Task\_Basic}$ %% DD -> SG complemente
-\item $\mathit{Queue\_Basic}$ %% DD -> SG complemente
-\item $\mathit{Queue}$ %% DD -> SG complemente
+\item Similarmente, a máquina $\mathit{Queue\_Core}$ define a entidade fila de
+mensagens e operações básicas associadas.
+\item $\mathit{Task\_Basic}$ Nessa máquina são especificadas as funcões da API
+do FreeRTOS escolhidas na sessão \ref{sec:projeto} que manipulam o conceito de
+tarefa, ou seja, as funções dos grupo controle de tarefa e gerenciamento do
+escalonador
+\item $\mathit{Queue\_Basic}$ Essa máquina foi adicionada devido a observação
+que nas funções da API do FreeRTOS que manipulam a entidade fila de mensagens
+varias comportamentos se repentem. Assim para agrupar esses comportamentos essa
+máquina intermidiária foi criada. Nela as operações básicas da máquina
+$\mathit{Queue\_Core}$ foram agrupadas em operações mais complexas.
+
+\item $\mathit{Queue}$. Nessa máquina é onde, através da utilização das
+operações da máquina $\mathit{Queue\_Basic}$, são especificadas as funções da
+API do FreeRTOS que manipulam o conceito de fila de mensagens.
+
 \end{itemize}
 
 \begin{figure}[!h]
@@ -705,13 +716,13 @@ $$
 \mathbf{INVARIANTS}\\
 
 \quad \mathit{tasks} \in \mathbf{FIN}(\mathit{TASK}) \land \\
-\quad \mathit{tasks} \neq \emptyset \land \\\\
+\quad \mathit{tasks} \neq \emptyset \land \\
 
 \quad \mathit{blocked}	\in \mathbf{FIN}(\mathit{TASK}) \land \\
-\quad \mathit{blocked} \subset \mathit{tasks} \land \\\\
+\quad \mathit{blocked} \subset \mathit{tasks} \land \\
 
 \quad \mathit{ready} \in \mathbf{FIN}(\mathit{TASK}) \land \\
-\quad \mathit{ready} \subset \mathit{tasks} \land \\\\	
+\quad \mathit{ready} \subset \mathit{tasks} \land \\	
 
 \quad \mathit{suspended} \in \mathbf{FIN}(\mathit{TASK}) \land \\
 \quad \mathit{suspended} \subset \mathit{tasks} \land \\
@@ -723,11 +734,11 @@ $$
 \quad \mathit{running} \in \mathit{tasks} \land \\
 \quad \mathit{running}  \not\in \mathit{ready} \land \\
 \quad \mathit{running} \not\in  \mathit{blocked} \land \\
-\quad \mathit{running} \not\in  \mathit{suspended} \land \\\\
+\quad \mathit{running} \not\in  \mathit{suspended} \land \\
 
 \quad \mathit{ready} \cap \mathit{blocked} = \emptyset \land \\ 
 \quad \mathit{blocked} \cap \mathit{suspended} = \emptyset \land \\
-\quad \mathit{suspended} \cap \mathit{ready} = \emptyset \land \\\\
+\quad \mathit{suspended} \cap \mathit{ready} = \emptyset \land \\
 
 \quad \mathit{tasks} = \mathit{\{running\}} \cup \mathit{suspended} \\ 
 \quad\quad\quad\quad\quad \cup \mathit{blocked} \cup \mathit{ready}
@@ -873,7 +884,7 @@ $$
 \mathit{result}:=\mathit{errMEMORY} \parallel \\ 
 \quad \quad 
 \mathit{handle} := \mathit{TASK\_NULL} \\
-\quad \END\\\\
+\quad \END\\
 \END;
 \end{array}
 
@@ -960,21 +971,142 @@ especificar-se o conceito de fila de mensagens foram criadas também,
 na máquina $\mathit{Queue\_Core}$, algumas operações básica
 responsáveis por manipular as características do conceito. 
 
-Com isso foram implementadas o total de seis operações, nas quais são
-feitas as inclusões e exclusões de mensagens e tarefas nos conjuntos
-que formam o conceito de fila de mensagens. 
+Com isso foram implementadas o total de seis operações, nas quais são feitas as
+inclusões e exclusões de mensagens e tarefas nos conjuntos que formam a entidade
+fila de mensagens. Com exemplo tem-se a operação $\mathit{sendItem}$, na
+figura~\ref{fig:sendItem} que é responsável por incluir uma mensagens, aqui
+referenciada como $\mathit{pxItem}$, no conjunto de mensagens da fila $\mathit{pxQueue}$. E em seguida, na mesma fila,
+a tarefa $\mathit{task}$ é retirada do conjunto de tarefas que aguardam pela
+chegada de uma mensagem, $\mathit{queue_receiving}$, criando assim, uma operação
+básica para especificar chega de uma mesagem na fila de mensagem.
 
-%% DD->SG
-%% Colocar um exemplo
+\begin{figure}[!h]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
 
-E para finalizar essa
-especificação abstrata, após a criação das operações básicas, as
-funcionalidades que utilizam o conceito de fila de mensagens
-(funcionalidades do grupo gerenciamento de fila de mensagens) foram
-especificadas pela máquina $\mathit{Queue}$.
+\mathit{sendItem}( \mathit{pxQueue}, \mathit{pxItem}
+					\mathit{task},\mathit{copy\_position}) = \\
+\mathbf{PRE}\\
+\quad  \mathit{pxQueue} \in \mathit{queues} \land \\ 
+\quad  \mathit{pxItem} \in \mathit{ITEM} \land \\ 
+\quad  \mathit{task}\in \mathit{TASK} \land \\ 
+\quad  \mathit{copy\_position} \in \mathit{COPY\_POSITION} \land\\    
+\quad  \mathit{task} \in \mathit{queue\_receiving}(\mathit{pxQueue})\\
+\mathbf{THEN}\\
+\quad  \mathit{queue\_items}(\mathit{pxQueue}):=
+				\mathit{queue\_items}(\mathit{pxQueue}) \cup \{\mathit{pxItem}\}\parallel\\
+\quad  \mathit{queue\_receiving}(\mathit{pxQueue}) :=
+				\mathit{queue\_receiving}(\mathit{pxQueue}) - \{\mathit{task}\} \\
+\mathbf{END};
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Modelagem da operação $\mathit{sendItem}$}
+\label{fig:sendItem}
+\end{figure}
+
+%% SG->DD:Vou colocar aqui duas versões dessa parte para o Sr. descidir a melhor
+% sendo que ná primeira versão eu do prioridade para a máquina Queue_Basic no
+% lugar de Queue e na segunda e oficial a máquina Queue é preferida.
+
+Uma particularidade presentes na funções que manipulam as entidades de fila de
+mensagens é que na maioria deles podemos a repetição de dois comportamentos: um
+para enviar uma mensagem para uma fila e o segundo para ler uma mensagem de uma
+fila. Assim esses comportamentos foram agrupados em operações intermediárias
+através da máquina $\mathbf{Queue_Core}$, resultando em duas operações principais
+$\mathit{xQueueGenericSend}$ e $\mathit{xQueueGenericReceive}$. Na figura
+\ref{fig:xQueueGenericSend} temos trechos da especificação da operação
+$\mathit{xQueueGenericSend}$ onde ou uma mensagem $\mathit{pvItemToQueue}$ é 
+passada para a fila de mensagens, causando o desbloqueio da tarefa
+$\mathit{task}$, ou a tarefa que utilizou-se da operação, tarefa corrente, é
+bloqueada, representando o comportamento de fila cheia, ou nenhuma mensagem é
+enviada e a tarefa não é bloqueda, retornado uma mensagem de erro.
+
+\begin{figure}[!h]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}   	
+\ldots\\
+\quad \mathbf{ANY}\\
+\quad \quad \mathit{task}\\
+\quad \mathbf{WHERE}\\
+\quad \quad \mathit{task} \in \mathit{TASK} \land \\ 
+\quad \quad \mathit{task}\in \mathit{blocked} \land \\
+\quad  \quad \mathit{task}\in \mathit{queue_receiving}(\mathit{pxQueue})\\ 
+\quad \mathbf{THEN}\\
+\quad \quad \mathit{sendItem}(\mathit{pxQueue}
+			,\mathit{pvItemToQueue},\mathit{task,copy_position})\parallel\\
+\quad \quad \mathit{Unblock}(task)\parallel\\ 
+\quad \quad \mathit{return}:=\mathit{pdPASS}\\
+\quad \mathbf{END}\\        	
+\ldots\\
+\quad
+\mathit{insertTaskWaitingToSend}(\mathit{pxQueue},\mathit{running})\parallel \\
+\quad \mathit{DelayTask}(\mathit{xTicksToWait})\parallel\\
+\quad \mathit{return}:=\mathit{pdTRUE}\\
+\ldots\\
+\quad \mathit{return}:=\mathit{errQUEUE\_FULL}\\
+\ldots
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Comportamentos da operação $\mathit{xQueueGenericReceive}$}
+\label{fig:xQueueGenericSend}
+\end{figure}
+
+Com isso, para especificar as funções que manipulam a entidade fila de
+mensagens, a máquina $\mathbf{Queue}$ necessita apenas realizar chamadas às
+operações da máquina $\mathbf{Queue_Basic}$, pois os comportamentos dessas
+funcionalidades foram agrupados em $\mathbf{Queue_Basic}$ para facilitar a
+especificação
+
+%E para finalizar essa especificação abstrata, após a criação das operações
+%básicas, as funções da API que utilizam o conceito de fila de mensagens foram
+%especificadas pela máquina $\mathbf{Queue}$. Sendo que nessa especificação são
+%utilizadas a operações espeficicadas pela máquina $\mathbf{Queue_Basic}$, na
+%qual estão presentes as operações responsáveis por enviar um mensagem para a
+%fila e ler uma mensagem da fila. Como exemplo de uma função especificada pela
+%máquina $\mathbf{Queue}$ tem-se a $\mathit{xQueueSend}$, que utiliza-se da
+%operação $\mathit{xQueueGenericSend}$ especificada na máquina
+%$\mathbf{Queue_Basic}$ para enviar uma mensagem para a uma fila de mensagens.
+
+
+%\begin{figure}[!h]
+%\begin{small}
+%$$
+%\begin{array}[t]{ccc}
+%\begin{array}[t]{l}  
+%\mathit{return} \longleftarrow \mathit{xQueueSend}(\mathit{pxQueue},
+%\mathit{pvItemToQueue}, \mathit{xTicksToWait})=\\
+%\mathbf{PRE}\\
+%\quad \mathit{pxQueue}\in \mathit{queues}  \land\\  
+%\quad \mathit{pvItemToQueue} \in \mathit{ITEM}  \land\\  
+%\quad \mathit{xTicksToWait}\in \mathit{TICK}\\
+%\mathbf{THEN}\\
+%\quad \mathbf{ANY}\\ 
+%\quad\quad \mathit{copy\_position}\\
+%\quad \mathbf{WHERE}\\
+%\quad\quad \mathit{copy\_position} \in \mathit{COPY\_POSITION}\\
+%\quad \mathbf{THEN}\\
+%\quad\quad \mathit{return} \gets \mathit{xQueueGenericSend}(\mathit{pxQueue},
+%\mathit{pvItemToQueue},\\
+%\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad
+%\mathit{xTicksToWait},\mathit{copy\_position})\\ 
+%\quad \mathbf{END}\\
+%\mathbf{END};
+%\end{array}
+%\end{array}
+%$$
+%\end{small}
+%\caption{Operação $\mathit{xQueueSend}$}
+%\label{fig:xQueueSend}
+%\end{figure}
   
-%% DD->SG
-%% Colocar um exemplo
 
 \subsection{Prioridades de tarefa}
 
