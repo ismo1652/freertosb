@@ -1,8 +1,0 @@
-digraph {
-FreeRTOSConfig [ label=" FreeRTOSConfig " shape= box ]
-Memory [ label=" Memory " shape= box ]
-Task [ label=" Task " shape= box ]
-Task_Concern [ label=" Task_Concern " shape= box ]
-Types [ label=" Types " shape= box ]
-
-}
