@@ -1,0 +1,37 @@
+\begin{thebibliography}{1}
+
+\bibitem{project}
+\MakeUppercase{Déharbe, D; Galvão, S\/}.
+\newblock {\bf Modelling freertos - a route sheet}.
+\newblock \url{http://docs.google.com/Doc?id=dhptkrcw_855dpm2ccf5}, 2008.
+\newblock Projeto da modelagem inicial do FreeRTOS.
+
+\bibitem{repository}
+\MakeUppercase{Déharbe, D; Galvão, S\/}.
+\newblock {\bf Repositório do projeto de modelagem do freertos}.
+\newblock \url{http://freertosb.googlecode.com/svn/trunk/}, 2008.
+\newblock Repositório do projeto de modelagem do FreeRTOS.
+
+\bibitem{freertos}
+\MakeUppercase{FreeRTOS\/}.
+\newblock {\bf Freertos}.
+\newblock \url{http://www.freertos.org/2002}, último acesso em Fevereiro de
+  2008.
+\newblock Site de informações sobre o FreeRTOS.
+
+\bibitem{Li:2003}
+\MakeUppercase{Li, Q; Yao, C\/}.
+\newblock {\bf Real Time Concepts for Embedded Systems}.
+\newblock CMP Books, 2003.
+
+\bibitem{Schn:01}
+\MakeUppercase{Schneider, S\/}.
+\newblock {\bf The B-Method: An Introduction}.
+\newblock Palgrave, 2001.
+
+\bibitem{jim:sbmf}
+\MakeUppercase{Woodcock, J\/}.
+\newblock {\bf Grand challenge in software verification}.
+\newblock Slides apresentados no SBMF 2008, 2008.
+
+\end{thebibliography}
