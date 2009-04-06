@@ -1,5 +1,5 @@
 
-/* Queue_Basic
+/* QueueCore
 
  \brief Basic layer of definitions for queue support in FreeRTOS.
  
@@ -11,17 +11,17 @@
  Universidade Federal do Rio Grande do Norte
  Departamento de Informática e Matemática Aplicada
  Programa de Pos-Graduacao em Sistemas e Computacao
- Formal Methods and Languages Laboratory
+ Formal Methods and Languages Research Laboratory
 */ 
 
 MACHINE
 
-    Queue_Core
+    QueueCore
 
 SEES
 
     Types,
-    Task_Core
+    TaskCore
 
 SETS
     ITEM;			/** queue items */
@@ -42,14 +42,14 @@ PROPERTIES
     REMOVE_EVENT = 
     	%(task, queues, pending).
     		(task : TASK & queues : POW(QUEUE) & pending : QUEUE +-> POW(TASK) |
-    				%(queue).(queue : queues | pending(queue) - {task}))
+    				%(queue).(queue : queues & queue : dom(pending) | pending(queue) - {task}))
                             
-ASSERTIONS
+/*ASSERTIONS
     
     !(task, queues, pending).
     	(task : TASK & queues : POW(QUEUE) & pending : QUEUE +-> POW(TASK) => 
-    	    dom(REMOVE_EVENT(task, queues, pending)) = queues)
-    	    
+    	    dom(REMOVE_EVENT(task, queues, pending)) = (queues /\ dom(pending)))
+*/    	    
 VARIABLES
 
     /** Different queues in FreeRTOS */
