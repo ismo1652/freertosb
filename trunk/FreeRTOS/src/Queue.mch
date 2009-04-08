@@ -15,10 +15,12 @@
  */ 
 MACHINE
     Queue
+    
 SEES
-    Types    
+    Types
+    
 INCLUDES
-    Queue_Basic
+    QueueBasic
 
 PROMOTES
 	xQueueCreate

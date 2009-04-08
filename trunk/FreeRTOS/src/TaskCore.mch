@@ -112,7 +112,7 @@ OPERATIONS
 	result <-- t_create (priority) =
 	PRE
 	    priority : PRIORITY &
-	    running=TASK_NULL
+	    running = TASK_NULL
 	THEN	
 	  	ANY
     	    task

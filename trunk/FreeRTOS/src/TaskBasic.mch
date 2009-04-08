@@ -21,8 +21,7 @@
  Formal Methods and Languages Laboratory
 */
 MACHINE
-
-    Task_Basic
+    TaskBasic
 
 SEES
 
@@ -30,11 +29,14 @@ SEES
     Types
     
 INCLUDES
-
-    Task_Core,
-    Queue_Core
+    TaskCore
+    
+EXTENDS
+    QueueCore
+    
 SETS
-    SCHEDULER_STATE = {taskSCHEDULER_NOT_STARTED, taskSCHEDULER_RUNNING, taskSCHEDULER_SUSPENDED}
+    SCHEDULER_STATE = 
+    {taskSCHEDULER_NOT_STARTED, taskSCHEDULER_RUNNING, taskSCHEDULER_SUSPENDED}
     
 VARIABLES
     
@@ -79,9 +81,10 @@ OPERATIONS
 	PRE
     	pvTaskCode : TASK_CODE & 
     	pcName : NAME & 
-    	usStackDepth : NATURAL &  
-    	pvParameters <: PARAMETER & 
-    	uxPriority : PRIORITY
+    	usStackDepth : NAT &  
+    	pvParameters : POW(PARAMETER) & 
+    	uxPriority : PRIORITY &
+    	running = TASK_NULL
 	THEN 
 	    CHOICE 
         	handle <-- t_create (uxPriority) ||
@@ -149,11 +152,10 @@ OPERATIONS
 		\brief	Resume Task
 		
 		\do	
-			This method resume a suspended tasks. If the task resumed have the priority great than current task.
-			the resumed task will be the current task and the current task will go to ready task list.
+			This method resume a suspended task. If the resumed task has priority greater than current task, the resumed task will be the current task and the current task will go to ready task list.
 			 
 		\parameters 
-			pxTaskToResume - Task that will be resume
+			pxTaskToResume - Task that will be resumed
 			
 	**/
 	vTaskResume(pxTaskToResume) =
@@ -161,7 +163,8 @@ OPERATIONS
     	INCLUDE_vTaskSuspend = 1 &
     	suspended /= {} & 
     	pxTaskToResume : TASK & 
-    	pxTaskToResume : suspended
+    	pxTaskToResume : suspended &
+    	running /= TASK_NULL
 	THEN    
     	t_resume (pxTaskToResume)	
 	END;
@@ -362,7 +365,8 @@ OPERATIONS
 	**/
 	xTaskResumeAll = 
 	PRE
-	    scheduler = taskSCHEDULER_SUSPENDED
+	    scheduler = taskSCHEDULER_SUSPENDED &
+	    running /= TASK_NULL
 	THEN
 	    CHOICE
     		scheduler := taskSCHEDULER_RUNNING ||
@@ -382,7 +386,9 @@ OPERATIONS
 			blocked list.
 	**/
 	incrementTick =
-	BEGIN
+	PRE
+	    running /= TASK_NULL
+	THEN
     	IF scheduler = taskSCHEDULER_RUNNING THEN 
     	    tickCount := TICK_INCREMENT(tickCount, 1)
     	ELSE 

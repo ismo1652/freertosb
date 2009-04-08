@@ -1,4 +1,4 @@
-/* Queue_Basic
+/* QueueBasic
 
  \brief Queue API of FreeRTOS
  
@@ -12,18 +12,18 @@
  Departamento de Informatica e Matematica Aplicada
  Programa de Pos-Graduacao em Sistemas e Computacao
  Formal Methods and Languages Laboratory
- */ 
+ */
 MACHINE
-    Queue_Basic
+    QueueBasic
 SEES
-    Types    
+    Types
 INCLUDES
-    Queue_Core,
-    Task_Core,
+    QueueCore,
+    TaskCore,
     FreeRTOSConfig
 
 PROMOTES
-	xQueueCreate
+        xQueueCreate
     
 OPERATIONS
     
@@ -46,13 +46,14 @@ OPERATIONS
     	pxQueue:queues  &  
     	pvItemToQueue:ITEM  &  
     	xTicksToWait:TICK &
-    	copy_position:COPY_POSITION
+    	copy_position:COPY_POSITION &
+    	running/= TASK_NULL
 	THEN
 	    IF (xTicksToWait>0) 
 	    THEN 
 	    	CHOICE
         		insertTaskWaitingToSend(pxQueue,running)|| 
-        		DelayTask(xTicksToWait)||
+        		t_delayTask(xTicksToWait)||
         		return:=pdTRUE        	
     		OR
     			ANY 
@@ -63,7 +64,7 @@ OPERATIONS
 		   			task:queue_receiving(pxQueue)
         		THEN
        				sendItem(pxQueue,pvItemToQueue,task,copy_position)||
-       				Unblock(task)||
+       				t_unblock(task)||
        				return:=pdPASS
         		END        
    	 		END
@@ -78,7 +79,7 @@ OPERATIONS
 		   			
        			THEN
    					sendItem(pxQueue,pvItemToQueue,task,copy_position)||
-   					Unblock(task)||
+   					t_unblock(task)||
    					return:=pdPASS
        			END
        		OR
@@ -114,14 +115,15 @@ OPERATIONS
 	PRE
     	xQueue:queues & 
     	xTicksToWait:TICK &
-    	justPeeking : BIT
+    	justPeeking : BIT &
+    	running /= TASK_NULL
 	THEN
 	    IF xTicksToWait > 0
 	    THEN
 	        
     		CHOICE
         		insertTaskWaitingToRecived(xQueue,running)||
-        		DelayTask(xTicksToWait)||
+        		t_delayTask(xTicksToWait)||
         		return,pvBuffer:=pdTRUE,ITEM_NULL
     		OR
         		ANY 
@@ -132,7 +134,7 @@ OPERATIONS
         	    	task:blocked
         		THEN         
         			pvBuffer<--receivedItem(xQueue,justPeeking,task)||
-        			IF justPeeking=pdFALSE THEN Unblock(task) END
+        			IF justPeeking=pdFALSE THEN t_unblock(task) END
         		END|| 
         		return:=pdPASS
         	END
@@ -143,11 +145,11 @@ OPERATIONS
         	    	task 
         		WHERE 
         	    	task:TASK & 
-        	    	task: queue_sending(xQueue) & 
+        	    	task:queue_sending(xQueue) & 
         	    	task:blocked
         		THEN         
         			pvBuffer<--receivedItem(xQueue,justPeeking,task)||
-        			IF justPeeking=pdFALSE THEN Unblock(task) END
+        			IF justPeeking=pdFALSE THEN t_unblock(task) END
         		END|| 
         		return:=pdPASS
         	OR
