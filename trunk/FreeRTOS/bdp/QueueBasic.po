@@ -1,0 +1,21 @@
+THEORY ProofList IS
+  _f(1) & _f(2) & _f(7) & xQueueGenericReceive.1,(_f(4) & _f(5) => _f(6));
+  _f(1) & _f(2) & _f(3) & xQueueGenericSend.1,(_f(4) & _f(5) => _f(6))
+END
+&
+THEORY Formulas IS
+  ("`Seen and used machines properties'" & BIT = 0..1 & pdTRUE: BIT & pdTRUE = 1 & pdFALSE: BIT & pdFALSE = 0 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & ERROR_DEFINITION = -5.. -1 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: 0..2147483647 & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}));
+  ("`Included,imported and extended machines properties'" & QUEUE_NULL: QUEUE & ITEM_NULL: ITEM & REMOVE_EVENT: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) & REMOVE_EVENT = %(task,queues,pending).(task: TASK & queues: POW(QUEUE) & pending: QUEUE +-> POW(TASK) | %queue.(queue: queues & queue: dom(pending) | pending(queue)-{task})) & ITEM: FIN(INTEGER) & not(ITEM = {}) & COPY_POSITION: FIN(INTEGER) & not(COPY_POSITION = {}) & QUEUE: FIN(INTEGER) & not(QUEUE = {}) & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TASK_NULL: TASK & TICK_INCREMENT: TICK*TICK +-> TICK & dom(TICK_INCREMENT) = TICK*TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & configMAX_PRIORITIES: INTEGER & configMAX_PRIORITIES<=2147483647 & -2147483647<=configMAX_PRIORITIES & 1<=configMAX_PRIORITIES & configTOTAL_HEAP_SIZE: INTEGER & configTOTAL_HEAP_SIZE<=2147483647 & -2147483647<=configTOTAL_HEAP_SIZE & 0<=configTOTAL_HEAP_SIZE & configMINIMAL_STACK_SIZE: INTEGER & configMINIMAL_STACK_SIZE<=2147483647 & -2147483647<=configMINIMAL_STACK_SIZE & 0<=configMINIMAL_STACK_SIZE & INCLUDE_uxTaskPriorityGet: BIT & INCLUDE_vTaskDelete: BIT & INCLUDE_vTaskSuspend: BIT & INCLUDE_xTaskGetSchedulerState: BIT & INCLUDE_vTaskPrioritySet: BIT & INCLUDE_xTaskGetCurrentTaskHandle: BIT & INCLUDE_vTaskDelayUntil: BIT & INCLUDE_vTaskDelay: BIT & "`Included,imported and extended machines invariants'" & queues: POW(QUEUE) & queue_items: QUEUE +-> POW(ITEM) & queue_receiving: QUEUE +-> POW(TASK) & queue_sending: QUEUE +-> POW(TASK) & queues = dom(queue_items) & queues = dom(queue_receiving) & queues = dom(queue_sending) & tasks: FIN(TASK) & TASK_NULL: tasks & blocked: FIN(TASK) & blocked: POW(tasks) & ready: FIN(TASK) & ready: POW(tasks) & suspended: FIN(TASK) & suspended: POW(tasks) & running: TASK & running: tasks & not(running: ready) & not(running: blocked) & not(running: suspended) & not(TASK_NULL: suspended) & not(TASK_NULL: ready) & not(TASK_NULL: blocked) & ready/\blocked = {} & blocked/\suspended = {} & suspended/\ready = {} & tasks = {running}\/suspended\/blocked\/ready\/{TASK_NULL} & "`Seen and used machines assertions'" & ERROR_DEFINITION: POW(INTEGER) & BIT: POW(NATURAL));
+  ("`xQueueGenericSend preconditions in this component'" & pxQueue: queues & pvItemToQueue: ITEM & xTicksToWait: TICK & copy_position: COPY_POSITION & not(running = TASK_NULL));
+  ("`Local hypotheses'" & 1<=xTicksToWait);
+  "`Check preconditions of called operation, or While loop construction, or Assert predicates'";
+  (not(xTicksToWait = 0));
+  ("`xQueueGenericReceive preconditions in this component'" & xQueue: queues & xTicksToWait: TICK & justPeeking: BIT & not(running = TASK_NULL))
+END
+&
+THEORY EnumerateX 
+END
+&
+THEORY Version IS
+  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO, genDivergencePO == KO, local_op == OK)
+END

@@ -1,0 +1,61 @@
+THEORY ProofList IS
+  _f(1) & _f(2) & _f(6) & _f(24) & incrementTick.7,(_f(32) & _f(30) => _f(25));
+  _f(1) & _f(2) & _f(6) & _f(24) & incrementTick.6,(_f(31) & _f(30) => _f(25));
+  _f(1) & _f(2) & _f(6) & _f(24) & incrementTick.5,(_f(29) & _f(30) => _f(25));
+  _f(1) & _f(2) & _f(6) & _f(24) & incrementTick.4,(_f(28) & _f(21) => _f(25));
+  _f(1) & _f(2) & _f(6) & _f(24) & incrementTick.3,(_f(27) & _f(21) => _f(25));
+  _f(1) & _f(2) & _f(6) & _f(24) & incrementTick.2,(_f(26) & _f(21) => _f(25));
+  _f(1) & _f(2) & _f(6) & _f(24) & incrementTick.1,(_f(8) => _f(25));
+  _f(1) & _f(2) & _f(6) & _f(18) & xTaskResumeAll.4,(_f(23) & _f(21) => _f(19));
+  _f(1) & _f(2) & _f(6) & _f(18) & xTaskResumeAll.3,(_f(22) & _f(21) => _f(19));
+  _f(1) & _f(2) & _f(6) & _f(18) & xTaskResumeAll.2,(_f(20) & _f(21) => _f(19));
+  _f(1) & _f(2) & _f(6) & _f(18) & xTaskResumeAll.1,(_f(8) => _f(19));
+  _f(1) & _f(2) & _f(6) & _f(15) & vTaskDelayUntil.1,(_f(16) & _f(8) => _f(17));
+  _f(1) & _f(2) & _f(6) & _f(13) & vTaskDelay.1,(_f(8) => _f(14));
+  _f(1) & _f(2) & _f(6) & _f(10) & vTaskSuspend.1,(_f(11) & _f(8) => _f(12));
+  _f(1) & _f(2) & _f(6) & _f(7) & vTaskDelete.1,(_f(8) => _f(9));
+  _f(1) & _f(2) & Initialisation.1,(_f(3) & _f(4) => _f(5))
+END
+&
+THEORY Formulas IS
+  ("`Seen and used machines properties'" & configMAX_PRIORITIES: INTEGER & configMAX_PRIORITIES<=2147483647 & -2147483647<=configMAX_PRIORITIES & 1<=configMAX_PRIORITIES & configTOTAL_HEAP_SIZE: INTEGER & configTOTAL_HEAP_SIZE<=2147483647 & -2147483647<=configTOTAL_HEAP_SIZE & 0<=configTOTAL_HEAP_SIZE & configMINIMAL_STACK_SIZE: INTEGER & configMINIMAL_STACK_SIZE<=2147483647 & -2147483647<=configMINIMAL_STACK_SIZE & 0<=configMINIMAL_STACK_SIZE & INCLUDE_uxTaskPriorityGet: BIT & INCLUDE_vTaskDelete: BIT & INCLUDE_vTaskSuspend: BIT & INCLUDE_xTaskGetSchedulerState: BIT & INCLUDE_vTaskPrioritySet: BIT & INCLUDE_xTaskGetCurrentTaskHandle: BIT & INCLUDE_vTaskDelayUntil: BIT & INCLUDE_vTaskDelay: BIT & BIT = 0..1 & pdTRUE: BIT & pdTRUE = 1 & pdFALSE: BIT & pdFALSE = 0 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & ERROR_DEFINITION = -5.. -1 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: 0..2147483647 & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & "`Component properties'" & (1..3)*{SCHEDULER_STATE}: FIN(NATURAL*{SCHEDULER_STATE}) & not((1..3)*{SCHEDULER_STATE} = {}));
+  ("`Included,imported and extended machines properties'" & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TASK_NULL: TASK & TICK_INCREMENT: TICK*TICK +-> TICK & dom(TICK_INCREMENT) = TICK*TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & QUEUE_NULL: QUEUE & ITEM_NULL: ITEM & REMOVE_EVENT: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) & REMOVE_EVENT = %(task,queues,pending).(task: TASK & queues: POW(QUEUE) & pending: QUEUE +-> POW(TASK) | %queue.(queue: queues & queue: dom(pending) | pending(queue)-{task})) & ITEM: FIN(INTEGER) & not(ITEM = {}) & COPY_POSITION: FIN(INTEGER) & not(COPY_POSITION = {}) & QUEUE: FIN(INTEGER) & not(QUEUE = {}) & "`Included,imported and extended machines invariants'" & tasks: FIN(TASK) & TASK_NULL: tasks & blocked: FIN(TASK) & blocked: POW(tasks) & ready: FIN(TASK) & ready: POW(tasks) & suspended: FIN(TASK) & suspended: POW(tasks) & running: TASK & running: tasks & not(running: ready) & not(running: blocked) & not(running: suspended) & not(TASK_NULL: suspended) & not(TASK_NULL: ready) & not(TASK_NULL: blocked) & ready/\blocked = {} & blocked/\suspended = {} & suspended/\ready = {} & tasks = {running}\/suspended\/blocked\/ready\/{TASK_NULL} & queues: POW(QUEUE) & queue_items: QUEUE +-> POW(ITEM) & queue_receiving: QUEUE +-> POW(TASK) & queue_sending: QUEUE +-> POW(TASK) & queues = dom(queue_items) & queues = dom(queue_receiving) & queues = dom(queue_sending) & "`Seen and used machines assertions'" & ERROR_DEFINITION: POW(INTEGER) & BIT: POW(NATURAL));
+  ("`Local hypotheses'" & {TASK_NULL}: FIN(TASK) & {}: FIN(TASK) & {}: POW({}) & {TASK_NULL} = {TASK_NULL}\/{}\/{}\/{}\/{TASK_NULL} & {}: POW(QUEUE) & {}: QUEUE +-> POW(ITEM) & {}: QUEUE +-> POW(TASK) & dom({}) = {});
+  "`Check that the invariant (tickCount: TICK) is established by the initialisation - ref 3.3'";
+  (0: TICK);
+  ("`Component invariant'" & tickCount: TICK & tickMissed: TICK & scheduler: (1..3)*{SCHEDULER_STATE});
+  ("`vTaskDelete preconditions in this component'" & INCLUDE_vTaskDelete = 1 & pxTaskToDelete: tasks & not(pxTaskToDelete = TASK_NULL) & not(tasks = {pxTaskToDelete}));
+  "`Check preconditions of called operation, or While loop construction, or Assert predicates'";
+  (pxTaskToDelete: TASK);
+  ("`vTaskSuspend preconditions in this component'" & INCLUDE_vTaskSuspend = 1 & pxTaskToSuspend: tasks & not(pxTaskToSuspend = TASK_NULL));
+  ("`Local hypotheses'" & not(pxTaskToSuspend: suspended));
+  (pxTaskToSuspend: TASK);
+  ("`vTaskDelay preconditions in this component'" & xTicksToDelay: TICK & INCLUDE_vTaskDelay = 1 & not(running = TASK_NULL) & not(TICK_INCREMENT(tickCount,xTicksToDelay) = 0));
+  (TICK_INCREMENT(tickCount,xTicksToDelay): TICK);
+  ("`vTaskDelayUntil preconditions in this component'" & pxPreviousWakeTime: TICK & xTimeIncrement: TICK & not(running = TASK_NULL) & INCLUDE_vTaskDelayUntil = 1);
+  ("`Local hypotheses'" & not(TICK_INCREMENT(pxPreviousWakeTime,xTimeIncrement) = 0));
+  (TICK_INCREMENT(pxPreviousWakeTime,xTimeIncrement): TICK);
+  ("`xTaskResumeAll preconditions in this component'" & scheduler = 3|->SCHEDULER_STATE & not(running = TASK_NULL));
+  (TICK_INCREMENT(tickCount,tickMissed): TICK);
+  ("`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked) & not(unblocked = {}) & task: TASK & task: tasks & task: unblocked & blocked-unblocked: FIN(TASK) & blocked-unblocked: POW(tasks) & ready\/{running}\/unblocked-{task}: FIN(TASK) & ready\/{running}\/unblocked-{task}: POW(tasks) & not(task: ready) & not(task = running) & not(task: blocked & not(task: unblocked)) & not(task: suspended) & not(TASK_NULL: unblocked & not(TASK_NULL = task)) & not(TASK_NULL: blocked & not(TASK_NULL: unblocked)) & ready\/{running}\/unblocked-{task}/\blocked-unblocked = {} & blocked-unblocked/\suspended = {} & suspended/\(ready\/{running}\/unblocked-{task}) = {} & tasks = {task}\/suspended\/blocked-unblocked\/(ready\/{running}\/unblocked-{task})\/{TASK_NULL});
+  "`Check that the invariant (tickCount: TICK) is preserved by the operation - ref 3.4'";
+  ("`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked) & not(unblocked = {}) & blocked-unblocked: FIN(TASK) & blocked-unblocked: POW(tasks) & ready\/unblocked: FIN(TASK) & ready\/unblocked: POW(tasks) & not(running: unblocked) & not(running: blocked & not(running: unblocked)) & not(TASK_NULL: unblocked) & not(TASK_NULL: blocked & not(TASK_NULL: unblocked)) & ready\/unblocked/\blocked-unblocked = {} & blocked-unblocked/\suspended = {} & suspended/\(ready\/unblocked) = {} & tasks = {running}\/suspended\/blocked-unblocked\/(ready\/unblocked)\/{TASK_NULL});
+  ("`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked) & unblocked = {});
+  ("`incrementTick preconditions in this component'" & not(running = TASK_NULL));
+  (TICK_INCREMENT(tickCount,1): TICK);
+  ("`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked) & not(unblocked = {}) & task: TASK & task: tasks & task: unblocked & scheduler = 2|->SCHEDULER_STATE & blocked-unblocked: FIN(TASK) & blocked-unblocked: POW(tasks) & ready\/{running}\/unblocked-{task}: FIN(TASK) & ready\/{running}\/unblocked-{task}: POW(tasks) & not(task: ready) & not(task = running) & not(task: blocked & not(task: unblocked)) & not(task: suspended) & not(TASK_NULL: unblocked & not(TASK_NULL = task)) & not(TASK_NULL: blocked & not(TASK_NULL: unblocked)) & ready\/{running}\/unblocked-{task}/\blocked-unblocked = {} & blocked-unblocked/\suspended = {} & suspended/\(ready\/{running}\/unblocked-{task}) = {} & tasks = {task}\/suspended\/blocked-unblocked\/(ready\/{running}\/unblocked-{task})\/{TASK_NULL});
+  ("`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked) & not(unblocked = {}) & scheduler = 2|->SCHEDULER_STATE & blocked-unblocked: FIN(TASK) & blocked-unblocked: POW(tasks) & ready\/unblocked: FIN(TASK) & ready\/unblocked: POW(tasks) & not(running: unblocked) & not(running: blocked & not(running: unblocked)) & not(TASK_NULL: unblocked) & not(TASK_NULL: blocked & not(TASK_NULL: unblocked)) & ready\/unblocked/\blocked-unblocked = {} & blocked-unblocked/\suspended = {} & suspended/\(ready\/unblocked) = {} & tasks = {running}\/suspended\/blocked-unblocked\/(ready\/unblocked)\/{TASK_NULL});
+  ("`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked) & unblocked = {} & scheduler = 2|->SCHEDULER_STATE);
+  ("`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked) & not(unblocked = {}) & task: TASK & task: tasks & task: unblocked & not(scheduler = 2|->SCHEDULER_STATE) & blocked-unblocked: FIN(TASK) & blocked-unblocked: POW(tasks) & ready\/{running}\/unblocked-{task}: FIN(TASK) & ready\/{running}\/unblocked-{task}: POW(tasks) & not(task: ready) & not(task = running) & not(task: blocked & not(task: unblocked)) & not(task: suspended) & not(TASK_NULL: unblocked & not(TASK_NULL = task)) & not(TASK_NULL: blocked & not(TASK_NULL: unblocked)) & ready\/{running}\/unblocked-{task}/\blocked-unblocked = {} & blocked-unblocked/\suspended = {} & suspended/\(ready\/{running}\/unblocked-{task}) = {} & tasks = {task}\/suspended\/blocked-unblocked\/(ready\/{running}\/unblocked-{task})\/{TASK_NULL});
+  "`Check that the invariant (tickMissed: TICK) is preserved by the operation - ref 3.4'";
+  ("`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked) & not(unblocked = {}) & not(scheduler = 2|->SCHEDULER_STATE) & blocked-unblocked: FIN(TASK) & blocked-unblocked: POW(tasks) & ready\/unblocked: FIN(TASK) & ready\/unblocked: POW(tasks) & not(running: unblocked) & not(running: blocked & not(running: unblocked)) & not(TASK_NULL: unblocked) & not(TASK_NULL: blocked & not(TASK_NULL: unblocked)) & ready\/unblocked/\blocked-unblocked = {} & blocked-unblocked/\suspended = {} & suspended/\(ready\/unblocked) = {} & tasks = {running}\/suspended\/blocked-unblocked\/(ready\/unblocked)\/{TASK_NULL});
+  ("`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked) & unblocked = {} & not(scheduler = 2|->SCHEDULER_STATE))
+END
+&
+THEORY EnumerateX IS
+  SCHEDULER_STATE == {taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED}
+END
+&
+THEORY Version IS
+  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO, genDivergencePO == KO, local_op == OK)
+END
