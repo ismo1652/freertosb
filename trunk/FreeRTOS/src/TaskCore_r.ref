@@ -1,4 +1,4 @@
-/* Task_CoreR
+/* TaskCore_r
 
  \brief Refinement of Task Core .
  
@@ -14,9 +14,10 @@
  
 */
 REFINEMENT
-	Task_CoreR
+    TaskCore_r
+    
 REFINES
-	Task_Core
+	TaskCore
 
 SEES
 	FreeRTOSConfig ,
@@ -385,3 +386,4 @@ OPERATIONS
 		blocked := blocked - { task }
 	END
 END
+
