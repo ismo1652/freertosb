@@ -45,11 +45,11 @@ CONSTANTS
 
 PROPERTIES
 
-	configMAX_PRIORITIES : INT &
+	configMAX_PRIORITIES : NAT &
 	configMAX_PRIORITIES >=1 &
-	configTOTAL_HEAP_SIZE : INT &
+	configTOTAL_HEAP_SIZE : NAT &
 	configTOTAL_HEAP_SIZE >= 0 &
-	configMINIMAL_STACK_SIZE : INT  &
+	configMINIMAL_STACK_SIZE : NAT  &
 	configMINIMAL_STACK_SIZE >= 0 &
 	INCLUDE_uxTaskPriorityGet : BIT &
 	INCLUDE_vTaskDelete : BIT &
@@ -82,6 +82,10 @@ No Used
 & configMAX_SYSCALL_INTERRUPT_PRIORITY : NATURAL
 & INCLUDE_vTaskCleanUpResources : BIT
 */
+
+ASSERTIONS
+    configMAX_PRIORITIES : NATURAL
+    
 END
 
 

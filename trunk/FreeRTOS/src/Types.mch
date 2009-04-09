@@ -17,9 +17,18 @@ MACHINE
 
 SETS 
 	NAME; /*Set of all avaliable name, strings */
-	PARAMETER /* Universal set of function parameters  */
+	PARAMETER; /* Universal set of function parameters  */
+	TASK;		/** tasks */	    
+    STACK;		/** stack of task**/
+    TASK_CODE;  /* pointer to code of task*/
+    SCHEDULER_STATE = 
+    {taskSCHEDULER_NOT_STARTED, taskSCHEDULER_RUNNING, taskSCHEDULER_SUSPENDED}
+    
 
-CONSTANTS
+CONSTANTS 
+    PRIORITY,	/** task priorities */
+    TICK, /*Tick available in freeRTOS*/
+    TICK_INCREMENT, /** function used to update the tick counter */	
     
 	BIT, /* Definition of bit set*/
 	
@@ -75,7 +84,17 @@ PROPERTIES
 		MAX_DELAY : 0..MAXINT &
 		1 <= MAX_DELAY & 
 	
-	NULL_PARAMETER : PARAMETER
+	NULL_PARAMETER : PARAMETER &
+
+    PRIORITY : POW(NAT) & 
+    
+    
+    TICK : POW (NAT) &
+    TICK = 0..MAX_DELAY &
+    
+    TICK_INCREMENT: TICK * TICK --> TICK &
+    TICK_INCREMENT = %(tick, inc).(tick : TICK & inc : TICK | (tick+inc) mod MAX_DELAY)
+    
 
 ASSERTIONS
 	ERROR_DEFINITION <: INTEGER &

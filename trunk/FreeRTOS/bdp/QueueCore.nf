@@ -13,7 +13,7 @@ THEORY LoadedStructureX IS
 END
 &
 THEORY ListSeesX IS
-  List_Sees(Machine(QueueCore))==(Types,TaskCore)
+  List_Sees(Machine(QueueCore))==(Types,QueueContext)
 END
 &
 THEORY ListUsesX IS
@@ -56,7 +56,7 @@ THEORY ListInvariantX IS
   Gluing_List_Invariant(Machine(QueueCore))==(btrue);
   Expanded_List_Invariant(Machine(QueueCore))==(btrue);
   Abstract_List_Invariant(Machine(QueueCore))==(btrue);
-  Context_List_Invariant(Machine(QueueCore))==(tasks: FIN(TASK) & {TASK_NULL} <: tasks & blocked: FIN(TASK) & blocked <: tasks & ready: FIN(TASK) & ready <: tasks & suspended: FIN(TASK) & suspended <: tasks & running: TASK & running: tasks & running/:ready & running/:blocked & running/:suspended & TASK_NULL/:suspended & TASK_NULL/:ready & TASK_NULL/:blocked & ready/\blocked = {} & blocked/\suspended = {} & suspended/\ready = {} & tasks = {running}\/suspended\/blocked\/ready\/{TASK_NULL});
+  Context_List_Invariant(Machine(QueueCore))==(btrue);
   List_Invariant(Machine(QueueCore))==(queues: POW(QUEUE) & queue_items: QUEUE +-> POW(ITEM) & queue_receiving: QUEUE +-> POW(TASK) & queue_sending: QUEUE +-> POW(TASK) & queues = dom(queue_items) & queues = dom(queue_receiving) & queues = dom(queue_sending))
 END
 &
@@ -79,7 +79,7 @@ END
 &
 THEORY ListInstanciatedParametersX IS
   List_Instanciated_Parameters(Machine(QueueCore),Machine(Types))==(?);
-  List_Instanciated_Parameters(Machine(QueueCore),Machine(TaskCore))==(?)
+  List_Instanciated_Parameters(Machine(QueueCore),Machine(QueueContext))==(?)
 END
 &
 THEORY ListConstraintsX IS
@@ -146,25 +146,23 @@ THEORY ListSubstitutionX IS
 END
 &
 THEORY ListConstantsX IS
-  List_Valuable_Constants(Machine(QueueCore))==(QUEUE_NULL,ITEM_NULL,REMOVE_EVENT);
+  List_Valuable_Constants(Machine(QueueCore))==(?);
   Inherited_List_Constants(Machine(QueueCore))==(?);
-  List_Constants(Machine(QueueCore))==(QUEUE_NULL,ITEM_NULL,REMOVE_EVENT)
+  List_Constants(Machine(QueueCore))==(?)
 END
 &
 THEORY ListSetsX IS
-  Set_Definition(Machine(QueueCore),ITEM)==(?);
-  Context_List_Enumerated(Machine(QueueCore))==(?);
-  Context_List_Defered(Machine(QueueCore))==(NAME,PARAMETER,TASK,STACK,TASK_CODE);
-  Context_List_Sets(Machine(QueueCore))==(NAME,PARAMETER,TASK,STACK,TASK_CODE);
-  List_Valuable_Sets(Machine(QueueCore))==(ITEM,COPY_POSITION,QUEUE);
+  Set_Definition(Machine(QueueCore),SCHEDULER_STATE)==({taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED});
+  Context_List_Enumerated(Machine(QueueCore))==(SCHEDULER_STATE);
+  Context_List_Defered(Machine(QueueCore))==(NAME,PARAMETER,TASK,STACK,TASK_CODE,ITEM,COPY_POSITION,QUEUE);
+  Context_List_Sets(Machine(QueueCore))==(NAME,PARAMETER,TASK,STACK,TASK_CODE,SCHEDULER_STATE,ITEM,COPY_POSITION,QUEUE);
+  List_Valuable_Sets(Machine(QueueCore))==(?);
   Inherited_List_Enumerated(Machine(QueueCore))==(?);
   Inherited_List_Defered(Machine(QueueCore))==(?);
   Inherited_List_Sets(Machine(QueueCore))==(?);
   List_Enumerated(Machine(QueueCore))==(?);
-  List_Defered(Machine(QueueCore))==(ITEM,COPY_POSITION,QUEUE);
-  List_Sets(Machine(QueueCore))==(ITEM,COPY_POSITION,QUEUE);
-  Set_Definition(Machine(QueueCore),COPY_POSITION)==(?);
-  Set_Definition(Machine(QueueCore),QUEUE)==(?)
+  List_Defered(Machine(QueueCore))==(?);
+  List_Sets(Machine(QueueCore))==(?)
 END
 &
 THEORY ListHiddenConstantsX IS
@@ -176,44 +174,21 @@ END
 &
 THEORY ListPropertiesX IS
   Abstract_List_Properties(Machine(QueueCore))==(btrue);
-  Context_List_Properties(Machine(QueueCore))==(BIT = 0..1 & pdTRUE: BIT & pdTRUE = 1 & pdFALSE: BIT & pdFALSE = 0 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & ERROR_DEFINITION = -5.. -1 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: 0..MAXINT & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TASK_NULL: TASK & TICK_INCREMENT: TICK*TICK --> TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}));
+  Context_List_Properties(Machine(QueueCore))==(BIT = 0..1 & pdTRUE: BIT & pdTRUE = 1 & pdFALSE: BIT & pdFALSE = 0 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & ERROR_DEFINITION = -5.. -1 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: 0..MAXINT & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TICK_INCREMENT: TICK*TICK --> TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & SCHEDULER_STATE: FIN(INTEGER) & not(SCHEDULER_STATE = {}) & QUEUE_NULL: QUEUE & ITEM_NULL: ITEM & REMOVE_EVENT: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) & REMOVE_EVENT = %(task,queues,pending).(task: TASK & queues: POW(QUEUE) & pending: QUEUE +-> POW(TASK) | %queue.(queue: queues & queue: dom(pending) | pending(queue)-{task})) & ITEM: FIN(INTEGER) & not(ITEM = {}) & COPY_POSITION: FIN(INTEGER) & not(COPY_POSITION = {}) & QUEUE: FIN(INTEGER) & not(QUEUE = {}));
   Inherited_List_Properties(Machine(QueueCore))==(btrue);
-  List_Properties(Machine(QueueCore))==(QUEUE_NULL: QUEUE & ITEM_NULL: ITEM & REMOVE_EVENT: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) & REMOVE_EVENT = %(task,queues,pending).(task: TASK & queues: POW(QUEUE) & pending: QUEUE +-> POW(TASK) | %queue.(queue: queues & queue: dom(pending) | pending(queue)-{task})) & ITEM: FIN(INTEGER) & not(ITEM = {}) & COPY_POSITION: FIN(INTEGER) & not(COPY_POSITION = {}) & QUEUE: FIN(INTEGER) & not(QUEUE = {}))
+  List_Properties(Machine(QueueCore))==(btrue)
 END
 &
 THEORY ListSeenInfoX IS
-  Seen_Internal_List_Operations(Machine(QueueCore),Machine(TaskCore))==(t_create,t_delete,t_suspend,t_resume,t_getPriority,t_getCurrent,t_getNumberOfTasks,t_delayTask,t_startScheduler,t_endScheduler,t_resumeAll,t_unblock);
-  Seen_Context_List_Enumerated(Machine(QueueCore))==(?);
+  Seen_Internal_List_Operations(Machine(QueueCore),Machine(QueueContext))==(?);
+  Seen_Context_List_Enumerated(Machine(QueueCore))==(SCHEDULER_STATE);
   Seen_Context_List_Invariant(Machine(QueueCore))==(btrue);
   Seen_Context_List_Assertions(Machine(QueueCore))==(ERROR_DEFINITION <: INTEGER & BIT <: NATURAL);
-  Seen_Context_List_Properties(Machine(QueueCore))==(configMAX_PRIORITIES: INT & configMAX_PRIORITIES>=1 & configTOTAL_HEAP_SIZE: INT & configTOTAL_HEAP_SIZE>=0 & configMINIMAL_STACK_SIZE: INT & configMINIMAL_STACK_SIZE>=0 & INCLUDE_uxTaskPriorityGet: BIT & INCLUDE_vTaskDelete: BIT & INCLUDE_vTaskSuspend: BIT & INCLUDE_xTaskGetSchedulerState: BIT & INCLUDE_vTaskPrioritySet: BIT & INCLUDE_xTaskGetCurrentTaskHandle: BIT & INCLUDE_vTaskDelayUntil: BIT & INCLUDE_vTaskDelay: BIT & BIT = 0..1 & pdTRUE: BIT & pdTRUE = 1 & pdFALSE: BIT & pdFALSE = 0 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & ERROR_DEFINITION = -5.. -1 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: 0..MAXINT & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}));
+  Seen_Context_List_Properties(Machine(QueueCore))==(BIT = 0..1 & pdTRUE: BIT & pdTRUE = 1 & pdFALSE: BIT & pdFALSE = 0 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & ERROR_DEFINITION = -5.. -1 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: 0..MAXINT & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TICK_INCREMENT: TICK*TICK --> TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & SCHEDULER_STATE: FIN(INTEGER) & not(SCHEDULER_STATE = {}));
   Seen_List_Constraints(Machine(QueueCore))==(btrue);
-  Seen_List_Precondition(Machine(QueueCore),t_unblock)==(task: TASK & task: blocked);
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_unblock)==(running = TASK_NULL ==> running:=task [] not(running = TASK_NULL) ==> (running,ready:=task,ready\/{running} [] ready:=ready\/{task}) || blocked:=blocked-{task});
-  Seen_List_Precondition(Machine(QueueCore),t_resumeAll)==(tick: TICK & running/=TASK_NULL);
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_resumeAll)==(@unblocked.(unblocked: FIN(TASK) & unblocked <: blocked ==> (unblocked/={} ==> (@task.(task: TASK & task: tasks & task: unblocked ==> running,ready:=task,ready\/{running}\/unblocked-{task}) [] ready:=ready\/unblocked || blocked:=blocked-unblocked) [] not(unblocked/={}) ==> skip)));
-  Seen_List_Precondition(Machine(QueueCore),t_endScheduler)==(btrue);
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_endScheduler)==(tasks,running,blocked,suspended,ready:={TASK_NULL},TASK_NULL,{},{},{});
-  Seen_List_Precondition(Machine(QueueCore),t_startScheduler)==(running = TASK_NULL);
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_startScheduler)==(@(idle_name,idle_task).(idle_name: NAME & idle_task: TASK & idle_task/:tasks ==> (tasks:=tasks\/{idle_task} || (ready = {} ==> running:=idle_task [] not(ready = {}) ==> @task.(task: ready ==> running,ready:=task,(ready\/{idle_task})-{task})))));
-  Seen_List_Precondition(Machine(QueueCore),t_delayTask)==(ticks: TICK & not(ticks = 0) & running/=TASK_NULL);
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_delayTask)==(ready = {} ==> blocked,running:=blocked\/{running},TASK_NULL [] not(ready = {}) ==> @task.(task: TASK & task: ready ==> blocked,ready,running:=blocked\/{running},ready-{task},task));
-  Seen_List_Precondition(Machine(QueueCore),t_getNumberOfTasks)==(btrue);
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_getNumberOfTasks)==(result:=card(tasks));
-  Seen_List_Precondition(Machine(QueueCore),t_getCurrent)==(btrue);
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_getCurrent)==(result:=running);
-  Seen_List_Precondition(Machine(QueueCore),t_getPriority)==(atask: tasks);
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_getPriority)==(@(priority$0).(priority$0: PRIORITY ==> priority:=priority$0));
-  Seen_List_Precondition(Machine(QueueCore),t_resume)==(suspended/={} & atask: TASK & atask: suspended & running/=TASK_NULL);
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_resume)==(ready,running:=ready\/{running},atask [] ready:=ready\/{atask} || suspended:=suspended-{atask});
-  Seen_List_Precondition(Machine(QueueCore),t_suspend)==(atask: TASK & atask: tasks & atask/:suspended & atask/=TASK_NULL);
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_suspend)==(atask = running ==> (ready = {} ==> @task.(task: TASK & task: ready ==> running,ready:=task,ready-{task}) [] not(ready = {}) ==> running:=TASK_NULL) [] not(atask = running) ==> (atask: ready ==> ready:=ready-{atask} [] not(atask: ready) ==> (atask: blocked ==> blocked:=blocked-{atask} [] not(atask: blocked) ==> skip)) || suspended:=suspended\/{atask});
-  Seen_List_Precondition(Machine(QueueCore),t_delete)==(atask: TASK & atask: tasks & atask/=TASK_NULL & tasks/={atask});
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_delete)==(tasks:=tasks-{atask} || (atask = running ==> (@task.(task: TASK & task: ready ==> running,ready:=task,ready-{task}) [] running:=TASK_NULL) [] not(atask = running) ==> (atask: ready ==> ready:=ready-{atask} [] not(atask: ready) ==> (atask: blocked ==> blocked:=blocked-{atask} [] not(atask: blocked) ==> (atask: suspended ==> suspended:=suspended-{atask} [] not(atask: suspended) ==> skip)))));
-  Seen_List_Precondition(Machine(QueueCore),t_create)==(priority: PRIORITY & running = TASK_NULL);
-  Seen_Expanded_List_Substitution(Machine(QueueCore),t_create)==(@task.(task: TASK & task/:tasks ==> tasks,ready,result:={task}\/tasks,{task}\/ready,task));
-  Seen_List_Operations(Machine(QueueCore),Machine(TaskCore))==(t_create,t_delete,t_suspend,t_resume,t_getPriority,t_getCurrent,t_getNumberOfTasks,t_delayTask,t_startScheduler,t_endScheduler,t_resumeAll,t_unblock);
-  Seen_Expanded_List_Invariant(Machine(QueueCore),Machine(TaskCore))==(btrue);
+  Seen_List_Operations(Machine(QueueCore),Machine(QueueContext))==(?);
+  Seen_Expanded_List_Invariant(Machine(QueueCore),Machine(QueueContext))==(btrue);
+  Set_Definition(Machine(QueueCore),SCHEDULER_STATE)==({taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED});
   Seen_Internal_List_Operations(Machine(QueueCore),Machine(Types))==(?);
   Seen_List_Operations(Machine(QueueCore),Machine(Types))==(?);
   Seen_Expanded_List_Invariant(Machine(QueueCore),Machine(Types))==(btrue)
@@ -230,34 +205,21 @@ THEORY ListANYVarX IS
 END
 &
 THEORY ListOfIdsX IS
-  List_Of_Ids(Machine(QueueCore)) == (QUEUE_NULL,ITEM_NULL,REMOVE_EVENT,ITEM,COPY_POSITION,QUEUE | ? | queue_sending,queue_receiving,queue_items,queues | ? | xQueueCreate,sendItem,insertTaskWaitingToSend,insertTaskWaitingToRecived,receivedItem,removeFromEventListQueue | ? | seen(Machine(Types)),seen(Machine(TaskCore)) | ? | QueueCore);
+  List_Of_Ids(Machine(QueueCore)) == (? | ? | queue_sending,queue_receiving,queue_items,queues | ? | xQueueCreate,sendItem,insertTaskWaitingToSend,insertTaskWaitingToRecived,receivedItem,removeFromEventListQueue | ? | seen(Machine(Types)),seen(Machine(QueueContext)) | ? | QueueCore);
   List_Of_HiddenCst_Ids(Machine(QueueCore)) == (? | ?);
-  List_Of_VisibleCst_Ids(Machine(QueueCore)) == (QUEUE_NULL,ITEM_NULL,REMOVE_EVENT);
+  List_Of_VisibleCst_Ids(Machine(QueueCore)) == (?);
   List_Of_VisibleVar_Ids(Machine(QueueCore)) == (? | ?);
   List_Of_Ids_SeenBNU(Machine(QueueCore)) == (?: ?);
-  List_Of_Ids(Machine(TaskCore)) == (PRIORITY,TASK_NULL,TICK,TICK_INCREMENT,TASK,STACK,TASK_CODE | ? | suspended,ready,running,blocked,tasks | ? | t_create,t_delete,t_suspend,t_resume,t_getPriority,t_getCurrent,t_getNumberOfTasks,t_delayTask,t_startScheduler,t_endScheduler,t_resumeAll,t_unblock | ? | seen(Machine(FreeRTOSConfig)),seen(Machine(Types)) | ? | TaskCore);
-  List_Of_HiddenCst_Ids(Machine(TaskCore)) == (? | ?);
-  List_Of_VisibleCst_Ids(Machine(TaskCore)) == (PRIORITY,TASK_NULL,TICK,TICK_INCREMENT);
-  List_Of_VisibleVar_Ids(Machine(TaskCore)) == (? | ?);
-  List_Of_Ids_SeenBNU(Machine(TaskCore)) == (?: ?);
-  List_Of_Ids(Machine(Types)) == (BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER,NAME,PARAMETER | ? | ? | ? | ? | ? | ? | ? | Types);
+  List_Of_Ids(Machine(QueueContext)) == (QUEUE_NULL,ITEM_NULL,REMOVE_EVENT,ITEM,COPY_POSITION,QUEUE | ? | ? | ? | ? | ? | seen(Machine(Types)) | ? | QueueContext);
+  List_Of_HiddenCst_Ids(Machine(QueueContext)) == (? | ?);
+  List_Of_VisibleCst_Ids(Machine(QueueContext)) == (QUEUE_NULL,ITEM_NULL,REMOVE_EVENT);
+  List_Of_VisibleVar_Ids(Machine(QueueContext)) == (? | ?);
+  List_Of_Ids_SeenBNU(Machine(QueueContext)) == (?: ?);
+  List_Of_Ids(Machine(Types)) == (PRIORITY,TICK,TICK_INCREMENT,BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER,NAME,PARAMETER,TASK,STACK,TASK_CODE,SCHEDULER_STATE,taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED | ? | ? | ? | ? | ? | ? | ? | Types);
   List_Of_HiddenCst_Ids(Machine(Types)) == (? | ?);
-  List_Of_VisibleCst_Ids(Machine(Types)) == (BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER);
+  List_Of_VisibleCst_Ids(Machine(Types)) == (PRIORITY,TICK,TICK_INCREMENT,BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER);
   List_Of_VisibleVar_Ids(Machine(Types)) == (? | ?);
-  List_Of_Ids_SeenBNU(Machine(Types)) == (?: ?);
-  List_Of_Ids(Machine(FreeRTOSConfig)) == (configMAX_PRIORITIES,configTOTAL_HEAP_SIZE,configMINIMAL_STACK_SIZE,INCLUDE_vTaskPrioritySet,INCLUDE_vTaskSuspend,INCLUDE_uxTaskPriorityGet,INCLUDE_vTaskDelete,INCLUDE_xTaskGetSchedulerState,INCLUDE_xTaskGetCurrentTaskHandle,INCLUDE_vTaskDelay,INCLUDE_vTaskDelayUntil | ? | ? | ? | ? | ? | seen(Machine(Types)) | ? | FreeRTOSConfig);
-  List_Of_HiddenCst_Ids(Machine(FreeRTOSConfig)) == (? | ?);
-  List_Of_VisibleCst_Ids(Machine(FreeRTOSConfig)) == (configMAX_PRIORITIES,configTOTAL_HEAP_SIZE,configMINIMAL_STACK_SIZE,INCLUDE_vTaskPrioritySet,INCLUDE_vTaskSuspend,INCLUDE_uxTaskPriorityGet,INCLUDE_vTaskDelete,INCLUDE_xTaskGetSchedulerState,INCLUDE_xTaskGetCurrentTaskHandle,INCLUDE_vTaskDelay,INCLUDE_vTaskDelayUntil);
-  List_Of_VisibleVar_Ids(Machine(FreeRTOSConfig)) == (? | ?);
-  List_Of_Ids_SeenBNU(Machine(FreeRTOSConfig)) == (?: ?)
-END
-&
-THEORY SetsEnvX IS
-  Sets(Machine(QueueCore)) == (Type(ITEM) == Cst(SetOf(atype(ITEM,"[ITEM","]ITEM")));Type(COPY_POSITION) == Cst(SetOf(atype(COPY_POSITION,"[COPY_POSITION","]COPY_POSITION")));Type(QUEUE) == Cst(SetOf(atype(QUEUE,"[QUEUE","]QUEUE"))))
-END
-&
-THEORY ConstantsEnvX IS
-  Constants(Machine(QueueCore)) == (Type(QUEUE_NULL) == Cst(atype(QUEUE,?,?));Type(ITEM_NULL) == Cst(atype(ITEM,?,?));Type(REMOVE_EVENT) == Cst(SetOf(atype(TASK,?,?)*SetOf(atype(QUEUE,?,?))*SetOf(atype(QUEUE,?,?)*SetOf(atype(TASK,?,?)))*SetOf(atype(QUEUE,?,?)*SetOf(atype(TASK,?,?))))))
+  List_Of_Ids_SeenBNU(Machine(Types)) == (?: ?)
 END
 &
 THEORY VariablesEnvX IS

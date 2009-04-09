@@ -102,9 +102,9 @@ THEORY ListPreconditionX END
 THEORY ListSubstitutionX END
 &
 THEORY ListConstantsX IS
-  List_Valuable_Constants(Machine(Types))==(BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER);
+  List_Valuable_Constants(Machine(Types))==(PRIORITY,TICK,TICK_INCREMENT,BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER);
   Inherited_List_Constants(Machine(Types))==(?);
-  List_Constants(Machine(Types))==(BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER)
+  List_Constants(Machine(Types))==(PRIORITY,TICK,TICK_INCREMENT,BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER)
 END
 &
 THEORY ListSetsX IS
@@ -112,14 +112,18 @@ THEORY ListSetsX IS
   Context_List_Enumerated(Machine(Types))==(?);
   Context_List_Defered(Machine(Types))==(?);
   Context_List_Sets(Machine(Types))==(?);
-  List_Valuable_Sets(Machine(Types))==(NAME,PARAMETER);
+  List_Valuable_Sets(Machine(Types))==(NAME,PARAMETER,TASK,STACK,TASK_CODE);
   Inherited_List_Enumerated(Machine(Types))==(?);
   Inherited_List_Defered(Machine(Types))==(?);
   Inherited_List_Sets(Machine(Types))==(?);
-  List_Enumerated(Machine(Types))==(?);
-  List_Defered(Machine(Types))==(NAME,PARAMETER);
-  List_Sets(Machine(Types))==(NAME,PARAMETER);
-  Set_Definition(Machine(Types),PARAMETER)==(?)
+  List_Enumerated(Machine(Types))==(SCHEDULER_STATE);
+  List_Defered(Machine(Types))==(NAME,PARAMETER,TASK,STACK,TASK_CODE);
+  List_Sets(Machine(Types))==(NAME,PARAMETER,TASK,STACK,TASK_CODE,SCHEDULER_STATE);
+  Set_Definition(Machine(Types),PARAMETER)==(?);
+  Set_Definition(Machine(Types),TASK)==(?);
+  Set_Definition(Machine(Types),STACK)==(?);
+  Set_Definition(Machine(Types),TASK_CODE)==(?);
+  Set_Definition(Machine(Types),SCHEDULER_STATE)==({taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED})
 END
 &
 THEORY ListHiddenConstantsX IS
@@ -133,7 +137,7 @@ THEORY ListPropertiesX IS
   Abstract_List_Properties(Machine(Types))==(btrue);
   Context_List_Properties(Machine(Types))==(btrue);
   Inherited_List_Properties(Machine(Types))==(btrue);
-  List_Properties(Machine(Types))==(BIT = 0..1 & pdTRUE: BIT & pdTRUE = 1 & pdFALSE: BIT & pdFALSE = 0 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & ERROR_DEFINITION = -5.. -1 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: 0..MAXINT & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}))
+  List_Properties(Machine(Types))==(BIT = 0..1 & pdTRUE: BIT & pdTRUE = 1 & pdFALSE: BIT & pdFALSE = 0 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & ERROR_DEFINITION = -5.. -1 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: 0..MAXINT & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TICK_INCREMENT: TICK*TICK --> TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & SCHEDULER_STATE: FIN(INTEGER) & not(SCHEDULER_STATE = {}))
 END
 &
 THEORY ListSeenInfoX END
@@ -143,19 +147,19 @@ THEORY ListANYVarX IS
 END
 &
 THEORY ListOfIdsX IS
-  List_Of_Ids(Machine(Types)) == (BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER,NAME,PARAMETER | ? | ? | ? | ? | ? | ? | ? | Types);
+  List_Of_Ids(Machine(Types)) == (PRIORITY,TICK,TICK_INCREMENT,BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER,NAME,PARAMETER,TASK,STACK,TASK_CODE,SCHEDULER_STATE,taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED | ? | ? | ? | ? | ? | ? | ? | Types);
   List_Of_HiddenCst_Ids(Machine(Types)) == (? | ?);
-  List_Of_VisibleCst_Ids(Machine(Types)) == (BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER);
+  List_Of_VisibleCst_Ids(Machine(Types)) == (PRIORITY,TICK,TICK_INCREMENT,BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER);
   List_Of_VisibleVar_Ids(Machine(Types)) == (? | ?);
   List_Of_Ids_SeenBNU(Machine(Types)) == (?: ?)
 END
 &
 THEORY SetsEnvX IS
-  Sets(Machine(Types)) == (Type(NAME) == Cst(SetOf(atype(NAME,"[NAME","]NAME")));Type(PARAMETER) == Cst(SetOf(atype(PARAMETER,"[PARAMETER","]PARAMETER"))))
+  Sets(Machine(Types)) == (Type(NAME) == Cst(SetOf(atype(NAME,"[NAME","]NAME")));Type(PARAMETER) == Cst(SetOf(atype(PARAMETER,"[PARAMETER","]PARAMETER")));Type(TASK) == Cst(SetOf(atype(TASK,"[TASK","]TASK")));Type(STACK) == Cst(SetOf(atype(STACK,"[STACK","]STACK")));Type(TASK_CODE) == Cst(SetOf(atype(TASK_CODE,"[TASK_CODE","]TASK_CODE")));Type(SCHEDULER_STATE) == Cst(SetOf(etype(SCHEDULER_STATE,0,2))))
 END
 &
 THEORY ConstantsEnvX IS
-  Constants(Machine(Types)) == (Type(BIT) == Cst(SetOf(btype(INTEGER,"[BIT","]BIT")));Type(pdTRUE) == Cst(btype(INTEGER,?,?));Type(pdFALSE) == Cst(btype(INTEGER,?,?));Type(pdPASS) == Cst(btype(INTEGER,?,?));Type(pdFAIL) == Cst(btype(INTEGER,?,?));Type(errQUEUE_EMPTY) == Cst(btype(INTEGER,?,?));Type(errQUEUE_FULL) == Cst(btype(INTEGER,?,?));Type(ERROR_DEFINITION) == Cst(SetOf(btype(INTEGER,"[ERROR_DEFINITION","]ERROR_DEFINITION")));Type(errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY) == Cst(btype(INTEGER,?,?));Type(errNO_TASK_TO_RUN) == Cst(btype(INTEGER,?,?));Type(errQUEUE_BLOCKED) == Cst(btype(INTEGER,?,?));Type(errQUEUE_YIELD) == Cst(btype(INTEGER,?,?));Type(MAX_DELAY) == Cst(btype(INTEGER,?,?));Type(NULL_PARAMETER) == Cst(atype(PARAMETER,?,?)))
+  Constants(Machine(Types)) == (Type(taskSCHEDULER_NOT_STARTED) == Cst(etype(SCHEDULER_STATE,0,2));Type(taskSCHEDULER_RUNNING) == Cst(etype(SCHEDULER_STATE,0,2));Type(taskSCHEDULER_SUSPENDED) == Cst(etype(SCHEDULER_STATE,0,2));Type(PRIORITY) == Cst(SetOf(btype(INTEGER,"[PRIORITY","]PRIORITY")));Type(TICK) == Cst(SetOf(btype(INTEGER,"[TICK","]TICK")));Type(TICK_INCREMENT) == Cst(SetOf(btype(INTEGER,"[TICK","]TICK")*btype(INTEGER,"[TICK","]TICK")*btype(INTEGER,"[TICK","]TICK")));Type(BIT) == Cst(SetOf(btype(INTEGER,"[BIT","]BIT")));Type(pdTRUE) == Cst(btype(INTEGER,?,?));Type(pdFALSE) == Cst(btype(INTEGER,?,?));Type(pdPASS) == Cst(btype(INTEGER,?,?));Type(pdFAIL) == Cst(btype(INTEGER,?,?));Type(errQUEUE_EMPTY) == Cst(btype(INTEGER,?,?));Type(errQUEUE_FULL) == Cst(btype(INTEGER,?,?));Type(ERROR_DEFINITION) == Cst(SetOf(btype(INTEGER,"[ERROR_DEFINITION","]ERROR_DEFINITION")));Type(errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY) == Cst(btype(INTEGER,?,?));Type(errNO_TASK_TO_RUN) == Cst(btype(INTEGER,?,?));Type(errQUEUE_BLOCKED) == Cst(btype(INTEGER,?,?));Type(errQUEUE_YIELD) == Cst(btype(INTEGER,?,?));Type(MAX_DELAY) == Cst(btype(INTEGER,?,?));Type(NULL_PARAMETER) == Cst(atype(PARAMETER,?,?)))
 END
 &
 THEORY TCIntRdX IS
