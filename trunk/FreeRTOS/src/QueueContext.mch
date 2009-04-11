@@ -1,6 +1,14 @@
 /* QueueContext
-* Author: david
-* Creation date: Wed Apr 8 2009
+
+Author: David Deharbe and Stephenson Galvao
+
+This machine specefic the FreeRTOS's API.
+
+Creation date: Wed Apr 8 2009
+Universidade Federal do Rio Grande do Norte
+Departamento de Informática e Matemática Aplicada
+Programa de Pos-Graduacao em Sistemas e Computacao
+Formal Methods and Languages Research Laboratory
 */
 MACHINE
     QueueContext

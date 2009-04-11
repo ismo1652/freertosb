@@ -1,3 +1,8 @@
+/*
+SG->DD:
+Queria saber se eu posso padronizar o nome dessas operações 
+como colocar q_ antes do nome da operação
+*/
 
 /* QueueCore
 
@@ -96,7 +101,29 @@ OPERATIONS
         	xQueueHandle:=QUEUE_NULL
      	END
    	END;
+   	
+   	
+   	/**
+		/brief Delete Queue
+		
+		/do
+			Delete a queue
+			
+		/parameters
+			queue - Queue that will be delete
 
+	**/
+	queueDelete(queue) =
+	PRE
+		queue : queues
+	THEN    
+    	queues := queues - {queue}||
+		queue_items := {queue} <<| queue_items  ||
+		queue_receiving := {queue} <<| queue_receiving ||
+		queue_sending := {queue} <<| queue_sending 
+		
+   	END;
+   	
 	/**
 		/brief Send Item
 		

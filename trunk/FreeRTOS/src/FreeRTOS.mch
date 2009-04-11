@@ -1,6 +1,14 @@
-/* FreeRTOS
-* Author: david
-* Creation date: Wed Apr 8 2009
+/* 
+FreeRTOS
+Author: David Deharbe and Stephenson Galvao
+
+This machine specefic the FreeRTOS's API.
+
+Creation date: Wed Apr 8 2009
+Universidade Federal do Rio Grande do Norte
+Departamento de Informática e Matemática Aplicada
+Programa de Pos-Graduacao em Sistemas e Computacao
+Formal Methods and Languages Research Laboratory
 */
 MACHINE
     FreeRTOS
@@ -14,6 +22,10 @@ INCLUDES
     QueueCore,
     TaskCore,
     Scheduler
+    
+PROMOTES
+    xQueueCreate
+    
     
 VARIABLES
     tickCount,		/** total tick count */
@@ -31,7 +43,22 @@ INITIALISATION
     tickMissed := 0 
     
 OPERATIONS
-    
+/*
+SG -> DD
+Professor essas funções (xQueueGenericSend,xQueueGenericReceive) não faz parte da API do FreeRTOS em si. Elas servem 
+funções intermediária que são utilizada pela maioria das funcionalidades da API Queue Management como :
+
+# xQueueSend
+# xQueueSendToBack
+# xQueueSendToFront
+# xQueueReceive
+# xQueuePeek 
+
+O Sr. uma vez me pediu para colocar essas duas funções em uma máquina intermediária que seria usada pela máquina 
+que especifica API Queue Management. Seria melhor eu criar uma Queue_Facade ou Queue_Basic para colocar essas duas operações,
+e depois chamar essas operações nas máquinas que especificam a API Queue Management ?
+*/
+
     /**
     /brief Queue Send
     
@@ -384,7 +411,7 @@ OPERATIONS
     \brief	Get Tick Count
     
     \do	
-    Return the current number of tick 
+    Return the current number of tick o
     
     \returns
     numberOfTicks - The current number of ticks 
@@ -485,6 +512,16 @@ OPERATIONS
         END
         
     END;
+/*
+SG->DD: 
+
+Essa função não faz parte da API do FreeRTOS. Ela apenas é usada para incrementar o tick do 
+processador e verificar quais tarefas devem ser retornadas no novo tick. 
+
+Eu achava melhor colocar essa operação em Task ou tentar passar para Task_Core, sendo essa última 
+uma coisa mais complicada
+*/
+
     
     /**
     /brief tick increment
@@ -503,5 +540,33 @@ OPERATIONS
             tickMissed := TICK_INCREMENT(tickCount, 1)
         END ||
         t_resumeAll (TICK_INCREMENT(tickCount, 1)) 
-    END
+    END;
+
+/*
+SG->DD
+Adicionei essa operação
+*/    
+	vQueueDelete(pxQueue)=
+	PRE
+	    pxQueue:queues
+	THEN
+	    queueDelete(pxQueue)
+	END;
+
+/*
+SG->DD
+Adicionei essa operação
+*/ 	
+vTaskPrioritySet(pxTask,uxNewPriority )=
+PRE
+    pxTask:tasks &
+    uxNewPriority:PRIORITY&
+    active=TRUE &
+    pxTask/=idle
+    
+THEN
+    t_setPriority(pxTask,uxNewPriority)
+END
+
+	
 END

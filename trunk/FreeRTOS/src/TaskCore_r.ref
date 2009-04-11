@@ -392,5 +392,28 @@ OPERATIONS
             ready := ready \/ { task }
         END
     END
+    ;
+    
+/*
+SG->DD
+Adicionei mais essa operação
+falta apenas uma obrigação de prova sobre essa operação
+*/
+    
+    t_setPriority(task,priority)=
+    BEGIN
+        IF task : ready 
+        THEN
+            IF priority>=t_priority(running)
+            THEN
+                running:=task ||        
+                ready:= (ready \/{running})-{task}
+            ELSE
+				skip
+            END
+        ELSE
+            skip
+        END
+    END
 END
 

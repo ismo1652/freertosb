@@ -1,4 +1,12 @@
 /* Task_Core
+SG->DD:
+Nessa máquina eu comecei a padronizar as operações, colocando um t_ antes das operações 
+para indicar que a operação trata-se da máquina Task_Core. Queria saber se posso fazer
+a mesma coisa em Queue_Core, sendo nessário também colocar um padrão para as outras máquinas
+como Task caso essa venha ser usada;
+*/
+
+/*
 
 \brief Core definitions for task support in FreeRTOS.
 
@@ -418,6 +426,32 @@ OPERATIONS
             END 
         END ||
         blocked := blocked - {task}
+    END
+    ;
+/*
+SG->DD
+Adicionei mais essa operação
+*/
+    t_setPriority(task,priority)=
+    PRE
+       
+        task:tasks &
+        priority:PRIORITY &
+        active = TRUE &
+        task/=idle
+        
+    THEN
+        IF task : ready 
+        THEN
+            CHOICE
+                skip
+            OR
+				running:=task ||        
+                ready:= (ready \/{running})-{task}
+            END
+        ELSE
+            skip
+        END
     END
     
 END
