@@ -131,12 +131,12 @@ THEORY PassList IS
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(0),(?;0;1);
   Force(0),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(0),(?;0;1);
+  Force(0),?;
+  Force(0),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;

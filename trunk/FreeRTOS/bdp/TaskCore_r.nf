@@ -78,8 +78,8 @@ THEORY ListInitialisationX IS
 END
 &
 THEORY ListOperationsX IS
-  Internal_List_Operations(Refinement(TaskCore_r))==(t_create,t_delete,t_suspend,t_resume,t_getPriority,t_getCurrent,t_getNumberOfTasks,t_delayTask,t_startScheduler,t_endScheduler,t_resumeAll,t_unblock);
-  List_Operations(Refinement(TaskCore_r))==(t_create,t_delete,t_suspend,t_resume,t_getPriority,t_getCurrent,t_getNumberOfTasks,t_delayTask,t_startScheduler,t_endScheduler,t_resumeAll,t_unblock)
+  Internal_List_Operations(Refinement(TaskCore_r))==(t_create,t_delete,t_suspend,t_resume,t_getPriority,t_getCurrent,t_getNumberOfTasks,t_delayTask,t_startScheduler,t_endScheduler,t_resumeAll,t_unblock,t_setPriority);
+  List_Operations(Refinement(TaskCore_r))==(t_create,t_delete,t_suspend,t_resume,t_getPriority,t_getCurrent,t_getNumberOfTasks,t_delayTask,t_startScheduler,t_endScheduler,t_resumeAll,t_unblock,t_setPriority)
 END
 &
 THEORY ListInputX IS
@@ -94,7 +94,8 @@ THEORY ListInputX IS
   List_Input(Refinement(TaskCore_r),t_startScheduler)==(?);
   List_Input(Refinement(TaskCore_r),t_endScheduler)==(?);
   List_Input(Refinement(TaskCore_r),t_resumeAll)==(tick);
-  List_Input(Refinement(TaskCore_r),t_unblock)==(task)
+  List_Input(Refinement(TaskCore_r),t_unblock)==(task);
+  List_Input(Refinement(TaskCore_r),t_setPriority)==(task,priority)
 END
 &
 THEORY ListOutputX IS
@@ -109,7 +110,8 @@ THEORY ListOutputX IS
   List_Output(Refinement(TaskCore_r),t_startScheduler)==(?);
   List_Output(Refinement(TaskCore_r),t_endScheduler)==(?);
   List_Output(Refinement(TaskCore_r),t_resumeAll)==(?);
-  List_Output(Refinement(TaskCore_r),t_unblock)==(?)
+  List_Output(Refinement(TaskCore_r),t_unblock)==(?);
+  List_Output(Refinement(TaskCore_r),t_setPriority)==(?)
 END
 &
 THEORY ListHeaderX IS
@@ -124,7 +126,8 @@ THEORY ListHeaderX IS
   List_Header(Refinement(TaskCore_r),t_startScheduler)==(t_startScheduler);
   List_Header(Refinement(TaskCore_r),t_endScheduler)==(t_endScheduler);
   List_Header(Refinement(TaskCore_r),t_resumeAll)==(t_resumeAll(tick));
-  List_Header(Refinement(TaskCore_r),t_unblock)==(t_unblock(task))
+  List_Header(Refinement(TaskCore_r),t_unblock)==(t_unblock(task));
+  List_Header(Refinement(TaskCore_r),t_setPriority)==(t_setPriority(task,priority))
 END
 &
 THEORY ListOperationGuardX END
@@ -153,10 +156,13 @@ THEORY ListPreconditionX IS
   Own_Precondition(Refinement(TaskCore_r),t_resumeAll)==(active = TRUE & tick: TICK);
   List_Precondition(Refinement(TaskCore_r),t_resumeAll)==(active = TRUE & tick: TICK & active = TRUE & tick: TICK);
   Own_Precondition(Refinement(TaskCore_r),t_unblock)==(active = TRUE & blocked/={} & task: TASK & task: blocked);
-  List_Precondition(Refinement(TaskCore_r),t_unblock)==(active = TRUE & blocked/={} & task: TASK & task: blocked & active = TRUE & task: TASK & task: blocked)
+  List_Precondition(Refinement(TaskCore_r),t_unblock)==(active = TRUE & blocked/={} & task: TASK & task: blocked & active = TRUE & task: TASK & task: blocked);
+  Own_Precondition(Refinement(TaskCore_r),t_setPriority)==(btrue);
+  List_Precondition(Refinement(TaskCore_r),t_setPriority)==(task: tasks & priority: PRIORITY & active = TRUE & task/=idle)
 END
 &
 THEORY ListSubstitutionX IS
+  Expanded_List_Substitution(Refinement(TaskCore_r),t_setPriority)==(task: tasks & priority: PRIORITY & active = TRUE & task/=idle | t_priority:=t_priority<+{task|->priority} || (task: ready & t_priority(running)<=priority ==> running,ready:=task,(ready\/{running})-{task} [] not(task: ready & t_priority(running)<=priority) ==> skip));
   Expanded_List_Substitution(Refinement(TaskCore_r),t_unblock)==(active = TRUE & blocked/={} & task: TASK & task: blocked & active = TRUE & task: TASK & task: blocked | blocked:=blocked-{task} || (t_priority(task)>=t_priority(running) ==> running,ready:=task,ready\/{running} [] not(t_priority(task)>=t_priority(running)) ==> ready:=ready\/{task}));
   Expanded_List_Substitution(Refinement(TaskCore_r),t_resumeAll)==(active = TRUE & tick: TICK & active = TRUE & tick: TICK | @unblocked.(unblocked: FIN(TASK) & unblocked <: blocked ==> (unblocked/={} ==> (t_priority(running)<=max(t_priority[unblocked]) ==> @task.(task: TASK & task: unblocked & task: tasks & t_priority(running)<=t_priority(task) & t_priority(task) = max(t_priority[unblocked]) ==> running,ready:=task,ready\/{running}\/unblocked-{task}) [] not(t_priority(running)<=max(t_priority[unblocked])) ==> ready:=ready\/unblocked || blocked:=blocked-unblocked) [] not(unblocked/={}) ==> skip)));
   Expanded_List_Substitution(Refinement(TaskCore_r),t_endScheduler)==(active = TRUE | active,tasks,t_priority,blocked,ready,suspended:=FALSE,{},{},{},{},{});
@@ -180,7 +186,8 @@ THEORY ListSubstitutionX IS
   List_Substitution(Refinement(TaskCore_r),t_startScheduler)==(active:=TRUE || blocked,suspended:={},{} || ANY idle_task WHERE idle_task: TASK & idle_task/:tasks THEN tasks:=tasks\/{idle_task} || t_priority:=t_priority\/{idle_task|->0} || idle:=idle_task || ANY task WHERE task: TASK & (ready = {} => task = idle_task) & (ready/={} => task: ready & t_priority(task) = max(t_priority[ready])) THEN running:=task || ready:=(ready\/{idle_task})-{task} END END);
   List_Substitution(Refinement(TaskCore_r),t_endScheduler)==(active:=FALSE || tasks:={} || t_priority:={} || blocked,ready,suspended:={},{},{});
   List_Substitution(Refinement(TaskCore_r),t_resumeAll)==(ANY unblocked WHERE unblocked: FIN(TASK) & unblocked <: blocked THEN IF unblocked/={} THEN IF t_priority(running)<=max(t_priority[unblocked]) THEN ANY task WHERE task: TASK & task: unblocked & task: tasks & t_priority(running)<=t_priority(task) & t_priority(task) = max(t_priority[unblocked]) THEN running:=task || ready:=ready\/{running}\/unblocked-{task} END ELSE ready:=ready\/unblocked END || blocked:=blocked-unblocked END END);
-  List_Substitution(Refinement(TaskCore_r),t_unblock)==(blocked:=blocked-{task} || IF t_priority(task)>=t_priority(running) THEN running:=task || ready:=ready\/{running} ELSE ready:=ready\/{task} END)
+  List_Substitution(Refinement(TaskCore_r),t_unblock)==(blocked:=blocked-{task} || IF t_priority(task)>=t_priority(running) THEN running:=task || ready:=ready\/{running} ELSE ready:=ready\/{task} END);
+  List_Substitution(Refinement(TaskCore_r),t_setPriority)==(t_priority(task):=priority || IF task: ready & t_priority(running)<=priority THEN running:=task || ready:=(ready\/{running})-{task} END)
 END
 &
 THEORY ListParametersX IS
@@ -259,11 +266,12 @@ THEORY ListANYVarX IS
   List_ANY_Var(Refinement(TaskCore_r),t_endScheduler)==(?);
   List_ANY_Var(Refinement(TaskCore_r),t_resumeAll)==((Var(unblocked) == SetOf(atype(TASK,?,?))),(Var(task) == atype(TASK,?,?)));
   List_ANY_Var(Refinement(TaskCore_r),t_unblock)==(?);
+  List_ANY_Var(Refinement(TaskCore_r),t_setPriority)==(?);
   List_ANY_Var(Refinement(TaskCore_r),?)==(?)
 END
 &
 THEORY ListOfIdsX IS
-  List_Of_Ids(Refinement(TaskCore_r)) == (max_prt,IDLE_PRIORITY | ? | t_priority,idle,suspended,ready,running,blocked,tasks,active | ? | t_create,t_delete,t_suspend,t_resume,t_getPriority,t_getCurrent,t_getNumberOfTasks,t_delayTask,t_startScheduler,t_endScheduler,t_resumeAll,t_unblock | ? | seen(Machine(FreeRTOSConfig)),seen(Machine(Types)) | ? | TaskCore_r);
+  List_Of_Ids(Refinement(TaskCore_r)) == (max_prt,IDLE_PRIORITY | ? | t_priority,idle,suspended,ready,running,blocked,tasks,active | ? | t_create,t_delete,t_suspend,t_resume,t_getPriority,t_getCurrent,t_getNumberOfTasks,t_delayTask,t_startScheduler,t_endScheduler,t_resumeAll,t_unblock,t_setPriority | ? | seen(Machine(FreeRTOSConfig)),seen(Machine(Types)) | ? | TaskCore_r);
   List_Of_HiddenCst_Ids(Refinement(TaskCore_r)) == (? | ?);
   List_Of_VisibleCst_Ids(Refinement(TaskCore_r)) == (max_prt,IDLE_PRIORITY);
   List_Of_VisibleVar_Ids(Refinement(TaskCore_r)) == (? | ?);
@@ -289,7 +297,7 @@ THEORY VariablesEnvX IS
 END
 &
 THEORY OperationsEnvX IS
-  Operations(Refinement(TaskCore_r)) == (Type(t_unblock) == Cst(No_type,atype(TASK,?,?));Type(t_resumeAll) == Cst(No_type,btype(INTEGER,?,?));Type(t_endScheduler) == Cst(No_type,No_type);Type(t_startScheduler) == Cst(No_type,No_type);Type(t_delayTask) == Cst(No_type,btype(INTEGER,?,?));Type(t_getNumberOfTasks) == Cst(btype(INTEGER,?,?),No_type);Type(t_getCurrent) == Cst(atype(TASK,?,?),No_type);Type(t_getPriority) == Cst(btype(INTEGER,"[PRIORITY","]PRIORITY"),atype(TASK,?,?));Type(t_resume) == Cst(No_type,atype(TASK,?,?));Type(t_suspend) == Cst(No_type,atype(TASK,?,?));Type(t_delete) == Cst(No_type,atype(TASK,?,?));Type(t_create) == Cst(atype(TASK,?,?),btype(INTEGER,?,?)))
+  Operations(Refinement(TaskCore_r)) == (Type(t_setPriority) == Cst(No_type,atype(TASK,?,?)*btype(INTEGER,?,?));Type(t_unblock) == Cst(No_type,atype(TASK,?,?));Type(t_resumeAll) == Cst(No_type,btype(INTEGER,?,?));Type(t_endScheduler) == Cst(No_type,No_type);Type(t_startScheduler) == Cst(No_type,No_type);Type(t_delayTask) == Cst(No_type,btype(INTEGER,?,?));Type(t_getNumberOfTasks) == Cst(btype(INTEGER,?,?),No_type);Type(t_getCurrent) == Cst(atype(TASK,?,?),No_type);Type(t_getPriority) == Cst(btype(INTEGER,"[PRIORITY","]PRIORITY"),atype(TASK,?,?));Type(t_resume) == Cst(No_type,atype(TASK,?,?));Type(t_suspend) == Cst(No_type,atype(TASK,?,?));Type(t_delete) == Cst(No_type,atype(TASK,?,?));Type(t_create) == Cst(atype(TASK,?,?),btype(INTEGER,?,?)))
 END
 &
 THEORY TCIntRdX IS

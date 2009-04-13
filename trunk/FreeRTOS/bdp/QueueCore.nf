@@ -88,12 +88,13 @@ THEORY ListConstraintsX IS
 END
 &
 THEORY ListOperationsX IS
-  Internal_List_Operations(Machine(QueueCore))==(xQueueCreate,sendItem,insertTaskWaitingToSend,insertTaskWaitingToRecived,receivedItem,removeFromEventListQueue);
-  List_Operations(Machine(QueueCore))==(xQueueCreate,sendItem,insertTaskWaitingToSend,insertTaskWaitingToRecived,receivedItem,removeFromEventListQueue)
+  Internal_List_Operations(Machine(QueueCore))==(xQueueCreate,queueDelete,sendItem,insertTaskWaitingToSend,insertTaskWaitingToRecived,receivedItem,removeFromEventListQueue);
+  List_Operations(Machine(QueueCore))==(xQueueCreate,queueDelete,sendItem,insertTaskWaitingToSend,insertTaskWaitingToRecived,receivedItem,removeFromEventListQueue)
 END
 &
 THEORY ListInputX IS
   List_Input(Machine(QueueCore),xQueueCreate)==(uxQueueLength,uxItemSize);
+  List_Input(Machine(QueueCore),queueDelete)==(queue);
   List_Input(Machine(QueueCore),sendItem)==(pxQueue,pxItem,task,copy_position);
   List_Input(Machine(QueueCore),insertTaskWaitingToSend)==(pxQueue,pxTask);
   List_Input(Machine(QueueCore),insertTaskWaitingToRecived)==(pxQueue,pxTask);
@@ -103,6 +104,7 @@ END
 &
 THEORY ListOutputX IS
   List_Output(Machine(QueueCore),xQueueCreate)==(xQueueHandle);
+  List_Output(Machine(QueueCore),queueDelete)==(?);
   List_Output(Machine(QueueCore),sendItem)==(?);
   List_Output(Machine(QueueCore),insertTaskWaitingToSend)==(?);
   List_Output(Machine(QueueCore),insertTaskWaitingToRecived)==(?);
@@ -112,6 +114,7 @@ END
 &
 THEORY ListHeaderX IS
   List_Header(Machine(QueueCore),xQueueCreate)==(xQueueHandle <-- xQueueCreate(uxQueueLength,uxItemSize));
+  List_Header(Machine(QueueCore),queueDelete)==(queueDelete(queue));
   List_Header(Machine(QueueCore),sendItem)==(sendItem(pxQueue,pxItem,task,copy_position));
   List_Header(Machine(QueueCore),insertTaskWaitingToSend)==(insertTaskWaitingToSend(pxQueue,pxTask));
   List_Header(Machine(QueueCore),insertTaskWaitingToRecived)==(insertTaskWaitingToRecived(pxQueue,pxTask));
@@ -123,6 +126,7 @@ THEORY ListOperationGuardX END
 &
 THEORY ListPreconditionX IS
   List_Precondition(Machine(QueueCore),xQueueCreate)==(uxQueueLength: NAT & uxItemSize: NAT);
+  List_Precondition(Machine(QueueCore),queueDelete)==(queue: queues);
   List_Precondition(Machine(QueueCore),sendItem)==(pxQueue: queues & pxItem: ITEM & task: TASK & copy_position: COPY_POSITION & task: queue_receiving(pxQueue));
   List_Precondition(Machine(QueueCore),insertTaskWaitingToSend)==(pxQueue: queues & pxTask: TASK);
   List_Precondition(Machine(QueueCore),insertTaskWaitingToRecived)==(pxQueue: queues & pxTask: TASK);
@@ -136,8 +140,10 @@ THEORY ListSubstitutionX IS
   Expanded_List_Substitution(Machine(QueueCore),insertTaskWaitingToRecived)==(pxQueue: queues & pxTask: TASK | queue_receiving:=queue_receiving<+{pxQueue|->(queue_receiving(pxQueue)\/{pxTask})});
   Expanded_List_Substitution(Machine(QueueCore),insertTaskWaitingToSend)==(pxQueue: queues & pxTask: TASK | queue_sending:=queue_sending<+{pxQueue|->(queue_sending(pxQueue)\/{pxTask})});
   Expanded_List_Substitution(Machine(QueueCore),sendItem)==(pxQueue: queues & pxItem: ITEM & task: TASK & copy_position: COPY_POSITION & task: queue_receiving(pxQueue) | queue_items,queue_receiving:=queue_items<+{pxQueue|->(queue_items(pxQueue)\/{pxItem})},queue_receiving<+{pxQueue|->queue_receiving(pxQueue)-{task}});
+  Expanded_List_Substitution(Machine(QueueCore),queueDelete)==(queue: queues | queues,queue_items,queue_receiving,queue_sending:=queues-{queue},{queue}<<|queue_items,{queue}<<|queue_receiving,{queue}<<|queue_sending);
   Expanded_List_Substitution(Machine(QueueCore),xQueueCreate)==(uxQueueLength: NAT & uxItemSize: NAT | @queue.(queue: QUEUE & queue/:queues ==> queues,queue_items,queue_receiving,queue_sending,xQueueHandle:=queues\/{queue},queue_items\/{queue|->{}},queue_receiving\/{queue|->{}},queue_sending\/{queue|->{}},queue) [] xQueueHandle:=QUEUE_NULL);
   List_Substitution(Machine(QueueCore),xQueueCreate)==(CHOICE ANY queue WHERE queue: QUEUE & queue/:queues THEN queues:=queues\/{queue} || queue_items:=queue_items\/{queue|->{}} || queue_receiving:=queue_receiving\/{queue|->{}} || queue_sending:=queue_sending\/{queue|->{}} || xQueueHandle:=queue END OR xQueueHandle:=QUEUE_NULL END);
+  List_Substitution(Machine(QueueCore),queueDelete)==(queues:=queues-{queue} || queue_items:={queue}<<|queue_items || queue_receiving:={queue}<<|queue_receiving || queue_sending:={queue}<<|queue_sending);
   List_Substitution(Machine(QueueCore),sendItem)==(queue_items(pxQueue):=queue_items(pxQueue)\/{pxItem} || queue_receiving(pxQueue):=queue_receiving(pxQueue)-{task});
   List_Substitution(Machine(QueueCore),insertTaskWaitingToSend)==(queue_sending(pxQueue):=queue_sending(pxQueue)\/{pxTask});
   List_Substitution(Machine(QueueCore),insertTaskWaitingToRecived)==(queue_receiving(pxQueue):=queue_receiving(pxQueue)\/{pxTask});
@@ -196,6 +202,7 @@ END
 &
 THEORY ListANYVarX IS
   List_ANY_Var(Machine(QueueCore),xQueueCreate)==(Var(queue) == atype(QUEUE,?,?));
+  List_ANY_Var(Machine(QueueCore),queueDelete)==(?);
   List_ANY_Var(Machine(QueueCore),sendItem)==(?);
   List_ANY_Var(Machine(QueueCore),insertTaskWaitingToSend)==(?);
   List_ANY_Var(Machine(QueueCore),insertTaskWaitingToRecived)==(?);
@@ -205,7 +212,7 @@ THEORY ListANYVarX IS
 END
 &
 THEORY ListOfIdsX IS
-  List_Of_Ids(Machine(QueueCore)) == (? | ? | queue_sending,queue_receiving,queue_items,queues | ? | xQueueCreate,sendItem,insertTaskWaitingToSend,insertTaskWaitingToRecived,receivedItem,removeFromEventListQueue | ? | seen(Machine(Types)),seen(Machine(QueueContext)) | ? | QueueCore);
+  List_Of_Ids(Machine(QueueCore)) == (? | ? | queue_sending,queue_receiving,queue_items,queues | ? | xQueueCreate,queueDelete,sendItem,insertTaskWaitingToSend,insertTaskWaitingToRecived,receivedItem,removeFromEventListQueue | ? | seen(Machine(Types)),seen(Machine(QueueContext)) | ? | QueueCore);
   List_Of_HiddenCst_Ids(Machine(QueueCore)) == (? | ?);
   List_Of_VisibleCst_Ids(Machine(QueueCore)) == (?);
   List_Of_VisibleVar_Ids(Machine(QueueCore)) == (? | ?);
@@ -227,7 +234,7 @@ THEORY VariablesEnvX IS
 END
 &
 THEORY OperationsEnvX IS
-  Operations(Machine(QueueCore)) == (Type(removeFromEventListQueue) == Cst(No_type,atype(TASK,?,?));Type(receivedItem) == Cst(atype(ITEM,?,?),atype(QUEUE,?,?)*btype(INTEGER,?,?)*atype(TASK,?,?));Type(insertTaskWaitingToRecived) == Cst(No_type,atype(QUEUE,?,?)*atype(TASK,?,?));Type(insertTaskWaitingToSend) == Cst(No_type,atype(QUEUE,?,?)*atype(TASK,?,?));Type(sendItem) == Cst(No_type,atype(QUEUE,?,?)*atype(ITEM,?,?)*atype(TASK,?,?)*atype(COPY_POSITION,?,?));Type(xQueueCreate) == Cst(atype(QUEUE,?,?),btype(INTEGER,?,?)*btype(INTEGER,?,?)))
+  Operations(Machine(QueueCore)) == (Type(removeFromEventListQueue) == Cst(No_type,atype(TASK,?,?));Type(receivedItem) == Cst(atype(ITEM,?,?),atype(QUEUE,?,?)*btype(INTEGER,?,?)*atype(TASK,?,?));Type(insertTaskWaitingToRecived) == Cst(No_type,atype(QUEUE,?,?)*atype(TASK,?,?));Type(insertTaskWaitingToSend) == Cst(No_type,atype(QUEUE,?,?)*atype(TASK,?,?));Type(sendItem) == Cst(No_type,atype(QUEUE,?,?)*atype(ITEM,?,?)*atype(TASK,?,?)*atype(COPY_POSITION,?,?));Type(queueDelete) == Cst(No_type,atype(QUEUE,?,?));Type(xQueueCreate) == Cst(atype(QUEUE,?,?),btype(INTEGER,?,?)*btype(INTEGER,?,?)))
 END
 &
 THEORY TCIntRdX IS

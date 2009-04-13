@@ -19,7 +19,10 @@ THEORY BalanceX IS
   vTaskEndScheduler,3,0,0,3,0,0,0;
   vTaskSuspendAll,4,0,0,4,0,0,0;
   xTaskResumeAll,17,2,0,15,0,0,0;
-  incrementTick,8,0,0,8,0,0,0
+  incrementTick,8,0,0,8,0,0,0;
+  vQueueDelete,0,0,0,0,0,0,0;
+  vTaskPrioritySet,0,0,0,0,0,0,0;
+  xQueueCreate,0,0,0,0,0,0,0
 END
 &
 THEORY ProofState IS
@@ -173,6 +176,6 @@ THEORY ManForms
 END
 &
 THEORY Version IS
-  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO,genDivergencePO == KO,local_op == OK);
+  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO, genDivergencePO == KO, local_op == OK);
   PRVersion("V3.3.3.p39")(CLT == "V3.7.6")
 END

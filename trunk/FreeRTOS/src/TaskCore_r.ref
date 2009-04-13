@@ -402,17 +402,11 @@ falta apenas uma obrigação de prova sobre essa operação
     
     t_setPriority(task,priority)=
     BEGIN
-        IF task : ready 
+        t_priority(task) := priority ||
+        IF task : ready & t_priority(running) <= priority 
         THEN
-            IF priority>=t_priority(running)
-            THEN
-                running:=task ||        
-                ready:= (ready \/{running})-{task}
-            ELSE
-				skip
-            END
-        ELSE
-            skip
+            running := task ||        
+            ready := (ready \/{running})-{task}
         END
     END
 END

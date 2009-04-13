@@ -1,4 +1,14 @@
 THEORY ProofList IS
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.10,(_f(190) & _f(204) => _f(205));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.9,(_f(190) & _f(202) => _f(203));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.8,(_f(199) & _f(200) => _f(201));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.7,(_f(190) & _f(196) => _f(198));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.6,(_f(190) & _f(196) => _f(52));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.5,(_f(190) & _f(196) => _f(51));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.4,(_f(190) & _f(196) => _f(197));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.3,(_f(190) & _f(195) => _f(136));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.2,(_f(190) & _f(193) => _f(194));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.1,(_f(190) & _f(191) => _f(192));
   _f(1) & _f(2) & _f(8) & _f(21) & _f(166) & t_unblock.30,(_f(178) & _f(36) => _f(188));
   _f(1) & _f(2) & _f(8) & _f(21) & _f(166) & t_unblock.29,(_f(181) & _f(34) => _f(187));
   _f(1) & _f(2) & _f(8) & _f(21) & _f(166) & t_unblock.28,(_f(178) & _f(47) => _f(186));
@@ -389,7 +399,24 @@ THEORY Formulas IS
   (not(running = task));
   (tasks = {running}\/suspended\/blocked-{task}\/(ready\/{task}));
   (tasks = ready\/{task});
-  (ready\/{task}/\blocked-{task} = {})
+  (ready\/{task}/\blocked-{task} = {});
+  ("`t_setPriority preconditions in this component'" & task: tasks & priority: PRIORITY & active = TRUE & not(task = idle));
+  ("`Local hypotheses'" & task: ready);
+  "`Check that the invariant (ready: FIN(TASK)) is preserved by the operation - ref 3.4'";
+  ((ready\/{running})-{task}: FIN(TASK));
+  "`Check that the invariant (ready <: tasks) is preserved by the operation - ref 3.4'";
+  ((ready\/{running})-{task}: POW(tasks));
+  "`Check that the invariant (running: TASK) is preserved by the operation - ref 3.4'";
+  "`Check that the invariant (active = TRUE => running = idle or idle: ready & running: tasks & running/:ready & running/:blocked & running/:suspended & tasks = {running}\/suspended\/blocked\/ready) is preserved by the operation - ref 3.4'";
+  (task = idle or (idle: ready\/{running} & not(idle = task)));
+  (tasks = {task}\/suspended\/blocked\/(ready\/{running})-{task});
+  ("`Local hypotheses'" & task: ready & active = FALSE);
+  "`Check that the invariant (active = FALSE => tasks = ready) is preserved by the operation - ref 3.4'";
+  (tasks = (ready\/{running})-{task});
+  "`Check that the invariant (ready/\blocked = {}) is preserved by the operation - ref 3.4'";
+  ((ready\/{running})-{task}/\blocked = {});
+  "`Check that the invariant (suspended/\ready = {}) is preserved by the operation - ref 3.4'";
+  (suspended/\(ready\/{running})-{task} = {})
 END
 &
 THEORY EnumerateX IS

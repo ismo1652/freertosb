@@ -1,18 +1,26 @@
 THEORY ProofList IS
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(84) & t_unblock.8,(_f(97) & _f(24) => _f(45));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(84) & t_unblock.7,(_f(96) & _f(24) => _f(47));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(84) & t_unblock.6,(_f(92) & _f(88) => _f(95));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(84) & t_unblock.5,(_f(92) & _f(93) => _f(94));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(84) & t_unblock.4,(_f(91) & _f(24) => _f(45));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(84) & t_unblock.3,(_f(90) & _f(24) => _f(43));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(84) & t_unblock.2,(_f(87) & _f(88) => _f(89));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(84) & t_unblock.1,(_f(85) => _f(86));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.7,(_f(81) & _f(82) => _f(83));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.6,(_f(80) & _f(75) => _f(45));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.5,(_f(79) & _f(75) => _f(47));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.4,(_f(77) & _f(72) => _f(78));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.3,(_f(76) & _f(75) => _f(45));
-  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.2,(_f(74) & _f(75) => _f(43));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(97) & t_setPriority.8,(_f(111) & _f(104) => _f(107));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(97) & t_setPriority.7,(_f(109) & _f(104) => _f(110));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(97) & t_setPriority.6,(_f(108) & _f(101) => _f(102));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(97) & t_setPriority.5,(_f(108) & _f(99) => _f(100));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(97) & t_setPriority.4,(_f(106) & _f(104) => _f(107));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(97) & t_setPriority.3,(_f(103) & _f(104) => _f(105));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(97) & t_setPriority.2,(_f(98) & _f(101) => _f(102));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(97) & t_setPriority.1,(_f(98) & _f(99) => _f(100));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(83) & t_unblock.8,(_f(96) & _f(24) => _f(45));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(83) & t_unblock.7,(_f(95) & _f(24) => _f(47));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(83) & t_unblock.6,(_f(91) & _f(87) => _f(94));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(83) & t_unblock.5,(_f(91) & _f(92) => _f(93));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(83) & t_unblock.4,(_f(90) & _f(24) => _f(45));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(83) & t_unblock.3,(_f(89) & _f(24) => _f(43));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(83) & t_unblock.2,(_f(86) & _f(87) => _f(88));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(83) & t_unblock.1,(_f(84) => _f(85));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.7,(_f(80) & _f(81) => _f(82));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.6,(_f(79) & _f(24) => _f(45));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.5,(_f(78) & _f(24) => _f(47));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.4,(_f(76) & _f(72) => _f(77));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.3,(_f(75) & _f(24) => _f(45));
+  _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.2,(_f(74) & _f(24) => _f(43));
   _f(1) & _f(2) & _f(8) & _f(12) & _f(70) & t_resumeAll.1,(_f(71) & _f(72) => _f(73));
   _f(1) & _f(2) & _f(8) & _f(12) & _f(68) & t_endScheduler.2,(_f(69) & _f(17) => _f(7));
   _f(1) & _f(2) & _f(8) & _f(12) & _f(68) & t_endScheduler.1,(_f(69) & _f(15) => _f(5));
@@ -133,7 +141,6 @@ THEORY Formulas IS
   "`Check that the invariant (running = running$1 & ready = ready$1 & blocked = blocked$1 & blocked = blocked$1) is preserved by the operation - ref 4.4, 5.5'";
   (#(unblocked$0).(unblocked$0: FIN(TASK) & unblocked$0: POW(blocked$1) & (not(unblocked$0 = {}) & (#(task$0).(task$0: TASK & task$0: tasks$1 & task$0: unblocked$0 & (task = task$0 & ready$1\/{running$1}\/unblocked-{task} = ready$1\/{running$1}\/unblocked$0-{task$0})) or (ready$1\/{running$1}\/unblocked-{task} = ready$1\/unblocked$0 & task = running$1) & blocked$1-unblocked = blocked$1-unblocked$0) or (unblocked$0 = {} & (ready$1\/{running$1}\/unblocked-{task} = ready$1 & task = running$1 & blocked$1-unblocked = blocked$1)))));
   ("`t_resumeAll preconditions in this component'" & active$1 = TRUE & tick: TICK & "`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked$1) & not(unblocked = {}) & t_priority$1(running$1)<=max(t_priority$1[unblocked]) & task: TASK & task: unblocked & task: tasks$1 & t_priority$1(running$1)<=t_priority$1(task) & t_priority$1(task) = max(t_priority$1[unblocked]) & tt: ready$1\/{running$1}\/unblocked-{task});
-  "`Check that the invariant (active$1 = TRUE => !tt.(tt: ready$1 => t_priority$1(tt)<=t_priority$1(running$1)) & !tt.(tt: tasks$1 => t_priority$1(idle$1)<=t_priority$1(tt))) is preserved by the operation - ref 4.4, 5.5'";
   ("`t_resumeAll preconditions in this component'" & active$1 = TRUE & tick: TICK & "`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked$1) & not(unblocked = {}) & t_priority$1(running$1)<=max(t_priority$1[unblocked]) & task: TASK & task: unblocked & task: tasks$1 & t_priority$1(running$1)<=t_priority$1(task) & t_priority$1(task) = max(t_priority$1[unblocked]) & tt: tasks$1);
   ("`t_resumeAll preconditions in this component'" & active$1 = TRUE & tick: TICK & "`Local hypotheses'" & unblocked: FIN(TASK) & unblocked: POW(blocked$1) & not(unblocked = {}) & not(t_priority$1(running$1)<=max(t_priority$1[unblocked])));
   (#(unblocked$0).(unblocked$0: FIN(TASK) & unblocked$0: POW(blocked$1) & (not(unblocked$0 = {}) & (#task.(task: TASK & task: tasks$1 & task: unblocked$0 & (running$1 = task & ready$1\/unblocked = ready$1\/{running$1}\/unblocked$0-{task})) or ready$1\/unblocked = ready$1\/unblocked$0 & blocked$1-unblocked = blocked$1-unblocked$0) or (unblocked$0 = {} & (unblocked: POW(ready$1) & blocked$1-unblocked = blocked$1)))));
@@ -155,7 +162,22 @@ THEORY Formulas IS
   (running$1 = task);
   (ready$1\/{task} = ready$1\/{idle$1});
   ("`t_unblock preconditions in this component'" & active$1 = TRUE & not(blocked$1 = {}) & task: TASK & task: blocked$1 & "`Local hypotheses'" & not(t_priority$1(running$1)<=t_priority$1(task)) & tt: ready$1\/{task});
-  ("`t_unblock preconditions in this component'" & active$1 = TRUE & not(blocked$1 = {}) & task: TASK & task: blocked$1 & "`Local hypotheses'" & not(t_priority$1(running$1)<=t_priority$1(task)) & tt: tasks$1)
+  ("`t_unblock preconditions in this component'" & active$1 = TRUE & not(blocked$1 = {}) & task: TASK & task: blocked$1 & "`Local hypotheses'" & not(t_priority$1(running$1)<=t_priority$1(task)) & tt: tasks$1);
+  ("`t_setPriority preconditions in previous components'" & task: tasks$1 & priority: PRIORITY & active$1 = TRUE & not(task = idle$1));
+  ("`t_setPriority preconditions in this component'" & task: tasks$1 & priority: PRIORITY & active$1 = TRUE & not(task = idle$1) & "`Local hypotheses'" & task: ready$1 & t_priority$1(running$1)<=priority);
+  "`Check that the invariant (t_priority$1: TASK +-> PRIORITY) is preserved by the operation - ref 4.4, 5.5'";
+  (t_priority$1<+{task|->priority}: TASK +-> PRIORITY);
+  "`Check that the invariant (dom(t_priority$1) = tasks$1) is preserved by the operation - ref 4.4, 5.5'";
+  (dom(t_priority$1<+{task|->priority}) = tasks$1);
+  ("`t_setPriority preconditions in this component'" & task: tasks$1 & priority: PRIORITY & active$1 = TRUE & not(task = idle$1) & "`Local hypotheses'" & task: ready$1 & t_priority$1(running$1)<=priority & tt: ready$1\/{running$1} & not(tt = task));
+  "`Check that the invariant (active$1 = TRUE => !tt.(tt: ready$1 => t_priority$1(tt)<=t_priority$1(running$1)) & !tt.(tt: tasks$1 => t_priority$1(idle$1)<=t_priority$1(tt))) is preserved by the operation - ref 4.4, 5.5'";
+  ((t_priority$1<+{task|->priority})(tt)<=(t_priority$1<+{task|->priority})(task));
+  ("`t_setPriority preconditions in this component'" & task: tasks$1 & priority: PRIORITY & active$1 = TRUE & not(task = idle$1) & "`Local hypotheses'" & task: ready$1 & t_priority$1(running$1)<=priority & tt: tasks$1);
+  ((t_priority$1<+{task|->priority})(idle$1)<=(t_priority$1<+{task|->priority})(tt));
+  ("`t_setPriority preconditions in this component'" & task: tasks$1 & priority: PRIORITY & active$1 = TRUE & not(task = idle$1) & "`Local hypotheses'" & not(task: ready$1 & t_priority$1(running$1)<=priority));
+  ("`t_setPriority preconditions in this component'" & task: tasks$1 & priority: PRIORITY & active$1 = TRUE & not(task = idle$1) & "`Local hypotheses'" & not(task: ready$1 & t_priority$1(running$1)<=priority) & tt: ready$1);
+  ((t_priority$1<+{task|->priority})(tt)<=(t_priority$1<+{task|->priority})(running$1));
+  ("`t_setPriority preconditions in this component'" & task: tasks$1 & priority: PRIORITY & active$1 = TRUE & not(task = idle$1) & "`Local hypotheses'" & not(task: ready$1 & t_priority$1(running$1)<=priority) & tt: tasks$1)
 END
 &
 THEORY EnumerateX IS

@@ -449,8 +449,6 @@ Adicionei mais essa operação
 				running:=task ||        
                 ready:= (ready \/{running})-{task}
             END
-        ELSE
-            skip
         END
     END
     

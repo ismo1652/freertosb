@@ -1,5 +1,5 @@
 THEORY BalanceX IS
-  TaskCore_r,57,7,0,43,7,0,0;
+  TaskCore_r,65,8,0,47,8,0,0;
   AssertionLemmas,1,0,0,1,0,0,0;
   Initialisation,2,0,0,2,0,0,0;
   t_create,2,0,0,2,0,0,0;
@@ -13,10 +13,19 @@ THEORY BalanceX IS
   t_startScheduler,5,2,0,3,0,0,0;
   t_endScheduler,2,0,0,2,0,0,0;
   t_resumeAll,7,5,0,2,0,0,0;
-  t_unblock,8,0,0,5,3,0,0
+  t_unblock,8,0,0,5,3,0,0;
+  t_setPriority,8,1,0,4,1,0,0
 END
 &
 THEORY ProofState IS
+  Unproved;
+  Unproved;
+  Proved(0);
+  Proved(0);
+  Proved(Util);
+  Proved(1);
+  Proved(0);
+  Proved(0);
   Proved(0);
   Proved(1);
   Proved(0);
@@ -77,6 +86,14 @@ THEORY ProofState IS
 END
 &
 THEORY MethodList IS
+  ?;
+  ?;
+  pr;
+  pr;
+  dd & ah((t_priority$1<+{task|->priority})(idle$1) = t_priority$1(idle$1)) & ah(idle$1: dom(t_priority$1) & not(idle$1 = task) & t_priority$1: TASK +-> PRIORITY) & pr & pr & pr & pr & dd & eh((t_priority$1<+{task|->priority})(idle$1),t_priority$1(idle$1),Goal) & ph(tt,!tt.(tt: tasks$1 => t_priority$1(idle$1)<=t_priority$1(tt))) & pr & dc(tt = task) & ss & pr & ss & dd & ah((t_priority$1<+{task|->priority})(tt) = t_priority$1(tt)) & ah(tt: dom(t_priority$1) & not(tt = task) & t_priority$1: TASK +-> PRIORITY) & pr & pr & pr & pr & dd & eh((t_priority$1<+{task|->priority})(tt),t_priority$1(tt),Goal) & ph(tt,!tt.(tt: tasks$1 => t_priority$1(idle$1)<=t_priority$1(tt))) & pr;
+  pr;
+  pr;
+  pr;
   pr;
   pr;
   pr;
@@ -137,17 +154,25 @@ THEORY MethodList IS
 END
 &
 THEORY PassList IS
-  Force(0),?;
-  Force(1),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(1),?;
-  Force(0),?;
-  Force(1),?;
+  Force(0),(?;0;1;2;3);
+  Force(0),(?;0;1;2;3);
   Force(0),?;
   Force(0),?;
   Force(0),(?;0;1;2;3);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(1),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(1),?;
+  Force(0),?;
+  Force(1),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
