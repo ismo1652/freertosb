@@ -162,7 +162,7 @@ THEORY ListPreconditionX IS
 END
 &
 THEORY ListSubstitutionX IS
-  Expanded_List_Substitution(Refinement(TaskCore_r),t_setPriority)==(task: tasks & priority: PRIORITY & active = TRUE & task/=idle | t_priority:=t_priority<+{task|->priority} || (task: ready & t_priority(running)<=priority ==> running,ready:=task,(ready\/{running})-{task} [] not(task: ready & t_priority(running)<=priority) ==> skip));
+  Expanded_List_Substitution(Refinement(TaskCore_r),t_setPriority)==(task: tasks & priority: PRIORITY & active = TRUE & task/=idle | t_priority:=t_priority<+{task|->priority} || (task: ready & t_priority(running)<=priority ==> running,ready:=task,(ready\/{running})-{task} [] not(task: ready & t_priority(running)<=priority) ==> (task = running & priority<max(t_priority[ready]) ==> @task.(task: TASK & task: tasks & task: ready & t_priority(task) = max(t_priority[ready]) ==> running,ready:=task,(ready\/{running})-{task}) [] not(task = running & priority<max(t_priority[ready])) ==> skip)));
   Expanded_List_Substitution(Refinement(TaskCore_r),t_unblock)==(active = TRUE & blocked/={} & task: TASK & task: blocked & active = TRUE & task: TASK & task: blocked | blocked:=blocked-{task} || (t_priority(task)>=t_priority(running) ==> running,ready:=task,ready\/{running} [] not(t_priority(task)>=t_priority(running)) ==> ready:=ready\/{task}));
   Expanded_List_Substitution(Refinement(TaskCore_r),t_resumeAll)==(active = TRUE & tick: TICK & active = TRUE & tick: TICK | @unblocked.(unblocked: FIN(TASK) & unblocked <: blocked ==> (unblocked/={} ==> (t_priority(running)<=max(t_priority[unblocked]) ==> @task.(task: TASK & task: unblocked & task: tasks & t_priority(running)<=t_priority(task) & t_priority(task) = max(t_priority[unblocked]) ==> running,ready:=task,ready\/{running}\/unblocked-{task}) [] not(t_priority(running)<=max(t_priority[unblocked])) ==> ready:=ready\/unblocked || blocked:=blocked-unblocked) [] not(unblocked/={}) ==> skip)));
   Expanded_List_Substitution(Refinement(TaskCore_r),t_endScheduler)==(active = TRUE | active,tasks,t_priority,blocked,ready,suspended:=FALSE,{},{},{},{},{});
@@ -187,7 +187,7 @@ THEORY ListSubstitutionX IS
   List_Substitution(Refinement(TaskCore_r),t_endScheduler)==(active:=FALSE || tasks:={} || t_priority:={} || blocked,ready,suspended:={},{},{});
   List_Substitution(Refinement(TaskCore_r),t_resumeAll)==(ANY unblocked WHERE unblocked: FIN(TASK) & unblocked <: blocked THEN IF unblocked/={} THEN IF t_priority(running)<=max(t_priority[unblocked]) THEN ANY task WHERE task: TASK & task: unblocked & task: tasks & t_priority(running)<=t_priority(task) & t_priority(task) = max(t_priority[unblocked]) THEN running:=task || ready:=ready\/{running}\/unblocked-{task} END ELSE ready:=ready\/unblocked END || blocked:=blocked-unblocked END END);
   List_Substitution(Refinement(TaskCore_r),t_unblock)==(blocked:=blocked-{task} || IF t_priority(task)>=t_priority(running) THEN running:=task || ready:=ready\/{running} ELSE ready:=ready\/{task} END);
-  List_Substitution(Refinement(TaskCore_r),t_setPriority)==(t_priority(task):=priority || IF task: ready & t_priority(running)<=priority THEN running:=task || ready:=(ready\/{running})-{task} END)
+  List_Substitution(Refinement(TaskCore_r),t_setPriority)==(t_priority(task):=priority || IF task: ready & t_priority(running)<=priority THEN running:=task || ready:=(ready\/{running})-{task} ELSIF task = running & priority<max(t_priority[ready]) THEN ANY task WHERE task: TASK & task: tasks & task: ready & t_priority(task) = max(t_priority[ready]) THEN running:=task || ready:=(ready\/{running})-{task} END END)
 END
 &
 THEORY ListParametersX IS
@@ -266,7 +266,7 @@ THEORY ListANYVarX IS
   List_ANY_Var(Refinement(TaskCore_r),t_endScheduler)==(?);
   List_ANY_Var(Refinement(TaskCore_r),t_resumeAll)==((Var(unblocked) == SetOf(atype(TASK,?,?))),(Var(task) == atype(TASK,?,?)));
   List_ANY_Var(Refinement(TaskCore_r),t_unblock)==(?);
-  List_ANY_Var(Refinement(TaskCore_r),t_setPriority)==(?);
+  List_ANY_Var(Refinement(TaskCore_r),t_setPriority)==(Var(task) == atype(TASK,?,?));
   List_ANY_Var(Refinement(TaskCore_r),?)==(?)
 END
 &

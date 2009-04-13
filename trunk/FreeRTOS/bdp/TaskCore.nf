@@ -159,7 +159,7 @@ THEORY ListPreconditionX IS
 END
 &
 THEORY ListSubstitutionX IS
-  Expanded_List_Substitution(Machine(TaskCore),t_setPriority)==(task: tasks & priority: PRIORITY & active = TRUE & task/=idle | task: ready ==> (skip [] running,ready:=task,(ready\/{running})-{task}) [] not(task: ready) ==> skip);
+  Expanded_List_Substitution(Machine(TaskCore),t_setPriority)==(task: tasks & priority: PRIORITY & active = TRUE & task/=idle | task: ready ==> (skip [] running,ready:=task,(ready\/{running})-{task}) [] not(task: ready) ==> (task = running ==> (skip [] @task.(task: TASK & task: tasks & task: ready ==> running,ready:=task,(ready\/{running})-{task})) [] not(task = running) ==> skip));
   Expanded_List_Substitution(Machine(TaskCore),t_unblock)==(active = TRUE & task: TASK & task: blocked | running = idle ==> running,ready:=task,ready\/{idle} [] not(running = idle) ==> (running,ready:=task,ready\/{running} [] ready:=ready\/{task}) || blocked:=blocked-{task});
   Expanded_List_Substitution(Machine(TaskCore),t_resumeAll)==(active = TRUE & tick: TICK | @unblocked.(unblocked: FIN(TASK) & unblocked <: blocked ==> (unblocked/={} ==> (@task.(task: TASK & task: tasks & task: unblocked ==> running,ready:=task,ready\/{running}\/unblocked-{task}) [] ready:=ready\/unblocked || blocked:=blocked-unblocked) [] not(unblocked/={}) ==> skip)));
   Expanded_List_Substitution(Machine(TaskCore),t_endScheduler)==(active = TRUE | active,tasks,blocked,suspended,ready:=FALSE,{},{},{},{});
@@ -184,7 +184,7 @@ THEORY ListSubstitutionX IS
   List_Substitution(Machine(TaskCore),t_endScheduler)==(active:=FALSE || tasks,blocked,suspended,ready:={},{},{},{});
   List_Substitution(Machine(TaskCore),t_resumeAll)==(ANY unblocked WHERE unblocked: FIN(TASK) & unblocked <: blocked THEN IF unblocked/={} THEN CHOICE ANY task WHERE task: TASK & task: tasks & task: unblocked THEN running:=task || ready:=ready\/{running}\/unblocked-{task} END OR ready:=ready\/unblocked END || blocked:=blocked-unblocked END END);
   List_Substitution(Machine(TaskCore),t_unblock)==(IF running = idle THEN running:=task || ready:=ready\/{idle} ELSE CHOICE running:=task || ready:=ready\/{running} OR ready:=ready\/{task} END END || blocked:=blocked-{task});
-  List_Substitution(Machine(TaskCore),t_setPriority)==(IF task: ready THEN CHOICE skip OR running:=task || ready:=(ready\/{running})-{task} END END)
+  List_Substitution(Machine(TaskCore),t_setPriority)==(IF task: ready THEN CHOICE skip OR running:=task || ready:=(ready\/{running})-{task} END ELSIF task = running THEN CHOICE skip OR ANY task WHERE task: TASK & task: tasks & task: ready THEN running:=task || ready:=(ready\/{running})-{task} END END END)
 END
 &
 THEORY ListConstantsX IS
@@ -249,7 +249,7 @@ THEORY ListANYVarX IS
   List_ANY_Var(Machine(TaskCore),t_endScheduler)==(?);
   List_ANY_Var(Machine(TaskCore),t_resumeAll)==((Var(unblocked) == SetOf(atype(TASK,?,?))),(Var(task) == atype(TASK,?,?)));
   List_ANY_Var(Machine(TaskCore),t_unblock)==(?);
-  List_ANY_Var(Machine(TaskCore),t_setPriority)==(?);
+  List_ANY_Var(Machine(TaskCore),t_setPriority)==(Var(task) == atype(TASK,?,?));
   List_ANY_Var(Machine(TaskCore),?)==(?)
 END
 &

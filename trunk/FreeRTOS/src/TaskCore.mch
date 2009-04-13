@@ -449,7 +449,22 @@ Adicionei mais essa operação
 				running:=task ||        
                 ready:= (ready \/{running})-{task}
             END
+        ELSIF task = running
+        THEN
+            CHOICE
+                skip
+            OR
+                ANY
+                    task
+                WHERE
+                    task : TASK &
+                    task : tasks &
+                    task : ready
+                THEN
+                    running := task ||
+                    ready := (ready \/ { running }) - { task }
+                END
+            END
         END
     END
-    
 END

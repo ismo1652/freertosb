@@ -1,5 +1,5 @@
 THEORY BalanceX IS
-  TaskCore,210,24,0,173,6,4,2;
+  TaskCore,210,25,0,173,6,4,2;
   AssertionLemmas,4,0,0,4,0,0,0;
   Initialisation,2,0,0,2,0,0,0;
   t_create,8,1,0,7,0,0,0;
@@ -14,14 +14,14 @@ THEORY BalanceX IS
   t_endScheduler,2,0,0,2,0,0,0;
   t_resumeAll,24,3,0,21,0,0,0;
   t_unblock,30,5,0,23,0,2,0;
-  t_setPriority,10,0,0,7,2,0,0
+  t_setPriority,10,1,0,7,2,0,0
 END
 &
 THEORY ProofState IS
   Proved(0);
   Proved(0);
   Proved(0);
-  Unproved;
+  Proved(Util);
   Proved(0);
   Proved(0);
   Proved(0);
@@ -234,7 +234,7 @@ THEORY MethodList IS
   pr;
   pr;
   pr;
-  ?;
+  dd & pp(rp.1);
   pr;
   pr;
   pr;
@@ -447,13 +447,13 @@ THEORY PassList IS
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(0),(?;0;1);
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(1),(?;0);
   Force(0),?;
-  Force(1),(?;0);
+  Force(1),?;
+  Force(0),?;
+  Force(1),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;

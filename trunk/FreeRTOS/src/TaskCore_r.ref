@@ -407,6 +407,18 @@ falta apenas uma obrigação de prova sobre essa operação
         THEN
             running := task ||        
             ready := (ready \/{running})-{task}
+        ELSIF task = running & priority < max(t_priority[ready])  THEN
+            ANY
+                task
+            WHERE
+                task : TASK &
+                task : tasks &
+                task : ready &
+                t_priority(task) = max(t_priority[ready])
+            THEN
+                running := task ||
+                ready := (ready \/ { running }) - { task }
+            END
         END
     END
 END

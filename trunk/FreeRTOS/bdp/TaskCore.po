@@ -1,4 +1,13 @@
 THEORY ProofList IS
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.19,(_f(206) & _f(204) => _f(216));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.18,(_f(206) & _f(202) => _f(215));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.17,(_f(213) & _f(200) => _f(214));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.16,(_f(206) & _f(196) => _f(212));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.15,(_f(206) & _f(196) => _f(211));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.14,(_f(206) & _f(196) => _f(210));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.13,(_f(206) & _f(196) => _f(209));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.12,(_f(206) & _f(193) => _f(208));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.11,(_f(206) & _f(191) => _f(207));
   _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.10,(_f(190) & _f(204) => _f(205));
   _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.9,(_f(190) & _f(202) => _f(203));
   _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.8,(_f(199) & _f(200) => _f(201));
@@ -416,7 +425,18 @@ THEORY Formulas IS
   "`Check that the invariant (ready/\blocked = {}) is preserved by the operation - ref 3.4'";
   ((ready\/{running})-{task}/\blocked = {});
   "`Check that the invariant (suspended/\ready = {}) is preserved by the operation - ref 3.4'";
-  (suspended/\(ready\/{running})-{task} = {})
+  (suspended/\(ready\/{running})-{task} = {});
+  ("`Local hypotheses'" & not(task: ready) & task = running & task$0: TASK & task$0: tasks & task$0: ready);
+  ((ready\/{running})-{task$0}: FIN(TASK));
+  ((ready\/{running})-{task$0}: POW(tasks));
+  (task$0 = idle or (idle: ready\/{running} & not(idle = task$0)));
+  (not(task$0: blocked));
+  (not(task$0: suspended));
+  (tasks = {task$0}\/suspended\/blocked\/(ready\/{running})-{task$0});
+  ("`Local hypotheses'" & not(task: ready) & task = running & task$0: TASK & task$0: tasks & task$0: ready & active = FALSE);
+  (tasks = (ready\/{running})-{task$0});
+  ((ready\/{running})-{task$0}/\blocked = {});
+  (suspended/\(ready\/{running})-{task$0} = {})
 END
 &
 THEORY EnumerateX IS
