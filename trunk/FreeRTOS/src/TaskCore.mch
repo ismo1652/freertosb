@@ -1,12 +1,5 @@
-/* Task_Core
-SG->DD:
-Nessa máquina eu comecei a padronizar as operações, colocando um t_ antes das operações 
-para indicar que a operação trata-se da máquina Task_Core. Queria saber se posso fazer
-a mesma coisa em Queue_Core, sendo nessário também colocar um padrão para as outras máquinas
-como Task caso essa venha ser usada;
-*/
-
 /*
+TaskCore
 
 \brief Core definitions for task support in FreeRTOS.
 
@@ -93,10 +86,10 @@ OPERATIONS
     \brief Task creation
     
     \do 
-    This method create a new task.
+    This method create a new task. The created task should have ready state
     
     \parameters
-    priority - The priority of the task.
+    priority - The priority of the new task.
     
     \note 
     The actual function takes the handled as a parameter passed by reference.
@@ -125,19 +118,10 @@ OPERATIONS
     
     \do	
     Delete a task managed by FreeRTOS. If the task that will be delete is the current task, a ready 
-    task will became the running task. The NULL task can't be deleted. 
+    task will became the running task.
     
     \parameters 
     aTask - Task that will be deleted
-    
-    \question
-    can it delete the idle task?
-    R - the handle to idle task is not visible for user
-    when the task that gonna delete is the unique task in tasks, what do it do?
-    R- I don't allow this. The handle for idle task can't be take.
-    \warning
-    I don't know what the system does when the current task is delete and the set ready is empty. 
-    
     
     **/
     t_delete (atask)=
@@ -320,8 +304,6 @@ OPERATIONS
     \do	
     Start the scheduler and create the idle task		
     
-    \return 
-    
     **/
     t_startScheduler = 
     PRE
@@ -352,7 +334,7 @@ OPERATIONS
     \brief	End Scheduler
     
     \do	
-    End the task of schuler
+    	End the task of schuler
     **/
     t_endScheduler =
     PRE
@@ -369,6 +351,10 @@ OPERATIONS
     \do	
     Method used for resume the scheduler. It increment the tick with missed ticks and verify the list of 
     blocked tasks to unblock the tasks with expired timers.
+    
+    \paramenters 
+    	tick - Number of tick that will be used to verify the list of blocked tasks.
+    
     **/
     t_resumeAll (tick) = 
     PRE
@@ -402,10 +388,14 @@ OPERATIONS
     END;
     
     /**
-    \brief	Remove From Block List
+    \brief	Unblock a blocked task
     
     \do
-    Unblock the given task
+    Unblock the given task. This task can go to ready or running state, depend of its priority. This choice will be specific 
+    in futures refinaments
+    
+    \parameters 
+    task - Task that will be unblocked
     
     **/
     t_unblock(task)=
@@ -428,10 +418,17 @@ OPERATIONS
         blocked := blocked - {task}
     END
     ;
-/*
-SG->DD
-Adicionei mais essa operação
-*/
+	/*
+	\brief	Set Task Priority
+    
+    \do
+    this method set the priority of one task 
+    
+    \paramenters 
+    task - Task that will change its priority
+    priority - The new priority of passed task
+
+	*/
     t_setPriority(task,priority)=
     PRE
        
@@ -462,7 +459,7 @@ Adicionei mais essa operação
                     task : ready
                 THEN
                     running := task ||
-                    ready := (ready \/ { running }) - { task }
+                    ready := (ready \/ { running }) - {task}
                 END
             END
         END

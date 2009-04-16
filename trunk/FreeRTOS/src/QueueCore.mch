@@ -1,9 +1,3 @@
-/*
-SG->DD:
-Queria saber se eu posso padronizar o nome dessas operações 
-como colocar q_ antes do nome da operação
-*/
-
 /* QueueCore
 
  \brief Basic layer of definitions for queue support in FreeRTOS.
@@ -26,12 +20,7 @@ SEES
     Types,
     QueueContext
                             
-/*ASSERTIONS
-    
-    !(task, queues, pending).
-    	(task : TASK & queues : POW(QUEUE) & pending : QUEUE +-> POW(TASK) => 
-    	    dom(REMOVE_EVENT(task, queues, pending)) = (queues /\ dom(pending)))
-*/    	    
+ 	    
 VARIABLES
 
     /** Different queues in FreeRTOS */
@@ -55,12 +44,7 @@ INVARIANT
 	queues = dom(queue_sending) 
     
 INITIALISATION
-    /**
-    queues := {QUEUE_NULL}||
-    queue_items := {QUEUE_NULL |-> {}}||
-    queue_receiving := {QUEUE_NULL |-> {}}||
-    queue_sending := {QUEUE_NULL |-> {}}||
-    **/
+    
     queues := {}||
     queue_items := {}||
     queue_receiving := {}||
@@ -79,27 +63,25 @@ OPERATIONS
 			uxItemSize - the size of one item of queue - No used in this abstraction level
  	
 	**/
-	xQueueHandle <-- xQueueCreate(uxQueueLength, uxItemSize) =
+	r_queue <-- q_queueCreate(uxQueueLength, uxItemSize) =
 	PRE
     	uxQueueLength: NAT & 
     	uxItemSize:NAT
 	THEN    
-    	CHOICE
-			ANY
-			    queue 
-			WHERE
-			    queue : QUEUE & 
-			    queue /: queues
-			THEN	
-		    	queues := queues \/ {queue}||
-		    	queue_items := queue_items \/ {queue |-> {}} ||
-		    	queue_receiving := queue_receiving \/ {queue |-> {}} ||
-		    	queue_sending := queue_sending \/ {queue |-> {}}||
-		    	xQueueHandle := queue
-			END		    
-     	OR
-        	xQueueHandle:=QUEUE_NULL
-     	END
+    	
+		ANY
+			queue 
+		WHERE
+			queue : QUEUE & 
+			queue /: queues
+		THEN	
+		    queues := queues \/ {queue}||
+		    queue_items := queue_items \/ {queue |-> {}} ||
+		    queue_receiving := queue_receiving \/ {queue |-> {}} ||
+		    queue_sending := queue_sending \/ {queue |-> {}}||
+		    r_queue := queue
+		END		    
+     	
    	END;
    	
    	
@@ -113,7 +95,7 @@ OPERATIONS
 			queue - Queue that will be delete
 
 	**/
-	queueDelete(queue) =
+	q_queueDelete(queue) =
 	PRE
 		queue : queues
 	THEN    
@@ -139,7 +121,7 @@ OPERATIONS
 							a item in front and black respective
 			
 	**/
-	sendItem(pxQueue, pxItem, task, copy_position) =
+	q_sendItem(pxQueue, pxItem, task, copy_position) =
 	PRE
     	pxQueue : queues & 
     	pxItem:ITEM & 
@@ -161,7 +143,7 @@ OPERATIONS
 			pxQueue - Queue that the task will be insert in the reciving
 			pxTask - Task that will insert in the set of task waiting to recive (reciving)
 	**/
-	insertTaskWaitingToSend(pxQueue, pxTask) =
+	q_insertTaskWaitingToSend(pxQueue, pxTask) =
 	PRE
 		pxQueue : queues & 
 		pxTask : TASK
@@ -179,7 +161,7 @@ OPERATIONS
 			pxQueue - Queue that the task will be insert in the sending
 			pxTask - Task that will insert in the set sending
 	**/
-	insertTaskWaitingToRecived(pxQueue, pxTask) =
+	q_insertTaskWaitingToRecived(pxQueue, pxTask) =
 	PRE
     	pxQueue : queues &
     	pxTask : TASK
@@ -200,7 +182,7 @@ OPERATIONS
 			justPeeking - Flag that indicate if the item will reade and remove or only read
 			pxTask - Task that have the item that will be read
 	**/
-	xItem <-- receivedItem(pxQueue, justPeeking, task) =
+	xItem <-- q_receivedItem(pxQueue, justPeeking, task) =
 	PRE
     	pxQueue : queues & 
     	justPeeking : BIT & 
@@ -232,7 +214,7 @@ OPERATIONS
 			task - Task that will be removing
 		
 	**/	
-	removeFromEventListQueue(task) =
+	q_removeFromEventListQueue(task) =
 	PRE
     	task : TASK  
 	THEN
