@@ -1,5 +1,5 @@
 THEORY BalanceX IS
-  QueueCore,33,0,0,31,2,0,0;
+  Queue,33,0,0,31,2,0,0;
   Initialisation,4,0,0,4,0,0,0;
   xQueueCreate,6,0,0,6,0,0,0;
   queueDelete,7,0,0,7,0,0,0;

@@ -1,23 +1,23 @@
 THEORY ProofList IS
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.19,(_f(206) & _f(204) => _f(216));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.18,(_f(206) & _f(202) => _f(215));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.17,(_f(213) & _f(200) => _f(214));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.16,(_f(206) & _f(196) => _f(212));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.15,(_f(206) & _f(196) => _f(211));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.14,(_f(206) & _f(196) => _f(210));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.13,(_f(206) & _f(196) => _f(209));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.12,(_f(206) & _f(193) => _f(208));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.11,(_f(206) & _f(191) => _f(207));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.10,(_f(190) & _f(204) => _f(205));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.9,(_f(190) & _f(202) => _f(203));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.8,(_f(199) & _f(200) => _f(201));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.7,(_f(190) & _f(196) => _f(198));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.6,(_f(190) & _f(196) => _f(52));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.5,(_f(190) & _f(196) => _f(51));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.4,(_f(190) & _f(196) => _f(197));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.3,(_f(190) & _f(195) => _f(136));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.2,(_f(190) & _f(193) => _f(194));
-  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.1,(_f(190) & _f(191) => _f(192));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.19,(_f(199) & _f(38) => _f(209));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.18,(_f(199) & _f(36) => _f(208));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.17,(_f(206) & _f(34) => _f(207));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.16,(_f(199) & _f(47) => _f(205));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.15,(_f(199) & _f(47) => _f(204));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.14,(_f(199) & _f(47) => _f(203));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.13,(_f(199) & _f(47) => _f(202));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.12,(_f(199) & _f(30) => _f(201));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.11,(_f(199) & _f(28) => _f(200));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.10,(_f(190) & _f(38) => _f(198));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.9,(_f(190) & _f(36) => _f(197));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.8,(_f(195) & _f(34) => _f(196));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.7,(_f(190) & _f(47) => _f(194));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.6,(_f(190) & _f(47) => _f(52));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.5,(_f(190) & _f(47) => _f(51));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.4,(_f(190) & _f(47) => _f(193));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.3,(_f(190) & _f(135) => _f(136));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.2,(_f(190) & _f(30) => _f(192));
+  _f(1) & _f(2) & _f(8) & _f(21) & _f(189) & t_setPriority.1,(_f(190) & _f(28) => _f(191));
   _f(1) & _f(2) & _f(8) & _f(21) & _f(166) & t_unblock.30,(_f(178) & _f(36) => _f(188));
   _f(1) & _f(2) & _f(8) & _f(21) & _f(166) & t_unblock.29,(_f(181) & _f(34) => _f(187));
   _f(1) & _f(2) & _f(8) & _f(21) & _f(166) & t_unblock.28,(_f(178) & _f(47) => _f(186));
@@ -221,8 +221,8 @@ THEORY ProofList IS
 END
 &
 THEORY Formulas IS
-  ("`Seen and used machines properties'" & configMAX_PRIORITIES: INTEGER & 0<=configMAX_PRIORITIES & configMAX_PRIORITIES<=2147483647 & 1<=configMAX_PRIORITIES & configTOTAL_HEAP_SIZE: INTEGER & 0<=configTOTAL_HEAP_SIZE & configTOTAL_HEAP_SIZE<=2147483647 & configMINIMAL_STACK_SIZE: INTEGER & 0<=configMINIMAL_STACK_SIZE & configMINIMAL_STACK_SIZE<=2147483647 & INCLUDE_uxTaskPriorityGet: BIT & INCLUDE_vTaskDelete: BIT & INCLUDE_vTaskSuspend: BIT & INCLUDE_xTaskGetSchedulerState: BIT & INCLUDE_vTaskPrioritySet: BIT & INCLUDE_xTaskGetCurrentTaskHandle: BIT & INCLUDE_vTaskDelayUntil: BIT & INCLUDE_vTaskDelay: BIT & BIT = 0..1 & pdTRUE: BIT & pdTRUE = 1 & pdFALSE: BIT & pdFALSE = 0 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & ERROR_DEFINITION = -5.. -1 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: 0..2147483647 & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TICK_INCREMENT: TICK*TICK +-> TICK & dom(TICK_INCREMENT) = TICK*TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & (1..3)*{SCHEDULER_STATE}: FIN(NATURAL*{SCHEDULER_STATE}) & not((1..3)*{SCHEDULER_STATE} = {}));
-  ("`Seen and used machines assertions'" & configMAX_PRIORITIES: INTEGER & 0<=configMAX_PRIORITIES & ERROR_DEFINITION: POW(INTEGER) & BIT: POW(NATURAL));
+  ("`Seen and used machines properties'" & configMAX_PRIORITIES: INTEGER & 0<=configMAX_PRIORITIES & configMAX_PRIORITIES<=2147483647 & 1<=configMAX_PRIORITIES & configTOTAL_HEAP_SIZE: INTEGER & 0<=configTOTAL_HEAP_SIZE & configTOTAL_HEAP_SIZE<=2147483647 & configMINIMAL_STACK_SIZE: INTEGER & 0<=configMINIMAL_STACK_SIZE & configMINIMAL_STACK_SIZE<=2147483647 & INCLUDE_uxTaskPriorityGet: BIT & INCLUDE_vTaskDelete: BIT & INCLUDE_vTaskSuspend: BIT & INCLUDE_xTaskGetSchedulerState: BIT & INCLUDE_vTaskPrioritySet: BIT & INCLUDE_xTaskGetCurrentTaskHandle: BIT & INCLUDE_vTaskDelayUntil: BIT & INCLUDE_vTaskDelay: BIT & BIT = 0..1 & MAX_DELAY: 0..2147483647 & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TICK_INCREMENT: TICK*TICK +-> TICK & dom(TICK_INCREMENT) = TICK*TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & QUEUE_NULL: QUEUE & ITEM_NULL: ITEM & REMOVE_EVENT: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) & REMOVE_EVENT = %(task,queues,pending).(task: TASK & queues: POW(QUEUE) & pending: QUEUE +-> POW(TASK) | %queue.(queue: queues & queue: dom(pending) | pending(queue)-{task})) & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & ITEM: FIN(INTEGER) & not(ITEM = {}) & QUEUE: FIN(INTEGER) & not(QUEUE = {}) & (1..3)*{SCHEDULER_STATE}: FIN(NATURAL*{SCHEDULER_STATE}) & not((1..3)*{SCHEDULER_STATE} = {}) & (1..2)*{COPY_POSITION}: FIN(NATURAL*{COPY_POSITION}) & not((1..2)*{COPY_POSITION} = {}) & (1..10)*{ERROR_DEFINITION}: FIN(NATURAL*{ERROR_DEFINITION}) & not((1..10)*{ERROR_DEFINITION} = {}));
+  ("`Seen and used machines assertions'" & configMAX_PRIORITIES: INTEGER & 0<=configMAX_PRIORITIES & BIT: POW(NATURAL));
   ("`Local hypotheses'" & running$0: TASK & idle$0: TASK);
   "`Check that the invariant (tasks: FIN(TASK)) is established by the initialisation - ref 3.3'";
   ({}: FIN(TASK));
@@ -411,20 +411,13 @@ THEORY Formulas IS
   (ready\/{task}/\blocked-{task} = {});
   ("`t_setPriority preconditions in this component'" & task: tasks & priority: PRIORITY & active = TRUE & not(task = idle));
   ("`Local hypotheses'" & task: ready);
-  "`Check that the invariant (ready: FIN(TASK)) is preserved by the operation - ref 3.4'";
   ((ready\/{running})-{task}: FIN(TASK));
-  "`Check that the invariant (ready <: tasks) is preserved by the operation - ref 3.4'";
   ((ready\/{running})-{task}: POW(tasks));
-  "`Check that the invariant (running: TASK) is preserved by the operation - ref 3.4'";
-  "`Check that the invariant (active = TRUE => running = idle or idle: ready & running: tasks & running/:ready & running/:blocked & running/:suspended & tasks = {running}\/suspended\/blocked\/ready) is preserved by the operation - ref 3.4'";
   (task = idle or (idle: ready\/{running} & not(idle = task)));
   (tasks = {task}\/suspended\/blocked\/(ready\/{running})-{task});
   ("`Local hypotheses'" & task: ready & active = FALSE);
-  "`Check that the invariant (active = FALSE => tasks = ready) is preserved by the operation - ref 3.4'";
   (tasks = (ready\/{running})-{task});
-  "`Check that the invariant (ready/\blocked = {}) is preserved by the operation - ref 3.4'";
   ((ready\/{running})-{task}/\blocked = {});
-  "`Check that the invariant (suspended/\ready = {}) is preserved by the operation - ref 3.4'";
   (suspended/\(ready\/{running})-{task} = {});
   ("`Local hypotheses'" & not(task: ready) & task = running & task$0: TASK & task$0: tasks & task$0: ready);
   ((ready\/{running})-{task$0}: FIN(TASK));
@@ -440,7 +433,9 @@ THEORY Formulas IS
 END
 &
 THEORY EnumerateX IS
-  SCHEDULER_STATE == {taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED}
+  SCHEDULER_STATE == {taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED};
+  COPY_POSITION == {queueSEND_TO_BACK,queueSEND_TO_FRONT};
+  ERROR_DEFINITION == {errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,errQUEUE_EMPTY,errQUEUE_FULL,pdPASS,pdFAIL,pdTRUE,pdFALSE}
 END
 &
 THEORY Version IS

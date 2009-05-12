@@ -35,8 +35,8 @@ THEORY ProofList IS
 END
 &
 THEORY Formulas IS
-  ("`Seen and used machines properties'" & BIT = 0..1 & pdTRUE: BIT & pdTRUE = 1 & pdFALSE: BIT & pdFALSE = 0 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & ERROR_DEFINITION = -5.. -1 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: 0..2147483647 & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TICK_INCREMENT: TICK*TICK +-> TICK & dom(TICK_INCREMENT) = TICK*TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & (1..3)*{SCHEDULER_STATE}: FIN(NATURAL*{SCHEDULER_STATE}) & not((1..3)*{SCHEDULER_STATE} = {}) & QUEUE_NULL: QUEUE & ITEM_NULL: ITEM & REMOVE_EVENT: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) & REMOVE_EVENT = %(task,queues,pending).(task: TASK & queues: POW(QUEUE) & pending: QUEUE +-> POW(TASK) | %queue.(queue: queues & queue: dom(pending) | pending(queue)-{task})) & ITEM: FIN(INTEGER) & not(ITEM = {}) & COPY_POSITION: FIN(INTEGER) & not(COPY_POSITION = {}) & QUEUE: FIN(INTEGER) & not(QUEUE = {}));
-  ("`Seen and used machines assertions'" & ERROR_DEFINITION: POW(INTEGER) & BIT: POW(NATURAL));
+  ("`Seen and used machines properties'" & BIT = 0..1 & MAX_DELAY: 0..2147483647 & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TICK_INCREMENT: TICK*TICK +-> TICK & dom(TICK_INCREMENT) = TICK*TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & QUEUE_NULL: QUEUE & ITEM_NULL: ITEM & REMOVE_EVENT: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) & REMOVE_EVENT = %(task,queues,pending).(task: TASK & queues: POW(QUEUE) & pending: QUEUE +-> POW(TASK) | %queue.(queue: queues & queue: dom(pending) | pending(queue)-{task})) & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & ITEM: FIN(INTEGER) & not(ITEM = {}) & QUEUE: FIN(INTEGER) & not(QUEUE = {}) & (1..3)*{SCHEDULER_STATE}: FIN(NATURAL*{SCHEDULER_STATE}) & not((1..3)*{SCHEDULER_STATE} = {}) & (1..2)*{COPY_POSITION}: FIN(NATURAL*{COPY_POSITION}) & not((1..2)*{COPY_POSITION} = {}) & (1..10)*{ERROR_DEFINITION}: FIN(NATURAL*{ERROR_DEFINITION}) & not((1..10)*{ERROR_DEFINITION} = {}));
+  ("`Seen and used machines assertions'" & BIT: POW(NATURAL));
   "`Check that the invariant (queues: POW(QUEUE)) is established by the initialisation - ref 3.3'";
   ({}: POW(QUEUE));
   "`Check that the invariant (queue_items: QUEUE +-> POW(ITEM)) is established by the initialisation - ref 3.3'";
@@ -69,7 +69,7 @@ THEORY Formulas IS
   (queues-{queue} = dom({queue}<<|queue_items));
   (queues-{queue} = dom({queue}<<|queue_receiving));
   (queues-{queue} = dom({queue}<<|queue_sending));
-  ("`sendItem preconditions in this component'" & pxQueue: queues & pxItem: ITEM & task: TASK & copy_position: COPY_POSITION & task: queue_receiving(pxQueue));
+  ("`sendItem preconditions in this component'" & pxQueue: queues & pxItem: ITEM & task: TASK & copy_position: (1..2)*{COPY_POSITION} & task: queue_receiving(pxQueue));
   (queue_items<+{pxQueue|->(queue_items(pxQueue)\/{pxItem})}: QUEUE +-> POW(ITEM));
   (queue_receiving<+{pxQueue|->queue_receiving(pxQueue)-{task}}: QUEUE +-> POW(TASK));
   (queues = dom(queue_items<+{pxQueue|->(queue_items(pxQueue)\/{pxItem})}));
@@ -80,8 +80,8 @@ THEORY Formulas IS
   ("`insertTaskWaitingToRecived preconditions in this component'" & pxQueue: queues & pxTask: TASK);
   (queue_receiving<+{pxQueue|->(queue_receiving(pxQueue)\/{pxTask})}: QUEUE +-> POW(TASK));
   (queues = dom(queue_receiving<+{pxQueue|->(queue_receiving(pxQueue)\/{pxTask})}));
-  ("`receivedItem preconditions in this component'" & pxQueue: queues & justPeeking: BIT & task: TASK & task: queue_sending(pxQueue));
-  ("`Local hypotheses'" & item: ITEM & item: queue_items(pxQueue) & justPeeking = pdFALSE);
+  ("`receivedItem preconditions in this component'" & pxQueue: queues & justPeeking: BOOL & task: TASK & task: queue_sending(pxQueue));
+  ("`Local hypotheses'" & item: ITEM & item: queue_items(pxQueue) & justPeeking = FALSE);
   (queue_items<+{pxQueue|->queue_items(pxQueue)-{item}}: QUEUE +-> POW(ITEM));
   (queue_sending<+{pxQueue|->queue_sending(pxQueue)-{task}}: QUEUE +-> POW(TASK));
   (queues = dom(queue_items<+{pxQueue|->queue_items(pxQueue)-{item}}));
@@ -95,7 +95,9 @@ THEORY Formulas IS
 END
 &
 THEORY EnumerateX IS
-  SCHEDULER_STATE == {taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED}
+  SCHEDULER_STATE == {taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED};
+  COPY_POSITION == {queueSEND_TO_BACK,queueSEND_TO_FRONT};
+  ERROR_DEFINITION == {errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,errQUEUE_EMPTY,errQUEUE_FULL,pdPASS,pdFAIL,pdTRUE,pdFALSE}
 END
 &
 THEORY Version IS
