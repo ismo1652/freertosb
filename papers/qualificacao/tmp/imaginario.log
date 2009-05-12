@@ -1,0 +1,122 @@
+This is pdfeTeX, Version 3.141592-1.30.6-2.2 (MiKTeX 2.5) (preloaded format=latex 2006.10.5)  15 MAR 2007 15:20
+entering extended mode
+**imaginario.tex
+(imaginario.tex
+LaTeX2e <2005/12/01>
+Babel <v3.8g> and hyphenation patterns for english, dumylang, nohyphenation, ge
+rman, ngerman, french, portuguese, loaded.
+(quali.cls
+Document Class: quali 2006/12/19 classe para qualificação CIC/UnB
+("C:\Arquivos de programas\MiKTeX 2.5\tex\latex\base\ifthen.sty"
+Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
+)
+("C:\Arquivos de programas\MiKTeX 2.5\tex\latex\base\article.cls"
+Document Class: article 2005/09/16 v1.4f Standard LaTeX document class
+("C:\Arquivos de programas\MiKTeX 2.5\tex\latex\base\size12.clo"
+File: size12.clo 2005/09/16 v1.4f Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+))
+("C:\Arquivos de programas\MiKTeX 2.5\tex\generic\babel\babel.sty"
+Package: babel 2005/05/21 v3.8g The Babel package
+
+*************************************
+* Local config file bblopts.cfg used
+*
+("C:\Arquivos de programas\MiKTeX 2.5\tex\latex\00miktex\bblopts.cfg"
+File: bblopts.cfg 2006/07/31 v1.0 MiKTeX 'babel' configuration
+)
+("C:\Arquivos de programas\MiKTeX 2.5\tex\generic\babel\english.ldf"
+Language: english 2005/03/30 v3.3o English support from the babel system
+
+("C:\Arquivos de programas\MiKTeX 2.5\tex\generic\babel\babel.def"
+File: babel.def 2005/05/21 v3.8g Babel common definitions
+\babel@savecnt=\count87
+\U@D=\dimen103
+)
+\l@british = a dialect from \language\l@english 
+\l@UKenglish = a dialect from \language\l@english 
+\l@canadian = a dialect from \language\l@american 
+\l@australian = a dialect from \language\l@british 
+\l@newzealand = a dialect from \language\l@british 
+)
+("C:\Arquivos de programas\MiKTeX 2.5\tex\generic\babel\portuges.ldf"
+Language: portuges 2005/03/31 v1.2p Portuguese support from the babel system
+\l@brazil = a dialect from \language\l@portuges 
+Package babel Info: Making " an active character on input line 145.
+))
+("C:\Arquivos de programas\MiKTeX 2.5\tex\latex\base\fontenc.sty"
+Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
+
+("C:\Arquivos de programas\MiKTeX 2.5\tex\latex\base\t1enc.def"
+File: t1enc.def 2005/09/27 v1.99g Standard LaTeX file
+LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
+))
+("C:\Arquivos de programas\MiKTeX 2.5\tex\latex\natbib\natbib.sty"
+Package: natbib 2006/09/06 7.4a (PWD)
+\bibhang=\skip43
+\bibsep=\skip44
+LaTeX Info: Redefining \cite on input line 541.
+\c@NAT@ctr=\count88
+)
+("C:\Arquivos de programas\MiKTeX 2.5\tex\latex\setspace\setspace.sty"
+Package: setspace 2000/12/01 6.7 Contributed and Supported LaTeX2e package
+
+Package: `setspace' 6.7 <2000/12/01>
+) (imaginario.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+ [1
+
+
+] (imaginario.toc)
+\tf@toc=\write3
+ [2] [3
+
+] [0
+
+]
+
+Package natbib Warning: Citation `fulano06' on page 1 undefined on input line 4
+8.
+
+[1] (imaginario.bbl)
+
+Package natbib Warning: There were undefined citations.
+
+[2] (imaginario.aux
+
+Package natbib Warning: Citation(s) may have changed.
+(natbib)                Rerun to get citations correct.
+
+) ) 
+Here is how much of TeX's memory you used:
+ 1195 strings out of 95401
+ 12253 string characters out of 1186798
+ 74390 words of memory out of 1064748
+ 4337 multiletter control sequences out of 60000
+ 10640 words of font info for 24 fonts, out of 1000000 for 2000
+ 16 hyphenation exceptions out of 8191
+ 28i,7n,24p,227b,155s stack positions out of 5000i,500n,10000p,200000b,32768s
+
+Output written on imaginario.dvi (6 pages, 17172 bytes).

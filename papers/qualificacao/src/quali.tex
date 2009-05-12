@@ -1,0 +1,216 @@
+%% LyX 1.3 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[brazil,ruledheader]{abnt}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+
+\makeatletter
+\usepackage{babel}
+
+\makeatother
+\begin{document}
+
+\autor{Stephenson de S. L. Galvão}
+
+
+\titulo{Modelagem do Sistema Operacional de Tempo Real FreeRTOS}
+
+\orientador{Prof. Dr. David Déharbe}
+
+
+\comentario{Qualificação de mestrado apresentada ao programa de Pós-gradução em
+Sistemas e Computação do Departamento de Informática e Matemática Aplicada da
+Universidade Federal do Rio Grande do Norte, como requisito parcial para a
+obtenção do grau de Mestre em Ciências da Computação.}
+
+
+\instituicao{Universidade Federal do Rio Grande do Norte \par Centro de
+Ciências Exatas e Da Terra \par Departamento de Informática e Matemática
+Aplicada \par Programa de Pós-Graduação em Sistemas e Computação}
+
+
+\local{Natal - Rn, Brasil}
+
+
+\data{1 de junho de 2009}
+
+\capa
+
+\folhaderosto
+
+%\begin{folhadeaprovacao}
+%Monografia de Projeto Final de Graduação sob o título
+%\textit{``\ABNTtitulodata''}, defendida por \ABNTautordata~e aprovada em
+%\ABNTdatadata, em Vitória, Estado do Espírito Santo, pela banca examinadora
+%constituída pelos professores: \setlength{\ABNTsignthickness}{0.4pt}
+
+%\assinatura{Prof. Msc. Sérgio A. A. de Freitas\\ Orientador} \assinatura{Prof.
+%Dr. Flávio Miguel Varejão\\ Universidade Federal do Espírito Santo}
+%\assinatura{Prof. Dr. Raul Henriques Cardoso Lopes\\ Universidade Federal do
+%Espírito Santo}
+%\end{folhadeaprovacao}
+%\begin{resumo}
+%Escreva aqui o texto do seu resumo.
+%\end{resumo}
+%\begin{abstract}
+%Write here the English version of your {}``Resumo''.
+%\end{abstract}
+
+%\chapter*{Dedicatória}
+
+%Dedico este trabalho a ...
+
+
+%\chapter*{Agradecimentos}
+
+%Agradeço a ...
+
+\tableofcontents{}\listoffigures
+
+
+
+\listoftables
+
+
+\chapter{Introdução\label{cap:introducao}}
+
+Falar dos grandes desafios (SBC) e do desafio do compilador ``Verifiging
+compile'', ``Verified Software repository'' desafio de Jim Woodcock
+
+\section{Objetivos}
+Falar do objetivo da dissertação e não só da qualificação. Items a serem
+discutidos:
+
+\begin{itemize}
+  \item Abragência da especificação
+  \item Profundidade em aspectos pelo menos da construção do software
+  \item Se necessário tem a possibilidade de estessão até o nível de assemblagem
+		devido aos códigos em assembler que compoem o FreeRTOS.
+\end{itemize}
+
+\section{Metodologia}
+Métodologia da dissertação, no contexto do que já foi feito
+
+
+
+%item \textbf{Assunto:}
+%\begin{itemize}
+%  \item Motivação do trabalho
+%  \item Falar do uso dos sistemas de tempo real
+%  \item Falar da importância dos sistemas de tempo real
+%  \item Falar da utilização dos STRs em aplicações críticas 
+%  \item Demonstrar exemplos de sistemas de tempo real
+%\end{itemize}
+
+%\item \textbf{Bibliografia ou Inspirações:}
+% \begin{itemize}
+%  \item Introdução do artigo do semish 2009
+%  \item Introdução do Relatório Técnico
+%  \item Livros de STR que falam da sua importância e utilização
+%\end{itemize}
+
+
+
+\newpage
+
+
+\chapter{FreeRTOS}
+
+\begin{itemize}
+  \item Características e conceitos do FreeRTOS
+  \item Apresentar a API
+  \item Exemplo de como é feita uma aplicação de tempo real no FreeRTOS
+\end{itemize}
+
+ \begin{itemize}
+  \item seção do artigo do SEMISH 2009 que fala do FreeRTOS
+  \item seção do relatório da modelagem que fala do FreeRTOS
+  \item site do projeto FreeRTOS  
+  \item outras fontes que falam sobre sistemas operacionais de tempo real    
+ \end{itemize}
+
+ 
+ 
+
+
+
+\chapter{Método B}
+
+O método B trata-se de uma abordagem formal para especificar e construir
+sistema computacionais. Nele são encontradas várias qualidades presentes nos
+demais método formais que sugiram nos últimos trinta anos. Entre elas estão as
+pré e pos condições, condições necessárias para a execução de um método e
+alcançadas após a execução do mesmo, mudularização, abstração e refinamento,
+estratégia de construção/especificação de sistemas através de vários níveis de
+abstração.
+
+A base do método B está na notação de máquina abstrada(em
+inglês: \textit{Abstract Machine Notation} - AMN) a qual disponibiliza um
+framework comum para a especificação e contrução de sistemas, permitindo também
+a verificação formal do mesmo.  Mais especificamente, a AMN trata-se de uma
+liguagem de especificação de sistemas formada por blocos básicos de construção
+chamados de Máquina Abstrata ou simplemente Máquina, nos quais são colocados
+conceitos (informações) bem definidas de parte do sistema. Assim para
+especificar grandes sistemas o Notação de Maquina Abstrata utiliza-se do
+paradigma composicional, sendo um sistema complexo formado pela a composição de
+várias Máquinas Abstratas o que gera também outra Máquina Abstrata
+
+\subsubsection*{Máquina Abstrata}
+
+Para especificar as informações de um sistema uma máquina abstrata é dividida
+em vários cabeçalhos, nos quais as características do sistemas são
+semânticamente organizadas e listada. Os principais cabeçalhos presentes em uma
+máquina abstrata são Maquina, Operações, Variáveis, Invariante, Inicialização e
+Constantes. A seguir tem-se a explicação ``semântica" do que trata cada um
+desses pedeços de uma especificação.
+
+
+
+\begin{itemize}
+  \item Explicar o que é o método B
+  \item Explicar a base teórica de B (AMN e as substituições)
+  \item Explicar como é especificado um sistema em B (como é criado um módulo)
+  \item Falar das obrigações de prova
+  \item Falar dos mecânismo de composição e refinamento
+  \item Dizer que o refinamento pode chegar em um nível concreto que pode ser
+  sintetizado para algumas linguagens de programação.
+  \item Falar do uso de ferramentas
+  \item Falar do projeto B2ASM
+\end{itemize}
+
+\chapter{Revisão Literária}
+
+ \begin{itemize}
+  \item Enumerar Projetos
+  \item Desafio de software verificado    
+ \end{itemize}
+
+
+
+
+
+
+
+\chapter{Proposta}
+
+\begin{itemize}
+  \item Como será feita a modelagem do FreeRTOS
+  \item Falar do estudo do FreeRTOS e identificação dos seus principais
+  conceitos e funcionalidades
+  \item O desenvolvimento progressivo acrescentando novas funcionalidades a cada
+  refinamento
+  \item Ligar a abordagem do compilador verificável ao FreeRTOS
+  \item Dizer como será ou deve feita a união do FreeRTOS para o compilador
+  verificável
+\end{itemize}
+
+\chapter{Atividades e Etapas}
+
+\newpage
+
+\bibliographystyle{abnt-alf}
+\bibliography{quali}
+
+\anexo
+
+\end{document}
