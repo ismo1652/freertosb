@@ -1,143 +1,138 @@
-/*
-TaskCore
+/* Task_r
 
-\brief Core definitions for task support in FreeRTOS.
+\brief Refinement of Task Core .
 
-Module responsible for specific the features task. In this initial specification, 
-we concerns priority with the changes of task states, abstracting the outher features 
-as priority, code task, context.
+Module responsible for specific the features priority in the task concepts.
 
 
 Author: Stephenson Galvao, David Deharbe
-Creation date: Fri Dec 5 2008
+Creation date: Sun Mar 8 2009
 Universidade Federal do Rio Grande do Norte
 Departamento de Informatica e Matematica Aplicada
 Programa de Pos-Graduacao em Sistemas e Computacao
 Formal Methods and Languages Laboratory
 
 */
-MACHINE
-    TaskCore
+REFINEMENT
+    Task_r
+    
+REFINES
+    Task
     
 SEES
-    FreeRTOSConfig,
+    FreeRTOSConfig ,
     Types
-        
-VARIABLES
-    active, /** the system is in active mode: the scheduler is functionning and tasks are executed */
     
-    tasks,	/** all existing tasks */   
-    blocked, /** set of blocked task*/
-    ready, /** set of ready task*/
-    suspended, /** set of suspend task*/
-    running, /** task current*/
+CONSTANTS
+    max_prt,
+    IDLE_PRIORITY
     
-    idle /* a private task that runs when all other tasks are suspended or blocked */
+    
+PROPERTIES
+    PRIORITY = 0..(configMAX_PRIORITIES-1) &
+    
+    IDLE_PRIORITY : PRIORITY &
+    IDLE_PRIORITY = 0 &
+     
+    max_prt: PRIORITY * PRIORITY --> PRIORITY &
+    max_prt = %(tmp_mprt_ready,t_prt).(tmp_mprt_ready : PRIORITY & t_prt : PRIORITY | max({tmp_mprt_ready,t_prt}))
+    
+ABSTRACT_VARIABLES
+    active,
+    tasks ,
+    blocked ,
+    running ,
+    ready ,
+    suspended,
+    idle,
+    t_priority
     
 INVARIANT
-    
     active : BOOL &
     
-    tasks : FIN(TASK) &
-    idle : TASK &
-    
-    blocked : FIN(TASK) &
-    blocked <: tasks &
-    
-    ready : FIN(TASK) &
-    ready <: tasks &
-    
-    suspended : FIN(TASK) &
-    suspended <: tasks &
-    
-    running : TASK &
-    
+    t_priority : TASK +-> PRIORITY & 
+    dom(t_priority) = tasks &
     (active = TRUE =>
-        (running = idle or idle : ready) &
-	    running : tasks &
-    	running /: ready &
-    	running /: blocked &
-    	running /: suspended &
- 	    tasks = {running} \/ suspended \/ blocked \/ ready) &
- 	
- 	(active = FALSE =>
- 	    tasks = ready) &
- 	
-    ready /\ blocked = {} & 
-    blocked /\ suspended = {} &
-    suspended /\ ready= {}
+        t_priority(idle) = IDLE_PRIORITY &
+        (!(tt).(tt : ready => (t_priority (tt) <= t_priority(running)))) &
+        (!(tt).(tt : tasks => (IDLE_PRIORITY <= t_priority(tt)))))
     
 ASSERTIONS
-    active = TRUE => idle : tasks;
-    active = TRUE => tasks /= {};
-    active = TRUE => idle /: blocked;
-    active = TRUE => idle /: suspended
+    PRIORITY <: NATURAL &
+    active = TRUE => (running : dom(t_priority))
     
 INITIALISATION
     active := FALSE ||
     tasks := {} ||
-    idle :: TASK ||
     running :: TASK ||
-    blocked, ready, suspended := {}, {}, {}
+    idle :: TASK ||
+    t_priority := {} ||
+    blocked , ready , suspended := {},{},{}
     
 OPERATIONS
-    
     /**	
     \brief Task creation
     
     \do 
-    This method create a new task. The created task should have ready state
+    This method create a new task. The task created can have the state ready or running. This choice 
+    depend both of the priorities of the tasks in ready state and the priority of the new task created
+    and will be implement in future refinement. The parameter priority is declared but not used.
     
     \parameters
-    priority - The priority of the new task.
+    
+    priority - The priority of the task
     
     \note 
     The actual function takes the handled as a parameter passed by reference.
     
     **/
     result <-- t_create (priority) =
-    PRE
-        active = FALSE &
-        priority : PRIORITY
-    THEN	
+    BEGIN	
         ANY
             task
         WHERE
             task : TASK &
-            task /: tasks 
+            task /: tasks
         THEN     	    
             tasks := { task } \/ tasks ||
-            ready :=  { task } \/ ready||
+            t_priority:= t_priority \/ {task|->priority}||
+            ready := {task} \/ ready ||
             result := task
-        END
+        END                  
     END;
-    
     
     /**
     \brief Delete Task
     
     \do	
     Delete a task managed by FreeRTOS. If the task that will be delete is the current task, a ready 
-    task will became the running task.
+    task will became the running task. The NULL task can't be deleted. 
     
     \parameters 
     aTask - Task that will be deleted
     
+    \question
+    can it delete the idle task?
+    R - the handle to idle task is not visible for user
+    when the task that gonna delete is the unique task in tasks, what do it do?
+    R- I don't allow this. The handle for idle task can't be take.
+    
     **/
     t_delete (atask)=
     PRE
-        active = TRUE &
         atask : TASK &
-        atask : tasks & 
-        atask /= idle 
+        atask : tasks &
+        atask /= idle
     THEN
         tasks := tasks - { atask } || 	
-        IF atask = running THEN
+        t_priority:= { atask } <<| t_priority ||
+        IF atask = running	THEN
             ANY
                 task
             WHERE 
                 task : TASK &
-                task : ready
+                task : ready &
+                t_priority(task) = max (t_priority[ready])
             THEN
                 running := task ||
                 ready := ready - { task }
@@ -164,18 +159,17 @@ OPERATIONS
     **/
     t_suspend (atask)=
     PRE
-        active = TRUE &
         atask : TASK &
         atask : tasks &
-     	atask /= idle
+        atask /= idle
     THEN
-        suspended := suspended \/ { atask } ||
         IF atask = running THEN
             ANY
                 task 
             WHERE
                 task : TASK &
-                task : ready
+                task : ready &
+                t_priority(task) = max(t_priority[ready])
             THEN
                 running := task ||
                 ready := ready - { task }
@@ -184,7 +178,8 @@ OPERATIONS
             ready := ready - { atask }
         ELSIF atask : blocked THEN
             blocked := blocked - { atask }
-        END
+        END ||
+        suspended := suspended \/ { atask }
     END;
     
     /**
@@ -199,15 +194,11 @@ OPERATIONS
     
     **/
     t_resume (atask) =
-    PRE 
-        active = TRUE &
-        atask : TASK & 
-        atask : suspended
-    THEN    
-        CHOICE
+    BEGIN   
+        IF t_priority(atask) >= t_priority(running) THEN
             ready := ready \/ { running } ||
             running := atask
-        OR
+        ELSE
             ready := ready \/ { atask }
         END ||
         suspended := suspended - { atask }	
@@ -228,10 +219,7 @@ OPERATIONS
     
     **/
     priority <-- t_getPriority(atask)=
-    PRE
-        atask : TASK &
-        atask : tasks
-    THEN 
+    BEGIN
         priority :: PRIORITY
     END;
     
@@ -246,9 +234,7 @@ OPERATIONS
     
     **/
     result <-- t_getCurrent =
-    PRE
-        active = TRUE
-    THEN
+    BEGIN
         result := running
     END;
     
@@ -280,21 +266,17 @@ OPERATIONS
     
     **/
     t_delayTask (ticks)=
-    PRE
-        active = TRUE & 
-        running /= idle &
-        ticks : TICK & 
-        not (ticks = 0)
-    THEN  
+    BEGIN
         blocked := blocked \/ { running } ||
         ANY
             task 
         WHERE
             task : TASK &
-            task : ready
-        THEN
-            ready := ready - { task } ||
-            running := task
+            task : ready & 
+            t_priority(task) = max(t_priority[ready])    	    
+        THEN   		    
+            running := task ||
+            ready := ready - { task } 
         END
     END;
     
@@ -304,11 +286,11 @@ OPERATIONS
     \do	
     Start the scheduler and create the idle task		
     
+    \return 
+    
     **/
     t_startScheduler = 
-    PRE
-        active = FALSE
-    THEN
+    BEGIN
         active := TRUE ||
         blocked, suspended := {}, {} ||
         ANY
@@ -317,12 +299,15 @@ OPERATIONS
             idle_task : TASK & 
             idle_task /: tasks 
         THEN
-            tasks := tasks \/ { idle_task }||
+            tasks := tasks \/ { idle_task } ||
+            t_priority := t_priority \/ { idle_task |-> IDLE_PRIORITY } ||
             idle := idle_task ||
             ANY 
                 task
             WHERE
-                task : ready \/ { idle_task }
+                task : TASK &
+                (ready = {} => task = idle_task) &
+                (ready /= {} => task : ready & t_priority(task) = max(t_priority[ready]))
             THEN
                 running := task ||           	        
                 ready := (ready \/ { idle_task }) - { task }
@@ -334,14 +319,14 @@ OPERATIONS
     \brief	End Scheduler
     
     \do	
-    	End the task of schuler
+    End the task of schuler
     **/
     t_endScheduler =
-    PRE
-        active = TRUE
-    THEN
+    BEGIN
         active := FALSE ||
-        tasks, blocked, suspended, ready := {}, {}, {}, {}
+        tasks := {} ||
+        t_priority:= {} ||
+        blocked , ready , suspended := {},{},{}
     END;
     
     
@@ -351,10 +336,6 @@ OPERATIONS
     \do	
     Method used for resume the scheduler. It increment the tick with missed ticks and verify the list of 
     blocked tasks to unblock the tasks with expired timers.
-    
-    \paramenters 
-    	tick - Number of tick that will be used to verify the list of blocked tasks.
-    
     **/
     t_resumeAll (tick) = 
     PRE
@@ -368,18 +349,21 @@ OPERATIONS
             unblocked <: blocked
         THEN
             IF unblocked /= {} THEN
-                CHOICE
+                IF t_priority(running) <= max(t_priority[unblocked])  THEN
                     ANY
                         task
                     WHERE
                         task : TASK &
+                        task : unblocked &
                         task : tasks &
-                        task : unblocked 
+                        t_priority(running) <= t_priority(task) &
+                        t_priority(task) = max(t_priority[unblocked])
                     THEN
                         running := task ||
                         ready := ready \/ { running } \/ (unblocked - { task })
                     END
-                OR
+                    
+                ELSE
                     ready := ready \/ unblocked
                 END ||
                 blocked := blocked - unblocked
@@ -388,80 +372,55 @@ OPERATIONS
     END;
     
     /**
-    \brief	Unblock a blocked task
+    \brief	Remove From Block List
     
     \do
-    Unblock the given task. This task can go to ready or running state, depend of its priority. This choice will be specific 
-    in futures refinaments
-    
-    \parameters 
-    task - Task that will be unblocked
+    Unblock the given task
     
     **/
     t_unblock(task)=
     PRE
         active = TRUE &
+        blocked /= {} &
         task : TASK &
         task : blocked
     THEN
-        IF running = idle THEN
+        blocked := blocked - { task } ||
+        IF t_priority(task) >= t_priority(running) THEN
             running := task ||
-            ready := ready \/ { idle }
+            ready := ready \/ { running }
         ELSE
-            CHOICE
-                running := task ||
-                ready := ready \/ {running}
-            OR
-                ready := ready \/ {task}
-            END 
-        END ||
-        blocked := blocked - {task}
+            ready := ready \/ { task }
+        END
     END
     ;
-	/*
-	\brief	Set Task Priority
     
-    \do
-    this method set the priority of one task 
+/*
+SG->DD
+Adicionei mais essa operação
+falta apenas uma obrigação de prova sobre essa operação
+*/
     
-    \paramenters 
-    task - Task that will change its priority
-    priority - The new priority of passed task
-
-	*/
-    t_setPriority(task,priority)=
-    PRE
-       
-        task:tasks &
-        priority:PRIORITY &
-        active = TRUE &
-        task/=idle
-        
-    THEN
-        IF task : ready 
+    t_setPriority (task, priority)=
+    BEGIN
+        t_priority(task) := priority ||
+        IF task : ready & t_priority(running) <= priority 
         THEN
-            CHOICE
-                skip
-            OR
-				running:=task ||        
-                ready:= (ready \/{running})-{task}
-            END
-        ELSIF task = running
-        THEN
-            CHOICE
-                skip
-            OR
-                ANY
-                    task
-                WHERE
-                    task : TASK &
-                    task : tasks &
-                    task : ready
-                THEN
-                    running := task ||
-                    ready := (ready \/ { running }) - {task}
-                END
+            running := task ||        
+            ready := (ready \/{running})-{task}
+        ELSIF task = running & priority < max(t_priority[ready])  THEN
+            ANY
+                task
+            WHERE
+                task : TASK &
+                task : tasks &
+                task : ready &
+                t_priority(task) = max(t_priority[ready])
+            THEN
+                running := task ||
+                ready := (ready \/ { running }) - { task }
             END
         END
     END
 END
+
