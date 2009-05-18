@@ -3,7 +3,7 @@
 \documentclass[brazil,ruledheader]{abnt}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
-
+\usepackage{graphicx}
 \makeatletter
 \usepackage{babel}
 
@@ -115,6 +115,199 @@ Métodologia da dissertação, no contexto do que já foi feito
 
 
 \chapter{FreeRTOS}
+
+O FreeRTOS é um sistema operacional de tempo real enxuto, simples e de fácil uso.
+O seu código fonte, feito em \textit{C} com partes em \textit{assembly}, é aberto
+e possui pouco mais de 2.200 linhas de código, que são essencialmente
+distribuídas em quatro arquivos: \texttt{task.c}, \texttt{queue.c},
+\texttt{croutine.c} e \texttt{list.c}. Uma outra característica marcante desse
+sistema está na sua portabilidade, sendo o mesmo oficialmente disponível para 17
+arquiteturas monoprocessadores diferentes, entre elas a PIC, ARM e Zilog Z80,
+as quais são amplamente difundidas em produtos comerciais através de sistemas
+computacionais embutidos.
+
+Como a maioria dos sistemas operacionais de tempo real, o FreeRTOS provê para os
+desenvolvedores de  sistemas concorrentes de tempo-real acesso aos recursos de
+\textit{hardware}, facilitando com isso o desenvovimento dos mesmo. Assim,
+FreeRTOS trabalha como na figura \ref{fig:rtos}, fornecendo uma camada de
+abstração localizada entre a aplicação e o hardware, que tem como papel esconder
+dos desenvolvedores de aplicações os detalhes do hardware que será utilizado.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.8]{../fig/rtos.jpg}
+\caption{Camada abstrata proporcionada pelo FreeRTOS}
+\label{fig:rtos}
+\end{figure}
+
+Para prover tal abstração o FreeRTOS é composto por um conjunto de bibliotecas de
+tipos e funções que devem ser linkeditadas\footnote{} com o código da aplicação a
+ser desenvolvida.  Juntas, essas bibliotecas fornecem para o desenvolvedor
+serviços como gerenciamento de tarefa, comunicação e sincronização entre tarefas,
+gerenciamento de memória e controle dos dispositivos de entrada e saída.
+
+A criação de uma aplicação utilizando o FreeRTOS pode ser divida em duas partes.
+Na primeira parte são criadas, de acordo com modelos fornecidos pelo FreeRTOS, as
+tarefas e demais \textbf{estruturas de controle} que serão utilizadas pela a
+aplicação. Na segunda parte é feito o cadastramento das tarefas utilizadas pelo o
+sistema assim como a inicialização do mesmo. Por fim, o sistema é
+\textbf{compilado} para arquitetura desejada.
+
+A seguir serão detalhadas os principais serviços providos pelo o
+FreeRTOS junto com a biblioteca que disponibiliza tão serviço. Após isso será
+também demonstrado como é criada uma aplicação utilizando o FreeRTOS
+
+\section{Gerenciamento de Tarefas e CoRotinas}
+\subsection{Tarefa}
+Para entender como fuciona o gerenciamento de tarefas do FreeRTOS é necessário
+primeiramente entender-se o conceito de tarefa. Uma tarefa é uma unidade básica
+de execução que compõem as aplicações, as quais geralmente são multitarefas.
+Para o FreeRTOS uma tarefa é composta por :
+
+\begin{itemize}
+  \item Um estado que demonstra a atual situação da tarefa
+  \item Uma prioridade que varia de zero até uma constante máxima definida pelo
+  o usuário
+  \item Uma pilha naqual é armazenada o ambiente de execução (estado dos
+  restradores) da tarefa quando está é interrompida
+\end{itemize}
+
+Os possível estados que uma tarefa pode assumir são :
+
+\begin{itemize}
+  \item \textbf{Em execução}: Indica que a tarefa esta sendo execultada pelo
+  processado
+  \item \textbf{Pronta}: Indica que a tarefa está pronta para entrar em execução
+  mas não está sendo executada
+  \item \textbf{Bloqueada}: Indica que a tarefa esta esperando por algum evento
+  para continuar a sua execução
+  \item \textbf{Suspensa}:Indica que a tarefa foi suspensa pelo kernel
+  através da chamada de uma funcionalidade usada para controlar as tarefas 
+\end{itemize}
+
+A permutação que ocorre entre os estados de uma tarefa funciona como demonstra a
+figura \ref{fig:task_states}. Nela uma tarefa com o estado ``em execução'' pode
+ir para o estado pronta, bloqueado ou suspenso, uma tarefa com o estado pronto
+pode ser suspensa ou entrar em execução e as tarefa com o estado bloqueada ou
+suspensa só podem ir para o estado pronto. 
+
+Entranto, vale enfatizar que por tratar-se de um SOTR para arquiteturas
+monoprocessadores o FreeRTOS não permite que mais de uma tarefa seja executada
+no mesmo momento. Assim no FreeRTOS apenas uma tarefa pode assumir o estado
+pronto em um determinado instante, restando as demais os outros estado. Com
+isso, para decidir qual tarefa deve ser executada existe um mecanismo no
+sistema operacional denominado escalonador, o qual será detalhado na sessão
+\ref{sec:escalonador}.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.5]{../fig/task_states.jpg}
+\caption{Grafo de estados de uma tarefa}
+\label{fig:task_states}
+\end{figure}
+
+\subsubsection{Tarefa Ociosa}
+
+No FreeRTOS existe também uma tarefa denominada de tarefa ociosa, a qual é
+executada quando nenhuma tarefa está em execução. A tarefa ociosa tem como
+principal finalidade excluir da memória tarefas que não serão mais usadas pelo
+sistema. Assim quando uma aplicação informa para o sistema que uma tarefa não
+será mais utilizada essa tarefa só será excluida quando a tarefa ociosa entrar
+em execução. A tarefa ociosa possui a menor prioridade dentre as tarefas que
+compoem um sistema.
+
+\section{Escalonador de Tarefas}
+\label{sec:escalonador}
+O escalonador é a parte mais importante de um sistema. É ele quem decide qual
+tarefa deve entrar em execução e realiza entre a tarefa que está no processador,
+ou seja em execução, com a nova tarefa que ira ocupar o processador, a tarefa
+que irá entrar em execução. No FreeRTOS o escalonador pode funcionar de três
+modos diferentes :
+
+\begin{itemize}
+  \item \textbf{Preemptivo}: Quando o escalonador interrompe a tarefa em
+  execução mudando o seu estado e ocupa o processador com outra tarefa
+  \item \textbf{Cooperativo}: Quando o escalonador não tem permissões de
+  interromper a tarefa em execução, tendo que esperar a mesma interromper a sua
+  execução para que ele possa decidir qual será a próxima tarefa que irá entrar
+  em execução e realizar a troca das mesmas.
+  \item \textbf{Híbrido}:  Quando o escalonador pode comporta-se tanto como
+  preemptivo como cooperativo.
+\end{itemize}
+
+Para as tarefas o escalonador funciona de forma preemptiva, sendo que a decisão
+de qual tarefa deve entrar em execução e baseada na prioridade e segue a seguinte
+política: a tarefa em execução deve ter prioridade maior ou igual a tarefa de
+maior prioridade com o estado ``pronta''. Assim sempre que uma tarefa, com
+prioridade maior que a tarefa em execução, entrar no estado pronto, ele deve
+imediatamente entrar ``em execução''. Um exemplo claro da política preemptiva de
+prioridade discutida acima pode de visto na figura \ref{fig:scheduler}, naqual
+três tarefas, em ordem crescente de prioridade, disputam a execução do
+processador.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.4]{../fig/scheduler.jpg}
+\small{
+\begin{enumerate}
+  \item Tarefa 1 entra no estado pronto, como não há nenhuma tarefa em execução
+  esta assume controle do processador entrando em execução
+  \item Tarefa 2 entra no estado pronto, como está tem prioridade maior do que
+  a tarefa 1  ela entra em exução passando a tarefa 1 para o estado pronto
+  \item Tarefa 3 entra no estado pronto, como está tem prioridade maior do que
+  a tarefa 2  ela entra em exução passando a tarefa 2 para o estado pronto
+  \item Tarefa 3 encerra a sua execução, sendo a tarefa 2 escolhida para entrar
+  em execução por ser a tarefa de maior prioridade no estado pronto
+  \item Tarefa 2 encerra a sua execução e o funcionamento do escalonador é
+  passado para a tarefa 1
+\end{enumerate}
+}
+\caption{Funcionamento de um escalonador preemptivo baseado na prioridade}
+\label{fig:scheduler}
+\end{figure}
+
+\section{Corotinas}
+Outro conceito importante suportado pelo FreeRTOS é o de Corotina. Como as
+tarefas corotinas são unidades de execução independentes que formam uma
+aplicação. Por isso assim como as tarefas, uma corotina é formada por uma
+prioridade um estado, sendo a principal diferença entre uma corotina e uma
+tarefa a falta de uma pilha para armazenar o contexto de execução, a qual está
+presente nas tarefas e nas corotinas não.
+
+Os estados que uma corotina pode assumir são:
+\begin{itemize}
+  \item \textbf{Em execução}: Quando a corotina está sendo executada
+  \item \textbf{Pronta}: Quando a corotina está pronta para ser executada mas
+  não está em execução
+  \item \textbf{Bloqueada}: Quando a corotina esta bloqueada esperando por
+  algum evento para continuar a sua execução. 
+\end{itemize}
+
+As transições entre os estados de uma corotina ocorre como demonstra a figura
+\ref{fig:croutine_states}. Nela uma corotina em execução pode ir tanto para o
+estado bloqueado como para o estado suspenso, uma corotina de estado bloqueado
+só pode ir para o estado pronto e uma corotina de estado pronto só pode ir para
+o estado ``em execução''. 
+
+Assim como nas tarafes, a decisão de qual corotina irá entrar em execução é
+feita pelo o escalonador que para as corotinas funciona de forma cooperativa e
+besada na prioridade. Assim, quando uma corotina estiver em execução ela não
+será interrompida pelo o escalonador se uma tarefa de maior prioridade entrar no
+estado pronto. Com isso, o escalonador deve esperar que a corotina em execução
+interrompa \footnote{} ou termine a sua execução para que ele possa escolher a
+próxima tarefa que ira assumir o controle do escalonador.
+
+
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.6]{../fig/croutine_states.jpg}
+\caption{Grafo de estados de uma corotina}
+\label{fig:croutine_states}
+\end{figure}
+
+\section{Bibliotecas}
+Bibliotecas que implementam os conceitos acima
 
 \begin{itemize}
   \item Características e conceitos do FreeRTOS

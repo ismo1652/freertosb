@@ -5,9 +5,15 @@
 \contentsline {section}{\numberline {1.1}Objetivos}{5}
 \contentsline {section}{\numberline {1.2}Metodologia}{5}
 \contentsline {chapter}{\numberline {2}FreeRTOS}{6}
-\contentsline {chapter}{\numberline {3}M\'etodo B}{7}
-\contentsline {subsubsection}{M\'aquina Abstrata}{7}
-\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{9}
-\contentsline {chapter}{\numberline {5}Proposta}{10}
-\contentsline {chapter}{\numberline {6}Atividades e Etapas}{11}
-\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{12}
+\contentsline {section}{\numberline {2.1}Gerenciamento de Tarefas e CoRotinas}{7}
+\contentsline {subsection}{\numberline {2.1.1}Tarefa}{7}
+\contentsline {subsubsection}{Tarefa Ociosa}{8}
+\contentsline {section}{\numberline {2.2}Escalonador de Tarefas}{9}
+\contentsline {section}{\numberline {2.3}Corotinas}{9}
+\contentsline {section}{\numberline {2.4}Bibliotecas}{10}
+\contentsline {chapter}{\numberline {3}M\'etodo B}{12}
+\contentsline {subsubsection}{M\'aquina Abstrata}{12}
+\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{14}
+\contentsline {chapter}{\numberline {5}Proposta}{15}
+\contentsline {chapter}{\numberline {6}Atividades e Etapas}{16}
+\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{17}

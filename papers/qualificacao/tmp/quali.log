@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2008.11.3)  12 MAY 2009 02:43
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2008.11.3)  18 MAY 2009 01:33
 entering extended mode
  Source specials enabled.
  %&-line parsing enabled.
@@ -204,6 +204,27 @@ Package: inputenc 2006/05/05 v1.1b Input encoding file
 (/usr/share/texmf-texlive/tex/latex/base/latin1.def
 File: latin1.def 2006/05/05 v1.1b Input encoding file
 ))
+(/usr/share/texmf-texlive/tex/latex/graphics/graphicx.sty
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+Package: graphics 2006/02/20 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+(/etc/texmf/tex/latex/config/graphics.cfg
+File: graphics.cfg 2007/01/18 v1.5 graphics configuration of teTeX/TeXLive
+)
+Package graphics Info: Driver file: pdftex.def on input line 90.
+
+(/usr/share/texmf-texlive/tex/latex/pdftex-def/pdftex.def
+File: pdftex.def 2007/01/08 v0.04d Graphics/color for pdfTeX
+\Gread@gobject=\count99
+))
+\Gin@req@height=\dimen113
+\Gin@req@width=\dimen114
+)
 (/usr/share/texmf-texlive/tex/generic/babel/babel.sty
 Package: babel 2005/11/23 v3.8h The Babel package
 
@@ -212,8 +233,8 @@ Language: portuges 2005/03/31 v1.2p Portuguese support from the babel system
 
 (/usr/share/texmf-texlive/tex/generic/babel/babel.def
 File: babel.def 2005/11/23 v3.8h Babel common definitions
-\babel@savecnt=\count99
-\U@D=\dimen113
+\babel@savecnt=\count100
+\U@D=\dimen115
 )
 \l@brazil = a dialect from \language\l@portuges 
 Package babel Info: Making " an active character on input line 145.
@@ -237,7 +258,7 @@ LaTeX Font Info:    Try loading font information for T1+ptm on input line 11.
 (/usr/share/texmf-texlive/tex/latex/psnfss/t1ptm.fd
 File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
 )
-\big@size=\dimen114
+\big@size=\dimen116
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 37.
 LaTeX Font Info:    Try loading font information for OT1+ztmcm on input line 37
@@ -325,54 +346,86 @@ LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
 
 ]
 Cap\'{\i }tulo 2.
-[6
+LaTeX Font Info:    Try loading font information for T1+cmtt on input line 122.
 
-]
+(/usr/share/texmf-texlive/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+<../fig/rtos.jpg, id=24, 176.66pt x 150.5625pt>
+File: ../fig/rtos.jpg Graphic file (type jpg)
+ <use ../fig/rtos.jpg>
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 144.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 144.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 144.
+ [6
+
+ <../fig/rtos.jpg>] [7] <../fig/task_states.jpg, id=34, 392.4261pt x 414.8298pt
+>
+File: ../fig/task_states.jpg Graphic file (type jpg)
+
+<use ../fig/task_states.jpg> [8 <../fig/task_states.jpg>]
+<../fig/scheduler.jpg, id=38, 752.8125pt x 292.84406pt>
+File: ../fig/scheduler.jpg Graphic file (type jpg)
+
+<use ../fig/scheduler.jpg>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[9] <../fig/croutine_states.jpg, id=42, 291.0875pt x 238.8925pt>
+File: ../fig/croutine_states.jpg Graphic file (type jpg)
+
+<use ../fig/croutine_states.jpg>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[10 <../fig/scheduler.jpg>] [11 <../fig/croutine_states.jpg>]
 Cap\'{\i }tulo 3.
-[7
+[12
 
-] [8]
+] [13]
 Cap\'{\i }tulo 4.
-[9
+[14
 
 ]
 Cap\'{\i }tulo 5.
-[10
+[15
 
 ]
 Cap\'{\i }tulo 6.
-[11
+[16
 
 ] (./quali.bbl
-Underfull \hbox (badness 10000) in paragraph at lines 24--27
-[][]\T1/ptm/m/n/12 The Nes-sus Pro-ject. \T1/ptm/m/it/12 The Nes-sus Pro-ject\T
-1/ptm/m/n/12 . 2002. URL:
- []
+
+LaTeX Warning: Empty `thebibliography' environment on input line 8.
 
 )
 +-------------------------------------------------------------------+
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
 +-------------------------------------------------------------------+
-[12
+[17
 
 ] (./quali.aux) ) 
 Here is how much of TeX's memory you used:
- 1783 strings out of 94101
- 23806 string characters out of 1165810
- 76494 words of memory out of 1500000
- 4992 multiletter control sequences out of 10000+50000
- 54464 words of font info for 62 fonts, out of 1200000 for 2000
+ 2176 strings out of 94101
+ 29375 string characters out of 1165810
+ 84645 words of memory out of 1500000
+ 5356 multiletter control sequences out of 10000+50000
+ 69995 words of font info for 86 fonts, out of 1200000 for 2000
  637 hyphenation exceptions out of 8191
- 30i,9n,41p,258b,232s stack positions out of 5000i,500n,6000p,200000b,5000s
-{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/sh
-are/texmf-texlive/fonts/type1/bluesky/cm/cmsy10.pfb></usr/share/texmf-texlive/f
-onts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times
-/utmbi8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr8a.pfb></usr/s
-hare/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on quali.pdf (13 pages, 76538 bytes).
+ 30i,9n,41p,258b,268s stack positions out of 5000i,500n,6000p,200000b,5000s
+ </home/stepgalvao/.texmf-var/fonts/pk/ljfour/jknappen/ec/ectt
+1200.600pk>{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/te
+xmf-texlive/fonts/type1/bluesky/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/t
+ype1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmbi
+8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr8a.pfb></usr/share/t
+exmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
+Output written on quali.pdf (18 pages, 230628 bytes).
 PDF statistics:
- 66 PDF objects out of 1000 (max. 8388607)
+ 103 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 131072)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 21 words of extra memory for PDF output out of 10000 (max. 10000000)
 

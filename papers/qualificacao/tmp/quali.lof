@@ -1,1 +1,5 @@
 \select@language {brazil}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Camada abstrata proporcionada pelo FreeRTOS}}{6}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Grafo de estados de uma tarefa}}{8}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Funcionamento de um escalonador preemptivo baseado na prioridade}}{10}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Grafo de estados de uma corotina}}{11}
