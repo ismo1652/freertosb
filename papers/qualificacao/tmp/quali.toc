@@ -1,19 +1,27 @@
 \select@language {brazil}
 \contentsline {chapter}{Lista de Figuras}{}
 \contentsline {chapter}{Lista de Tabelas}{}
-\contentsline {chapter}{\numberline {1}Introdu\c c\~ao}{5}
-\contentsline {section}{\numberline {1.1}Objetivos}{5}
-\contentsline {section}{\numberline {1.2}Metodologia}{5}
-\contentsline {chapter}{\numberline {2}FreeRTOS}{6}
-\contentsline {section}{\numberline {2.1}Gerenciamento de Tarefas e CoRotinas}{7}
-\contentsline {subsection}{\numberline {2.1.1}Tarefa}{7}
-\contentsline {subsubsection}{Tarefa Ociosa}{8}
-\contentsline {section}{\numberline {2.2}Escalonador de Tarefas}{9}
-\contentsline {section}{\numberline {2.3}Corotinas}{9}
-\contentsline {section}{\numberline {2.4}Bibliotecas}{10}
-\contentsline {chapter}{\numberline {3}M\'etodo B}{12}
-\contentsline {subsubsection}{M\'aquina Abstrata}{12}
-\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{14}
-\contentsline {chapter}{\numberline {5}Proposta}{15}
-\contentsline {chapter}{\numberline {6}Atividades e Etapas}{16}
-\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{17}
+\contentsline {chapter}{\numberline {1}Introdu\c c\~ao}{6}
+\contentsline {section}{\numberline {1.1}Objetivos}{6}
+\contentsline {section}{\numberline {1.2}Metodologia}{6}
+\contentsline {chapter}{\numberline {2}FreeRTOS}{7}
+\contentsline {section}{\numberline {2.1}Gerenciamento de Tarefas e CoRotinas}{8}
+\contentsline {subsection}{\numberline {2.1.1}Tarefa}{8}
+\contentsline {subsubsection}{Tarefa Ociosa}{9}
+\contentsline {subsection}{\numberline {2.1.2}Escalonador de Tarefas}{10}
+\contentsline {subsection}{\numberline {2.1.3}Corotinas}{10}
+\contentsline {subsection}{\numberline {2.1.4}Bibliotecas}{12}
+\contentsline {subsubsection}{Cria\c c\~ao de Tarefas}{12}
+\contentsline {subsubsection}{Controle de tarefas}{12}
+\contentsline {subsubsection}{Utilit\'arios de tarefas}{13}
+\contentsline {subsubsection}{Controle do Escalonador}{14}
+\contentsline {section}{\numberline {2.2}Comunica\c c\~ao e sicroniza\c c\~ao entre tarefa}{14}
+\contentsline {subsection}{\numberline {2.2.1}Fila de Mensagens}{14}
+\contentsline {subsection}{\numberline {2.2.2}Bibliotecas}{15}
+\contentsline {section}{\numberline {2.3}Cria\c c\~ao de uma aplica\c c\~ao utilizando o FreeRTOS}{15}
+\contentsline {chapter}{\numberline {3}M\'etodo B}{16}
+\contentsline {subsubsection}{M\'aquina Abstrata}{16}
+\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{18}
+\contentsline {chapter}{\numberline {5}Proposta}{19}
+\contentsline {chapter}{\numberline {6}Atividades e Etapas}{20}
+\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{21}

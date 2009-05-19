@@ -207,7 +207,7 @@ sistema operacional denominado escalonador, o qual será detalhado na sessão
 \end{figure}
 
 \subsubsection{Tarefa Ociosa}
-
+\label{subsubsection:tarefa_ociosa}
 No FreeRTOS existe também uma tarefa denominada de tarefa ociosa, a qual é
 executada quando nenhuma tarefa está em execução. A tarefa ociosa tem como
 principal finalidade excluir da memória tarefas que não serão mais usadas pelo
@@ -216,7 +216,7 @@ será mais utilizada essa tarefa só será excluida quando a tarefa ociosa entrar
 em execução. A tarefa ociosa possui a menor prioridade dentre as tarefas que
 compoem um sistema.
 
-\section{Escalonador de Tarefas}
+\subsection{Escalonador de Tarefas}
 \label{sec:escalonador}
 O escalonador é a parte mais importante de um sistema. É ele quem decide qual
 tarefa deve entrar em execução e realiza entre a tarefa que está no processador,
@@ -266,7 +266,7 @@ processador.
 \label{fig:scheduler}
 \end{figure}
 
-\section{Corotinas}
+\subsection{Corotinas}
 Outro conceito importante suportado pelo FreeRTOS é o de Corotina. Como as
 tarefas corotinas são unidades de execução independentes que formam uma
 aplicação. Por isso assim como as tarefas, uma corotina é formada por uma
@@ -289,16 +289,6 @@ estado bloqueado como para o estado suspenso, uma corotina de estado bloqueado
 só pode ir para o estado pronto e uma corotina de estado pronto só pode ir para
 o estado ``em execução''. 
 
-Assim como nas tarafes, a decisão de qual corotina irá entrar em execução é
-feita pelo o escalonador que para as corotinas funciona de forma cooperativa e
-besada na prioridade. Assim, quando uma corotina estiver em execução ela não
-será interrompida pelo o escalonador se uma tarefa de maior prioridade entrar no
-estado pronto. Com isso, o escalonador deve esperar que a corotina em execução
-interrompa \footnote{} ou termine a sua execução para que ele possa escolher a
-próxima tarefa que ira assumir o controle do escalonador.
-
-
-
 \begin{figure}[!h]
 \centering
 \includegraphics[scale=0.6]{../fig/croutine_states.jpg}
@@ -306,26 +296,157 @@ próxima tarefa que ira assumir o controle do escalonador.
 \label{fig:croutine_states}
 \end{figure}
 
-\section{Bibliotecas}
-Bibliotecas que implementam os conceitos acima
+Assim como nas tarafes, a decisão de qual corotina irá entrar em execução é
+feita pelo o escalonador. Para as corotinas o escalonador funciona de forma
+cooperativa e baseada na prioridade. Com isso, a corotina em execução é
+quem decide o momento de sua interrupção, sendo que a próxima corotina a entrar
+em execução será a de maior prioridade entre as corotinas com o estado pronto
+
+\subsection{Bibliotecas}
+
+Para disponibilizar as caraterísticas discutidas nesta seção o FreeRTOS disponhe
+das seguintes bibliotecas: Criação de Tarefas, Controle de Tarefas, Utilidades de
+Tarefas, Controle do Kernel e Corotinas. A seguir tem-se em detalhe a descrição
+de cada uma dessas bibliotecas junto com as funcionalidades que cada uma delas
+disponibiliza
+
+\subsubsection{Criação de Tarefas}
+Essa biblioteca é responsável pelo conceito de tarefa. Nela estão presente um
+tipo responsável por representar uma tarefa do sistema e duas funcionalidades uma
+para a criação de uma tarefa e outra para a remoção de uma tarefa do sistema. Em
+seguida tem-se uma lista com todas os tipos e funcionalidades disponibilizados
+por essa biblioteca.
 
 \begin{itemize}
-  \item Características e conceitos do FreeRTOS
-  \item Apresentar a API
-  \item Exemplo de como é feita uma aplicação de tempo real no FreeRTOS
+  \item \textbf{xTaskHandle} - Tipo pelo qual uma tarefa e referenciada. Por
+  exemplo quando uma tarefa é criada através do método \textit{xTaskCreate} ela
+  é retornada pela método através do tipo \textit{xTaskHandle}
+  \item \textbf{xTaskCreate} - Funcionalidade usada para criar uma nova tarefa
+  para o sistema.
+  \item \textbf{vTaskDelete} - Funcionalidade usada para indicar que uma tarefa
+  deve ser removida do sistema\footnote{A verdadeira remoção de uma tarefa do
+  sistema só é feita pela tarefa ocisa \ref{subsubsection:tarefa_ociosa}, nesse
+  método é apenas indicado para o sistema qual tarefa deve ser removida}
 \end{itemize}
 
- \begin{itemize}
-  \item seção do artigo do SEMISH 2009 que fala do FreeRTOS
-  \item seção do relatório da modelagem que fala do FreeRTOS
-  \item site do projeto FreeRTOS  
-  \item outras fontes que falam sobre sistemas operacionais de tempo real    
- \end{itemize}
+\subsubsection{Controle de tarefas}
+A biblioteca de controle de tarefas realiza determinadas operações sobre as
+tarefas do sistema. Ela disponiliza funcionalidades capazes de bloquear,
+suspender e retornar uma tarefa do estado suspenso, além das funcionalidades de
+alterar e informar a prioridade de uma determinada tarefa. A lista das
+principais funcionalidades presentes nessa biblioteca pode ser vista a seguir:
 
+\begin{itemize}
+  \item \textbf{vTaskDelay} - Método usada para suspender uma tarefa por um
+  determinado tempo. Nesse método, para calcular quando será o tem que a tarefa
+  deve acordar, é levando em consideração o tempo relativo, ou seja, o tempo que
+  o método foi chamado. E por isso, é uma método não indicado para a criação de
+  tarefas cíclicas, pois o tempo que o método é chamado pode variar em cada
+  execução da tarefa devido as interrupções que a mesma pode sofrer.
+  \item \textbf{vTaskDelayUntil} - Método usado para suspender uma tarefa por
+  um determinado tempo. Esse método difere do \textit{vTaskDelayUntil} pelo o
+  qual do tempo em que a tarefa deve ser retornada, pois nesse é levado em
+  consideração o tempo em que uma tarefa foi retornada. Assim, se ocorrer uma
+  interrupção o tempo que a tarefa foi retornada não ira mudar, podendo criar
+  assim uma tarefa com intervalos iguais de execução chamada de tarefa cíclica
+  \item \textbf{uxTaskPriorityGet} - Método usado para informar prioridade de
+  uma determinada tarefa
+  \item \textbf{vTaskPrioritySet} - Método usado mudar a prioridade de uma
+  determinada tarefa
+  \item \textbf{vTaskSuspend} - Método usado para suspender uma determinada
+  tarefa
+  \item \textbf{vTaskResume} - Método usado retornar uma tarefa
+\end{itemize}
+
+\subsubsection{Utilitários de tarefas}
+É atravé dessa biblioteca que o FreeRTOS diponibiliza para o usuário informações
+importantes a respeito das tarefas e do escalonador do sistema . Nela estão
+prensentes funcionalidades com a de retornar uma referência para a utual tarefa
+em execução, retornar o tempo de funcionamento e o estado do escalonador e
+retornar o número e a lista das tarefas que estão sendo gerenciadas pelo
+sistema. Uma listagem das principais funcionalidades dessa biblioteca é
+encontrada a seguir:
+
+\begin{itemize}
+  \item \textbf{xTaskGetCurrentTaskHandle} - Retorna a uma referência para
+  atual tarefa em execução
+  \item \textbf{xTaskGetTickCount} - Retorna o tempo decorrido desde a
+  inicialização do sistema
+  \item \textbf{xTaskGetSchedulerState} - Retorna o estado do escalonador 
+  \item \textbf{uxTaskGetNumberOfTasks} - Retorna o número de tarefas do sistema
+  \item \textbf{vTaskList} - Retorna uma lista de tarefas do sistema
+\end{itemize}
+\subsubsection{Controle do Escalonador}
+Nessa biblioteca estão presentes as funcionalidades responsáveis por controlar
+as atividades do escalonador do sistema. Nela encontramos funcionalidades
+responsáveis por inicializar e finalizar as atividades do escalonador, assim
+como, suspender e retornar a atividades do mesmo. As principais funcionalidades
+presente nessa biblioteca são :
+
+\begin{itemize}
+  \item \textbf{vTaskStartScheduler} - Método que inicia as atividades do
+  escalonador. Usado para a inicialização do sistema
+  \item \textbf{vTaskEndScheduler} - Método que termina as atividades do
+  escalonador. Usado para a finalização das atividades do sistema também 
+  \item \textbf{vTaskSuspendAll} - Método que suspende as atividades do
+  escalonador
+  \item \textbf{xTaskResumeAll} - Método que retorna as atividades de uma
+  escalonador suspenso
+  
+\end{itemize}
+
+\section{Comunicação e sicronização entre tarefa}
+Frequentemente tarefas necessitam se um com as outras. Por exemplo a tarefa A
+depende da leitura do teclado feito pela tarefa B. Com isso a uma necessidade
+de que está comunição sejá feita de maneira bem estruturada e sem interrupções.
+Devido a isso a maiorida dos sistemas operacionais oferencem vários tipos de
+comunicação entre as tarefas. Que podem ocorrer da seguinte forma: uma tarefa
+deseja passar informações para outra, duas ou mais tarefas querem utilizar o
+mesmo recurso e uma tarefa dependo do resultado produzido por outra tarefa.
+
+No FreeRTOS assim como na maioria dos sistemas operacionais os mecanismos
+responsáveis pela a comunicação entre as tarefas são a fila de mensagem, o
+semáforo e o mutex (Mutal Excluision). Para entender melhor como funciona a
+comunicação entre tarefas no FreeRTOS, cada um desses mecanismo será detalhado
+a seguir
+
+\subsection{Fila de Mensagens}
+
+Filas de mensagens são estruturas primitivas de comunicação entre tarefas. Elas
+funcionam como, demonstra a figura \ref{fig:fila_de_mensagens}, um túnel no qual
+tarefas enviam e recebem mensagem. Assim quando uma tarefa necessita comunicar-se com outra primeiramente
+ela envia uma mensagem para o túnel para que a outra tarefa, quando entrar em
+execução possa ler a mensagem enviada.
+ 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.6]{../fig/croutine_states.jpg}
+\caption{Funcionamento de uma fila de mensagens}
+\label{fig:fila_de_mensagens}
+\end{figure} 
  
  
+No FreeRTOS, as filas de mensagens possuem tamanho fixo, defino pelo tamanho e
+quantidade de itens (mensagem) que ela pode armazenados. Devido a isso, para uma
+tarefa enviar uma mensagem para uma fila, primeiramente a fila não pode estar
+cheia, caso contrário, a tarefa é bloqueada até que seja liberado um lugar na
+fila. O mesmo ocorre quando uma tarefa tenta receber uma mensagem de uma fila, só
+que, nesse caso, a fila deve possuir pelo menos uma mensagem, para que essa sejá
+lida, caso contrário, a tarefa é bloqueada até a chegada de uma mensagem na fila.
 
+O FreeRTOS, disponibiliza para o usuário funcionalidades é possíveis de definir o
+tempo máximo que uma tarefa pode ficar bloqueada esperado por uma fila (liberação
+de espaço ou chega de mensagem). E no caso em que existem mais de uma tarefa
+bloqueadas aguardando por um evento de uma fila, as tarefas de maior prioridade
+têm preferência sobre as demais.
 
+\subsection{Bibliotecas}
+
+\section{Criação de uma aplicação utilizando o FreeRTOS}
+Exemplo de como é feita uma aplicação no FreeRTOS
+
+ 
 
 \chapter{Método B}
 
@@ -407,3 +528,4 @@ desses pedeços de uma especificação.
 \anexo
 
 \end{document}
+
