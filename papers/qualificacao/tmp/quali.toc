@@ -17,11 +17,15 @@
 \contentsline {subsubsection}{Controle do Escalonador}{14}
 \contentsline {section}{\numberline {2.2}Comunica\c c\~ao e sicroniza\c c\~ao entre tarefa}{14}
 \contentsline {subsection}{\numberline {2.2.1}Fila de Mensagens}{14}
-\contentsline {subsection}{\numberline {2.2.2}Bibliotecas}{15}
-\contentsline {section}{\numberline {2.3}Cria\c c\~ao de uma aplica\c c\~ao utilizando o FreeRTOS}{15}
-\contentsline {chapter}{\numberline {3}M\'etodo B}{16}
-\contentsline {subsubsection}{M\'aquina Abstrata}{16}
-\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{18}
-\contentsline {chapter}{\numberline {5}Proposta}{19}
-\contentsline {chapter}{\numberline {6}Atividades e Etapas}{20}
-\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{21}
+\contentsline {subsection}{\numberline {2.2.2}Sem\'aforo}{15}
+\contentsline {subsection}{\numberline {2.2.3}Mutex}{16}
+\contentsline {subsection}{\numberline {2.2.4}Bibliotecas}{16}
+\contentsline {subsubsection}{Gerencialmente de fila de Mensagens}{17}
+\contentsline {subsubsection}{Sem\'aforo/Mutex}{17}
+\contentsline {section}{\numberline {2.3}Cria\c c\~ao de uma aplica\c c\~ao utilizando o FreeRTOS}{18}
+\contentsline {chapter}{\numberline {3}M\'etodo B}{19}
+\contentsline {subsubsection}{M\'aquina Abstrata}{19}
+\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{21}
+\contentsline {chapter}{\numberline {5}Proposta}{22}
+\contentsline {chapter}{\numberline {6}Atividades e Etapas}{23}
+\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{24}

@@ -414,26 +414,36 @@ a seguir
 
 Filas de mensagens são estruturas primitivas de comunicação entre tarefas. Elas
 funcionam como, demonstra a figura \ref{fig:fila_de_mensagens}, um túnel no qual
-tarefas enviam e recebem mensagem. Assim quando uma tarefa necessita comunicar-se com outra primeiramente
-ela envia uma mensagem para o túnel para que a outra tarefa, quando entrar em
-execução possa ler a mensagem enviada.
+tarefas enviam e recebem mensagem. Assim quando uma tarefa necessita comunicar-se
+com outra primeiramente ela envia uma mensagem para o túnel para que a outra
+tarefa, quando entrar em execução possa ler a mensagem enviada.
  
 
-\begin{figure}[!h]
-\centering
+\begin{figure}[!h] \centering
 \includegraphics[scale=0.6]{../fig/croutine_states.jpg}
 \caption{Funcionamento de uma fila de mensagens}
 \label{fig:fila_de_mensagens}
 \end{figure} 
  
  
-No FreeRTOS, as filas de mensagens possuem tamanho fixo, defino pelo tamanho e
-quantidade de itens (mensagem) que ela pode armazenados. Devido a isso, para uma
-tarefa enviar uma mensagem para uma fila, primeiramente a fila não pode estar
-cheia, caso contrário, a tarefa é bloqueada até que seja liberado um lugar na
-fila. O mesmo ocorre quando uma tarefa tenta receber uma mensagem de uma fila, só
-que, nesse caso, a fila deve possuir pelo menos uma mensagem, para que essa sejá
-lida, caso contrário, a tarefa é bloqueada até a chegada de uma mensagem na fila.
+No FreeRTOS, uma fila de mensagens é formada por uma lista de tamanho fixo que
+armazena as mensagens,também de tamanhos fixos, enviadas para a lista. Assim,
+quando uma mensagem é envida para uma fila, uma cópia dela é armazenada na lista
+de mensagens para que outra tarefa possa utiliza-la. Entranto, no lugar de copiar
+toda mensagem para a lista de mensagens, é possível também armazenar-se apenas
+uma referência para a mesma, o que torna mais complicado um trabalho do
+desenvolvedor, pois assim o acesso à mensagem ficará compartilhado entre as
+tarefas, necessitando com isso de uma estrutura de sicronização para coordenar a
+utilização da mensagem pelas tarefas.
+
+Além da lista de mensagens uma fila de mensagens é composta por mais duas
+outras lista, uma para armazenar as tarefas que estão aguardando enviar uma
+mensagens para a fila e outra para armazenar as tarefas que estão aguardando
+receber uma mensagem da fila. Assim, quando uma tarefa tenta enviar uma
+mensagem para uma fila cheia esta é bloqueada e colocada na lista de tarefa
+aguardam para enviar uma mensagem para fila até que um lugar na fila sejá
+liberado. O mesmo acontece quando uma tarefa tenta ler uma mensagem de uma fila
+vazia.
 
 O FreeRTOS, disponibiliza para o usuário funcionalidades é possíveis de definir o
 tempo máximo que uma tarefa pode ficar bloqueada esperado por uma fila (liberação
@@ -441,7 +451,87 @@ de espaço ou chega de mensagem). E no caso em que existem mais de uma tarefa
 bloqueadas aguardando por um evento de uma fila, as tarefas de maior prioridade
 têm preferência sobre as demais.
 
+\subsection{Semáforo}
+Semáforos são mecanismos usados na sincronização entre tarefas. Eles funcionam
+como uma chave que libera, ou não, o uso de um determinado recurso. Assim quando
+uma tarefa deseja acessar um recurso compartilhado, ela primeiramente deve
+solicitar o semáforo que coordena o uso do recurso, caso o semáforo esteja
+liberado, a tarefa tem a permissão de utilizar o recurso e, em seguida, libera o
+semáforo, caso contrário, a tarefa é bloqueada até que o semáforo seja liberado.
+
+O FreeRTOS disponibiliza dois tipo de semáforos: os semáforo binário e o semáforo
+de contador. A diferença entre os dois está apenas no número de tarefas que podem
+reter o semáforo ao mesmo tempo. No semáforo binario apenas uma tarefa pode reter
+o semáforo e acessar o recurso compartilhado. E no semáforo com contador existe
+um número fixo de tarefa que podem reter o semáforo, sendo esse número definido
+na criação do semáfor e controlado pelo contador. Assim no semáforo com contador
+para cada tarefa que retem o semáforo o contador é decrementado de um e para cada
+tarefa que libera o semáforo o contador é incrementado, sendo que o semáforo
+torna-se indisponível quando o contador for igual a zero.
+
+No FreeRTOS o semáforo binário funciona como uma fila de mensagens com um único
+item. Assim, quando a fila estiver vazia, indica que o semáforo está sendo usado
+e, quando a fila estiver cheia, indica que o semáforo está liberado. O mesmo
+ocorre para o semáforo com contador, só que nesse caso, o tamanho da fila será a
+quantidade de tarefas que podem reter o semáforo ao mesmo tempo.
+
+\subsection{Mutex}
+
+Mutex são parecidos com o semáforo binário. A única diferença entre os dois é que
+o mutex implementa um mecanismo de herança de prioridade, o qual impede que uma
+tarefa de maior prioridade fique bloqueada a espera de um semáforo ocupado por
+uma tarefa de menor prioridade, causando o que chamamos de inversão de
+prioridade.
+
+O mecanismo de herança de prioridade funciona da seguinte forma, quando uma
+tarefa solicita o semáforo ele verifica se a tarefa solicitante possui prioridade
+maior que a tarefa com o semáforo. Caso afirmativo, a tarefa que retém o semáforo
+tem, momentaneamente, a sua prioridade elevada, para que assim ela possa realizar
+a suas funções sem interrupções e, conseqüentemente, liberar mais rapidamente o
+semáforo.
+
 \subsection{Bibliotecas}
+A característica de comunicação e sicronização entre tarefas está dividida em
+duas bibliotecas, Gerenciamento de fila de mensagens e Semáforo/Mutex. A seguir
+tem-se a explicação de cada uma dessas bibliotecas.
+
+\subsubsection{Gerencialmente de fila de Mensagens}
+A biblioteca gerenciamento de fila de mensagens é responsável pela criação e
+utilização da estrutura fila de mensagens. Ela é composta por funcionalidades que
+instanciam e removem fila de mensagens do sistema assim como também
+funcionalidades que enviam/recebem mensagens para/de uma fila de mensagens
+desejada. Abaixo tem-se uma lista com as principais funcionalidades dessas
+biblioteca.
+
+\begin{itemize}
+  \item \textbf{xQueueCreate} - Cria uma instância de uma nova fila de
+  mensagens no sistema
+  \item \textbf{vQueueDelete} - Remove uma fila de mensagem do sistema
+  \item \textbf{xQueueSend} - Envia um mensagem para a fila 
+  \item \textbf{xQueueSendToBack} - Envia uma mensagem para o fim da fila  
+  \item \textbf{xQueueSendToFront} - Envia uma mensagem para o inicio da fila
+  \item \textbf{xQueueReceive} - Ler e remove uma mensagem da fila 
+  \item \textbf{xQueuePeek} - Apenas ler uma mensagem da fila
+\end{itemize}
+
+\subsubsection{Semáforo/Mutex}
+Na biblioteca de semáforo e mutex são implementadas as características de
+sicronização entre tarefas, ou seja, os mecanísmo de semáforo e mutex junto com
+as suas operações. Assim nessa biblioteca estão presentes funcionalidades que
+criam e removem semáforos e mutex, além das funcionalidades que solicitam e
+liberam os semáforos e os mutex. As principais funcionalidades dessa biblioteca
+pode ser vista a seguir.
+
+
+\begin{itemize}
+  \item \textbf{vSemaphoreCreateBinary} - Cria um semáforo binário
+  \item \textbf{vSemaphoreCreateCounting} - Cria um semáforo com contador 
+  \item \textbf{xSemaphoreCreateMutex} - Cria um mutex 
+  \item \textbf{xSemaphoreTake} - Solicita a retensão de um semáforo ou de um
+  mutex
+  \item \textbf{xSemaphoreGive} - Libera um semáforo ou um mutex retido
+\end{itemize}
+
 
 \section{Criação de uma aplicação utilizando o FreeRTOS}
 Exemplo de como é feita uma aplicação no FreeRTOS
