@@ -4,6 +4,11 @@
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\input{commands}
+
 \makeatletter
 \usepackage{babel}
 
@@ -534,39 +539,224 @@ pode ser vista a seguir.
 
 
 \section{Criação de uma aplicação utilizando o FreeRTOS}
-Exemplo de como é feita uma aplicação no FreeRTOS
 
+Para construir uma aplicação de tempo real utilizando o FreeRTOS o desenvolvedor
+deve seguir determinadas restrições imposta pelo sistema operacional para a
+aplicação desenvolvida possa funcionar coretamente. Entre essas restrições
+estão alguns parâmetros de configurações contento informações sobre o hardware,
+como tamanho da memória e velocidade clock, assim como restrições de templates
+para a criação de determinadas estruturas utilizadas pela a aplicação, como
+tarefas e fila de mensagem. Entretanto, para facilitar o trabalho e o
+entendimento do desenvolvedores iniciantes o FreeRTOS disponibilizou junto com
+seu código fonte várias aplicações exemplos que devem ser tomadas como base
+para o desenvolvimento de novas aplicações. Nelas são encontrados vários tipos
+de configurações diferentes para cada arquitetura alvo suportada, assim como
+vários padrões que tornam o desenvolvimento de aplicações através do FreeRTOS
+uma tarefa mais simples.
+
+Contudo explicar detalhadamente como é desenvolvida um novo sistema utilizando
+o FreeRTOS foge do escopo desse capítulo, que tem como objetivo realizar uma
+pequena introdução ao Sistema Operacional de Tempo Real. Assim, com o objetivo
+finalizar uma introdução a explicação sobre o FreeRTOS e demonstrar como as
+bibliotecas do sistema são utilizadas para a criação de uma nova aplicação,
+nessas seção será demonstrada uma explicação didática de como é criada uma
+aplicação no FreeRTOS.
+
+
+Para criar-se uma aplicação no FreeRTOS deve-se inicialmente defenir e
+implementar as tarefas que são execultadas pela a aplicação. 
+
+
+
+  
+
+Inicialmente a construção de novas aplicações utilizando o FreeRTOS é feita
+através de modificações em exemplos disponibilizados junto com o seu código
+fonte. Assim o desenvolvedor 
+
+Com dito no inicio do capítulo, o FreeRTOS é um simples e portável, sendo o mesmo
+compatível com várias arquiteturas diferentes. Ele disponibiliza, junto com seu
+código fonte, exemplos de aplicações para vários tipos de arquiteturas
+diferentes. Inicialmente essas aplicações servem como base para o
+desenvolvimento de novos sistemas, pois vários detalhes como configuração do
+hardware e utilização ou não de certo recurso pelo o sistema já vem
+pre configurados nesses exemplos, sendo necessário o desenvolvedor apenas 
  
+ 
+Entretanto,
+
+demonstrar detalhamente como é construida uma aplicação no FreeRTOS foge do
+escopo desse trabalho. Desse
+
 
 \chapter{Método B}
 
-O método B trata-se de uma abordagem formal para especificar e construir
-sistema computacionais. Nele são encontradas várias qualidades presentes nos
-demais método formais que sugiram nos últimos trinta anos. Entre elas estão as
-pré e pos condições, condições necessárias para a execução de um método e
-alcançadas após a execução do mesmo, mudularização, abstração e refinamento,
+Métodos Formais trata-se de uma abordagem formal para a especificação e
+construção de sistemas computacionais. Eles utilizam-se de conceitos
+matemáticos sólidos como lógica de primeira ordem e teorias dos conjuntos para
+a criação e verificação de sistemas consistentes, seguros e sem ambiguidades.
+Devido a sua rigosa construção os métodos formais tem sido bastante utilizados
+na criação de sistemas críticos como industria aeronaltica, programas médicos e
+programas lidam enormes valores monetários.
+
+O método B trata-se de uma abordagem formal usado para especificar e construir
+sistema computacionais seguros. Ele foi criado por Jean-Raymond Abrial, com a
+colaboração de outros pesquisadores da universidade de Oxford. Na sua criação
+foram reunidaes várias qualidades presentes nos demais método formais. Entre elas
+estão as pré e pós condições, condições necessárias para a execução de um método
+e alcançadas após a execução do mesmo, mudularização, abstração e refinamento,
 estratégia de construção/especificação de sistemas através de vários níveis de
 abstração.
 
-A base do método B está na notação de máquina abstrada(em
-inglês: \textit{Abstract Machine Notation} - AMN) a qual disponibiliza um
-framework comum para a especificação e contrução de sistemas, permitindo também
-a verificação formal do mesmo.  Mais especificamente, a AMN trata-se de uma
-liguagem de especificação de sistemas formada por blocos básicos de construção
-chamados de Máquina Abstrata ou simplemente Máquina, nos quais são colocados
-conceitos (informações) bem definidas de parte do sistema. Assim para
-especificar grandes sistemas o Notação de Maquina Abstrata utiliza-se do
-paradigma composicional, sendo um sistema complexo formado pela a composição de
-várias Máquinas Abstratas o que gera também outra Máquina Abstrata
+o método B proporciona uma criação de sistemas através de sucessiveis níveis de
+abstração, na qual inicialmente cria-se um modulo abstrato em uma linguagem de
+modelagem. Esse módulo é refinado através de vários outros módulos até chegar em
+uma linguagem algorítmica, denominada B0, que pode ser traduzida automaticamente
+em algumas linguagem de programação imperativa com C, Ada, Java, JavaCard e C\#.
 
-\subsubsection*{Máquina Abstrata}
+Cada módulo criado no desenvolvimento do sistema com o método B deve ser
+analisado estaticamente para saber se ele é implementável ou consistente, ou
+seja, que sua execução não leve a um estado não permitido pela especificação.
+Assim como também cada nível de abstração deve ser analisado estaticamente para
+saber se ele é coerente com o nível acima.
 
-Para especificar as informações de um sistema uma máquina abstrata é dividida
-em vários cabeçalhos, nos quais as características do sistemas são
-semânticamente organizadas e listada. Os principais cabeçalhos presentes em uma
-máquina abstrata são Maquina, Operações, Variáveis, Invariante, Inicialização e
-Constantes. A seguir tem-se a explicação ``semântica" do que trata cada um
-desses pedeços de uma especificação.
+Atualmente o desenvolvimento de sistemas utilizando o método B pode ser apoiado
+por diversas ferramentas que vão desde a analise estática da especificação até a
+geração de código executável. Devido a isso, o método B utrapassou a barreira
+acadêmica e passou a ser bastante difundido na indústria de sistemas críticos,
+principalmente na industrias ferroviárias e automobilistica, sendo utilizado em
+sistemas que atuam no metro de Paris e em subsistemas dos automóveis da Peugeot.
+
+
+\section{Notação de Máquina Abstrata}
+
+A base do método B está na notação de máquina abstrada(em inglês:
+\textit{Abstract Machine Notation} - AMN) a qual disponibiliza um framework comum
+para a especificação e contrução de sistemas, permitindo também a verificação
+estática do mesmo.  Mais especificamente, a AMN trata-se de uma liguagem de
+especificação de sistemas formada por moódulos básicos de construção chamados de
+Máquina Abstrata ou simplemente Máquina. 
+
+Cada Máquina Abstrata é composta por diferentes seções, sendo que cada seção é
+responsável por definir um aspecto da especificação do sistema como: parâmetros,
+tipos, constantes, variáveis de estado, estados iniciais e transições do sistema.
+Como, por exemplo, a figura~\ref{fig:tarefas_maquina} contém uma Máquina
+Abstrata, chamada \textit{Kernel}, a qual especifica um sistema que permite
+incluir e excluir tarefas até o limite de 10 tarefas e possui as seguintes
+seções:
+
+
+\begin{description}
+\item[MACHINE] Nessa seção inicia-se
+o código da máquina abstrata. Ela identifica a natureza e o nome do módulo,
+seguido opcionalmente por um ou mais parâmetros separados por vírgula e
+limitados por parenteses
+\item[SETS] introduz um novo tipo de entidade, no exmplo é
+  $\mathit{TASK}$. Nesse momento, nenhum detalhe é fornecido quanto à
+  maneira como essa entidade será implementada.
+\item[VARIABLES] informa o nome das diferentes variáveis que compoem o estado.
+No exemplo, apenas há uma variável de estado: $\mathit{tasks}$.
+\item[INVARIANT] especifica o tipo das variáveis de estado assim
+  também como os estados válidos do sistema. Aqui, $\mathit{tasks}$ é
+  um conjunto de até 10 elementos do tipo $\mathit{TASK}$. A
+  caracterização lógica do conjunto dos estados válidos é uma das
+  atividades mais importantes da especificação.
+\item[INITIALISATION] identifica quais são os possíveis estados
+  iniciais do sistema. No caso, $\mathit{tasks}$ é o conjunto vazio.
+\item[OPERATIONS] determina os diferentes tipo de eventos que o
+  sistema pode sofrer. No nosso exemplo, temos operações para
+  adicionar e eliminar um elemento de $\mathit{tasks}$. Uma operação
+  pode ter parâmetros, resultados e pode alterar o valor de variáveis
+  de estado. Um ponto importante encontrados nas operações são as précondições,
+  a quais são condições que devem ser satisfeitas para que a operaçõas seja
+  realizada
+\end{description}  
+\begin{figure}[!ht]
+\begin{small}
+
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\MACHINE\\
+\quad \mathit{Kernel}\\
+    
+\SETS\\
+\quad \mathit{TASK}\\
+    
+\VARIABLES\\
+\quad \mathit{tasks}\\
+    
+\INVARIANT\\
+\quad \mathit{tasks} \in \pow(\mathit{TASK}) \land \\
+\quad \card(\mathit{tasks})\leq 10\\
+    
+\INITIALISATION\\
+\quad \mathit{tasks}:=\emptyset\\
+    
+\end{array}
+\begin{array}[t]{l}
+\OPERATIONS\\\\
+\mathit{task\_add}(\mathit{task}) = \\
+\quad \PRE \\
+\quad\quad \mathit{task}\in \mathit{TASK} \land \\
+\quad\quad \mathit{task}\not\in \mathit{tasks} \land\\
+\quad\quad \card(\mathit{tasks})<10\\
+\quad \THEN\\
+\quad\quad \mathit{tasks}:=\mathit{tasks}\cup \{\mathit{task}\}\\
+\quad   \END;\\
+
+\end{array}
+
+\begin{array}[t]{l}
+\ldots\\
+\mathit{task\_delete}(\mathit{task})=\\
+\quad \PRE\\
+\quad \quad \mathit{task}\in \mathit{tasks}\\
+\quad \THEN\\
+\quad \quad \mathit{tasks}:=\mathit{tasks}-\{\mathit{task}\}\\
+\quad \END\\
+	
+\END\\
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Maquina abstrata de tarefas}
+\label{fig:tarefas_maquina}
+\end{figure}
+
+Com isso a especificação de sistemas utilizando o método B pode ser dividido em
+duas partes principais, a especificação do estado da máquina e a especificação
+das operações da máquina. Essas duas partes serão discutidas a seguir.
+
+\subsection{Especificação do estado dá máquina}
+O estado de uma máquina abstrata pode ser definido em termos de suas variáveis
+e do seu invariante. Assim o estado de uma máquina é formado pelas as variáveis
+da máquina junto com suas definições e limitações. É no estado que é defino os
+estado válidos do sistema. 
+
+No estado da máquina são especificados, por meio de calculo de predicados, da
+teoria do conjunto e relações, as propriedades estáticas que o sistema deve
+obedecer. Assim no exemplo da figura~\ref{fig:tarefas_maquina} o estado foi
+especificado como sendo a variável $$\mathit{tasks}$$ e seu predicados
+$$\mathit{tasks} \in \pow(\mathit{TASK})$$ e $$ \card(\mathit{tasks})\leq 10$$
+
+\subsection{Especificação das operações da máquina}
+
+Nas operações da máquina é especificado o comportamento dinâmico do sistema. É
+através das operações que o estado da máquina é alterado, respeitando sempre as
+restrições do estado da máquina, ou seja, as codições declaradas no invariante
+dá máquina deve ser sempre satisfeita no final da operação.
+
+falar das pre condições
+
+\subsection{Outras seções de uma Máquina Abstrata}
+\section{Obrigação de Prova}
+\section{Modularização}
+\section{Refinamento}
+
+
 
 
 
