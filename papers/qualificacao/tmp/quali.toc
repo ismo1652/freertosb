@@ -26,12 +26,14 @@
 \contentsline {chapter}{\numberline {3}M\'etodo B}{19}
 \contentsline {section}{\numberline {3.1}Nota\c c\~ao de M\'aquina Abstrata}{20}
 \contentsline {subsection}{\numberline {3.1.1}Especifica\c c\~ao do estado d\'a m\'aquina}{21}
-\contentsline {subsection}{\numberline {3.1.2}Especifica\c c\~ao das opera\c c\~oes da m\'aquina}{22}
-\contentsline {subsection}{\numberline {3.1.3}Outras se\c c\~oes de uma M\'aquina Abstrata}{22}
-\contentsline {section}{\numberline {3.2}Obriga\c c\~ao de Prova}{22}
-\contentsline {section}{\numberline {3.3}Modulariza\c c\~ao}{22}
-\contentsline {section}{\numberline {3.4}Refinamento}{22}
-\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{23}
-\contentsline {chapter}{\numberline {5}Proposta}{24}
-\contentsline {chapter}{\numberline {6}Atividades e Etapas}{25}
-\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{26}
+\contentsline {subsection}{\numberline {3.1.2}Especifica\c c\~ao das opera\c c\~oes da m\'aquina}{21}
+\contentsline {subsubsection}{Substitui\c c\~ao Simples}{22}
+\contentsline {subsubsection}{Substitui\c c\~ao Multipla}{23}
+\contentsline {subsubsection}{Substitui\c c\~ao Condicional}{23}
+\contentsline {section}{\numberline {3.2}Obriga\c c\~ao de Prova}{24}
+\contentsline {section}{\numberline {3.3}Modulariza\c c\~ao}{24}
+\contentsline {section}{\numberline {3.4}Refinamento}{24}
+\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{25}
+\contentsline {chapter}{\numberline {5}Proposta}{26}
+\contentsline {chapter}{\numberline {6}Atividades e Etapas}{27}
+\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{28}

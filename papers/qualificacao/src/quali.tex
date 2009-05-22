@@ -739,8 +739,8 @@ estado válidos do sistema.
 No estado da máquina são especificados, por meio de calculo de predicados, da
 teoria do conjunto e relações, as propriedades estáticas que o sistema deve
 obedecer. Assim no exemplo da figura~\ref{fig:tarefas_maquina} o estado foi
-especificado como sendo a variável $$\mathit{tasks}$$ e seu predicados
-$$\mathit{tasks} \in \pow(\mathit{TASK})$$ e $$ \card(\mathit{tasks})\leq 10$$
+especificado como sendo a variável $\mathit{tasks}$ e seu predicados
+$\mathit{tasks} \in \pow(\mathit{TASK})$ e $ \card(\mathit{tasks})\leq 10$
 
 \subsection{Especificação das operações da máquina}
 
@@ -749,9 +749,115 @@ através das operações que o estado da máquina é alterado, respeitando sempre as
 restrições do estado da máquina, ou seja, as codições declaradas no invariante
 dá máquina deve ser sempre satisfeita no final da operação.
 
-falar das pre condições
+O cabeçalho de uma operação é composto por um nome, uma lista de parâmetro de
+entra e uma lista de parâmentro de saida \footnote{A notação de máquina abstrata
+permite que uma operação retorne mais de um parâmetro}, sendo que os parâmetro de
+entrada e os parâmetros são argumentos opcionais. Assim o exemplo mais completo
+de uma operação pode ser visto na figura~\ref{fig:query_task}, a qual o nome da
+operação é $\mathit{query\_task}$, o parâmetro de entrada é $\mathit{task}$ e o
+parâmetro de saida é $\mathit{belong}$.
 
-\subsection{Outras seções de uma Máquina Abstrata}
+A operação propriamente dita é formada por pré-condição e corpo da operação. Na
+pré-condição, são colocadas as informações sobre todos os parâmetros de entrada
+da operação e as condições que devem ser satisfeitas para que a operações sejá
+execultada. Com isso, a pré condição funciona como uma premissa que deve ser
+satisfeita para que a operação funcione corretamente. 
+
+Por exemplo, na figura~\ref{fig:tarefas_maquina} para que a operação
+$\mathit(add_task)$ funcione corretamente e não leve a máquina para um estado
+inválido as pré-condições $\mathit{task}\in \mathit{TASK}$, $\mathit{task}\not\in
+\mathit{tasks}$ e $\card(\mathit{tasks})<10$ devem ser obedecidas.
+
+
+
+\begin{figure}[!ht]
+\begin{small}
+
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{ans}\leftarrow \mathit{query\_task}(\mathit{task}) =\\
+\PRE
+\quad \mathit{task} \in \mathit{TASK}\\
+\THEN\\
+\quad\quad \IF \quad \mathit{task} \in \mathit{TASK} \\
+\quad\quad \THEN \quad ans := yes\\
+\quad\quad \ELSE \quad ans:=no\\
+\END
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Operação que consulta se uma tarefa pertece a máquina
+$\mathit{Kernel}$}
+\label{fig:query_task}
+\end{figure}
+No corpo da operação é especificado o seu comportamento. Nele os parametros de
+saida são obrigatoriamente valorados e os estados da máquina são alterado ou
+consultados. Assim, para realizar essas atualizações de modo formal a notação
+de máquina abstrata possui um conjunto de atribuiçoes abstratas, denominadas
+substituições, que possuem regras de como tal atribuições é realizada, o que
+permite uma analise estática da operações em realação a consistência da máquina.
+A seguir são demonstradas algumas das principais substituições da AMN.
+
+
+\subsubsection{Substituição Simples}
+
+A substituição simples é definida da seguinte forma: $$\mathit{x}:= \mathit{E}$$
+Nela $\mathit{x}$ trata-se a variável ou parâmentro de saida, para o qual será
+atribuido o valor da expressão $\mathit{E}$. Mais precisamente uma substituição é
+interpreta da seguinte maneira $$[\mathit{x}:=\mathit{E}]\mathit{P}$$ Assim
+tem-se que o predicado $\mathit{P}$ deve ser mantido quando a variável
+$\mathit{x}$ for substituida por $\mathit{E}$. Por exemplo na operação
+$\mathit{add_task}$ a substuição $\mathit{tasks}:=\mathit{tasks}\cup
+\{\mathit{task}\}$ pode ser vista como $[\mathit{tasks}:=\mathit{tasks}\cup
+\{\mathit{task}\}] \card(\mathit{tasks})<10$, Na qual $\card(\mathit{tasks})<10$
+é o predicado, no caso o invariante da máquina, que deve ser obdecido quando a
+substituição for realizada, ficando ao final $\mathit{tasks}\cup
+\{\mathit{task}\}<10$
+
+\subsubsection{Substituição Multipla}
+
+A substituição multipla trata-se de uma generalização da substituição simple. Ela
+permite que várias variáveis seja atribuidas simutaneamente. Assim uma
+substituição multipla utilizando duas variável tem a seguinte forma:
+$$\mathit{x},\mathit{y}:=\mathit{E},\mathit{F}$$ Onde paras variáveis
+$\mathit{x}$ e $\mathit{y}$ são atribuido os valores das exepressõe $\mathit{E}$
+e $\mathit{F}$, respectivamente. Assim da mesma forma que a substituição simples,
+a multipla substituição é definida da seguinte maneira:
+$$[\mathit{x}:=\mathit{E},\mathit{y}:=\mathit{F}]\mathit{P}$$ Na qual
+$\mathit{P}$ é o predicado que deve ser verdadeiro quando suas variáveis
+$\mathit{x}$ e $\mathit{y}$ forem substituidas por $\mathit{E}$ e $\mathit{F}$,
+respectivamente. Por exemplo, uma máquina que possui o predicado
+$\mathit{x}<\mathit{y}$ e possui a seguinte substituição $\mathit{x},\mathit{y}
+:=\mathit{x}+10,\mathit{y}+5$ é redizida a seguinte forma $[\mathit{x},\mathit{y}
+:=x+10,y+5]\mathit{x}<\mathit{y}$, o que resulta em $\mathit{x}+10<\mathit{y}+5$
+
+\subsubsection{Substituição Condicional}
+As substituições simples e multiplas permitem somente um mode de especificação
+onde as atribuições são feitas de maneira uniforme sem levar em consideração os
+estados iniciais da operação. Entretanto linguagens de programação provem um
+tipo condicional de atribuição na qual é permitido caminhos diferente de acordo
+com o valor inicial de variáveis, sendo o mecanismo utilizado para que tal
+escolhar seja realizada é a construção if then else. 
+
+Assim como nas liguangens de programação, a notação de máquina abstrata também
+permite a construção de estrutura de condição, através da substituição
+condicional, que possui a seguinte forma:
+$$\IF \mathit{E} \THEN \mathit{S} \ELSE \mathit{T}$$
+
+Nela $\mathit{S}$ e $\mathit{T}$ são substituições que são executadas ou não,
+dependedo a avaliação da exepressão booleana $\mathit{E}$. Assim caso
+$\mathit{E}$ sejá afirmativo a substituição $\mathit{S}$ é realizada e caso
+negativo a substituição $\mathit{T}$ é realizada. Com isso a substituição
+condicional pode ser interpretada da seguinte forma:
+
+$$[\IF \mathit{E} \THEN \mathit{S} \ELSE \mathit{T}] \mathit{P} = \mathit{E}
+\Longrightarrow [\mathit{S}] P \land  \not\mathit{E}
+\Longrightarrow [\mathit{T}] P$$.
+
+
+
 \section{Obrigação de Prova}
 \section{Modularização}
 \section{Refinamento}

@@ -5,3 +5,4 @@
 \contentsline {figure}{\numberline {2.4}{\ignorespaces Grafo de estados de uma corotina}}{11}
 \contentsline {figure}{\numberline {2.5}{\ignorespaces Funcionamento de uma fila de mensagens}}{15}
 \contentsline {figure}{\numberline {3.1}{\ignorespaces Maquina abstrata de tarefas}}{21}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Opera\c c\~ao que consulta se uma tarefa pertece a m\'aquina $\mathit {Kernel}$}}{22}
