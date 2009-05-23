@@ -768,11 +768,8 @@ $\mathit(add_task)$ funcione corretamente e não leve a máquina para um estado
 inválido as pré-condições $\mathit{task}\in \mathit{TASK}$, $\mathit{task}\not\in
 \mathit{tasks}$ e $\card(\mathit{tasks})<10$ devem ser obedecidas.
 
-
-
 \begin{figure}[!ht]
 \begin{small}
-
 $$
 \begin{array}[t]{ccc}
 \begin{array}[t]{l}
@@ -834,31 +831,207 @@ $\mathit{x}<\mathit{y}$ e possui a seguinte substituição $\mathit{x},\mathit{y}
 :=x+10,y+5]\mathit{x}<\mathit{y}$, o que resulta em $\mathit{x}+10<\mathit{y}+5$
 
 \subsubsection{Substituição Condicional}
-As substituições simples e multiplas permitem somente um mode de especificação
-onde as atribuições são feitas de maneira uniforme sem levar em consideração os
-estados iniciais da operação. Entretanto linguagens de programação provem um
-tipo condicional de atribuição na qual é permitido caminhos diferente de acordo
-com o valor inicial de variáveis, sendo o mecanismo utilizado para que tal
-escolhar seja realizada é a construção if then else. 
+
+As substituições simples e multiplas permitem somente um opção de especificação
+onde uma atribuições é sempre feitas de maneira uniforme sem opções e sem levar
+consideração os estados iniciais na operação. Entretanto, as linguagens de
+programação convencionais disponibilizam um tipo condicional de atribuição na
+qual é permitido caminhos diferente de acordo com expressões lógicas que utilizam
+o valores iniciais das variáveis do sistema. Esse tipo de atribuição é
+feita através da formação $\IF$ $\THEN$ $\ELSE$.
 
 Assim como nas liguangens de programação, a notação de máquina abstrata também
-permite a construção de estrutura de condição, através da substituição
-condicional, que possui a seguinte forma:
-$$\IF \mathit{E} \THEN \mathit{S} \ELSE \mathit{T}$$
+permite a construção de atribuições condição, as quais são feitas através da
+substituição condicional. Com isso, uma substituição condicional funciona da
+mesma forma que as linguagens de programação, não qual uma expressão lógica é
+avaliada para saber qual caminha a estrutura deve seguir, e qual atribução deve
+ser realizada. A forma como é especificada uma substituição condicional na ANM
+pode ser visto a seguir:
 
-Nela $\mathit{S}$ e $\mathit{T}$ são substituições que são executadas ou não,
-dependedo a avaliação da exepressão booleana $\mathit{E}$. Assim caso
-$\mathit{E}$ sejá afirmativo a substituição $\mathit{S}$ é realizada e caso
-negativo a substituição $\mathit{T}$ é realizada. Com isso a substituição
-condicional pode ser interpretada da seguinte forma:
+$$\IF \quad \mathit{E}\quad \THEN\quad \mathit{S}\quad \ELSE\quad \mathit{T}$$
 
-$$[\IF \mathit{E} \THEN \mathit{S} \ELSE \mathit{T}] \mathit{P} = \mathit{E}
-\Longrightarrow [\mathit{S}] P \land  \not\mathit{E}
-\Longrightarrow [\mathit{T}] P$$.
+NA especificação acima $\mathit{S}$ e $\mathit{T}$ são substituições tem suas
+execuções condicionadas pela exepressão lógica é $\mathit{E}$, na qual pode
+conter variáveis da máquina como também os parâmetros de entrada da operação. Com
+isso, caso $\mathit{E}$ sejá afirmativo a substituição $\mathit{S}$ é realizada
+e caso ele seja negativo a substituição $\mathit{T}$ é executada. Assim a
+substituição condicional pode ser interpretada da seguinte forma:
+
+$$[\IF \quad \mathit{E} \quad \THEN \quad \mathit{S} \quad \ELSE
+\quad \mathit{T}] \mathit{P} \quad = \quad (\mathit{E} \Longrightarrow
+[\mathit{S}] P )\land (\neg\mathit{E} \Longrightarrow [\mathit{T}] P)$$.
+
+Um exemplo simples da utilização dessa substituição pode ser visto na
+figura~\ref{fig:query_task}. Nela a expressão $\mathit{task} \in \mathit{TASK}$ é
+primeiramente analisada para decidir qual substituição simples deve ser
+execultada. Caso a o resultado da expressão sejá afirmativo $\mathit{ans} :=
+\mathit{yes}$ é execultado e caso a expressão sejá negativa $\mathit{ans} :=
+\mathit{no}$ é execultado.
+ 
+\subsubsection{Substituição não deterministica $\ANY$}
+Até agora foram vista apenas substituições deterministacas, ou sejá elas possuem
+um comportamento previsível que leva a apenas um resultado final é possível.
+Entretanto, as máquinas abstratas de B servem para fazer especificação abstrata
+de sistemas e componetes e as vezes em certo nível de abstração o comportamento
+das operações do sistema podem não ser tão previsíveis como as substituições
+deterministicas exigem. Para resolver esse problema foram criadas as
+substituições não deterministicas
+
+As substituições não deterministicas tratam-se de substituições que introduzem
+escolhas aleatórias no corpo das operações, levando a mesma não mais para um
+estado final previsível e sim para um conjunto de estados finais possíveis. Assim
+para uma determinada escolha a especificação apenas define em qual conjunto deve
+ser feita a escolha e não diz nenhuma informação de como tal escolha deve ser
+feita.
+
+Um exemplo de substituição não deterministica da AMN é a substituição $\ANY$.
+Essa substituição possui o seguinte formato:  
+$$\ANY\quad\mathit{x}\quad\WHERE \quad\mathit{Q}\quad\THEN\quad\mathit{T}\quad\END$$
+
+Através da especificação assim percebe-se que a substituição $\ANY$ é formada
+por três elementos:
+
+\begin{description}
+\item[$\mathit{x}$]trata-se de uma lista de variável que será utilizada no
+corpo da substituição e para as quais serão escolhidos valores abstratos
+delimitados pelo o predicado $\mathit{Q}$.
+\item[$\mathit{Q}$] são predicados que delimitam o conjunto de opções para as
+variáveis $\mathit{x}$. Nessa parte as variáveis $\mathit{x}$ devem
+obrigatoriamente serem tipificadas.
+\item[$\mathit{T}$] é denominado corpo da substituição. Nele são colocados
+atribuições que utilizam-se das variáveis $\mathit{x}$ para atualizar estados
+ou atribuir valores para os parâmetros de saida de uma operação
+\end{description}
+
+Um exemplo da substituição $\ANY$ pode ser visto na
+figura~\ref{fig:random_create} naqual uma tarefa aleatória a adicionada na
+máquina $\mathit{Kernel}$. Nela primeiramente a variável $\mathit{task}$ é criada
+para qual será atribuido um valor aleatório. Em seguida, tipo e uma restrição
+sobre $\mathit{task}$ é definida. Por ultimo a variável $\mathit{task}$ é
+adicionada ao conjunto $\mathit{tasks}$. Assim um comportamento não
+deterministico é atribudo a operação pois para cada execução da operação a
+variável $\mathit{task}$ pode assumir um valor aleatório.
+ 
+
+\begin{figure}[!ht]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{random\_create}=\\
+\PRE\\
+\quad\card(\mathit{tasks})<9 \\
+\THEN\\
+\quad \ANY \\
+\quad\quad \mathit{task}\\
+\quad \WHERE \\
+\quad\quad \mathit{task}\in \mathit{TASK} \land\\
+\quad\quad \mathit{task} \not\in \mathit{tasks}\\
+\quad \THEN\\
+\quad\quad \mathit{tasks}:=\mathit(tasks)\cap \mathit{task}\\
+\quad \END\\
 
 
+\END
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Operação que cria uma tarefa aleatória na máquina
+$\mathit{Kernel}$}
+\label{fig:random_create}
+\end{figure}
+
+Uma definição para a substituição $\ANY$ seria: $$\forall \mathit{x}.(Q
+\Rightarrow [\mathit{T}]P)$$ Indicando que para todo valor que for escolhido para
+o conjunto de variável $\mathit{x}$ as substituições $\mathit{T}$ devem garantir
+o predicado $\mathit{P}$.
 
 \section{Obrigação de Prova}
+
+Após a criação de uma máquina abstrata utilizando o método B essa deve ser
+avaliada estaticamente para saber se a mesma é coerente e passível de
+impementação. Para realizar tal análise o método B dispoem de um conjunto de
+obrigações de prova que são asserções criadas apartir da especificação de uma
+máquina abstrata e que devem provadas afim a corretude da especificação.
+
+Resulmidamente a analise estática de uma máquina abstrata através das obrigações
+de prova avalia se essa possui estados válidos, ou seja, se pelo menos uma
+combinação de estados válidos é alcançada pela máquina e, caso afirmativos, se
+esses são mantidos pelos invariantes. Com isso as principais obrigações de prova
+gerada em uma máquina abstrata saõ: Consistência do Invariante, Obrigação de
+Prova da Inicialização e Obrigação de Prova das Operações. A seguir é detalhado o
+que significa cada uma dessas obrigações de prova e como elas são realizadas.
+
+\subsection{Consistência do Invariante}
+Nessa obrigação de prova é analisado se o invariante da máquina possui pelo
+menos uma combinação naqual todos os estados são válidos. Assim essa obrigação
+de prova é definida da seguinte maneira :
+ 
+$$\exists\mathit{v}.\mathit{I}$$ 
+
+Onde $\mathit{v}$ indica o vetor de todos as variáveis da máquina e $\mathit{I}$
+representa o Invariante da máquina. Com isso, a definição acima pode ser
+entendida como: Deve existir pelo menos um valor para o vetor de variáveis
+$\mathit{v}$ que satisfaça o invariante
+
+Um exemplo da aplicação desse obrigação de prova na máquina da
+figura~\ref{fig:tarefas_maquina} seria: 
+
+$$\exists \mathit{tasks}.(\mathit{tasks} \in \mathit{TASK} \cap
+\card(\mathit{tasks})\leq 10 $$
+
+O que pode ser provador como verdadeiro para $\mathit{tasks} = \emptyset $
+
+
+\subsection{Obrigação de prova da inicialização}
+Outro obrigação de prova necessária para uma máquina abstrata é saber se seu
+estado inicial satisfaz o invariante. Em outras palavras significa verificar se
+o estado inicial da máquina é um estado válido. Assim essa obrigação de prova é
+definida da seguinte maneira :
+$$\mathit[T]\mathit[I]$$
+
+Nela $\mathit[T]$ indica as substituições realizadas na inicialização da máquina
+e $\mathit[I]$ indica os predicados definidos no invariante. Assim a obrigação de
+prova da inicialização da máquina da figura~\ref{fig:tarefas_maquina} pode ser
+definido como sendo:
+
+$$[\mathit{task}:= \emptyset] (\mathit{tasks} \in \mathit{TASK} \cap
+\card(\mathit{tasks})\leq 10) \quad \Rightarrow\quad \emptyset \in \mathit{TASK}
+\cap \card(\emptyset)\leq 10 $$
+
+O que pode ser facilmente visto como uma verdade.
+
+
+\subsection{Obrigação de prova das Operações}
+Na obrigação de prova das operações deve ser analisado se, quando satisfeita a
+sua pré-condição, a execução da operação levará a máquina a um estado válido.
+Assim a definição dessa obrigação de prova pode ser vista da seguinte maneira:
+
+$$\mathit{I} \land \mathit{P} \Rightarrow [\mathit{S}]I$$
+
+Na definição acima $\mathit{I}$ representa o invariante da máquina,
+$\mathit{P}$ representa a pré-condição da operação analisada e $\mathit{S}$
+indica as substituições realizadas no corpo da operação. Assim, uma explicação
+mais precisa desa definição serai que quando a máquina estiver em um estado
+válido e a pré-condição da operação for satisfieta, a execução da operação deve
+manter a máquina em um estado válido. Nota-se assim que essa obrigação de prova
+não torna-se necessário ser avaliada para as operações que não alteram o estado
+da máquina, chamada operções de consulta como a da figura~\ref{fig:query_task},
+onde apenas o valor da parâmentro de retorno é alterado.
+
+Um exemplo de uma obrigação de prova da operação $\mathit{add_task}$ da máquina
+da figura~\ref{fig:task_states} pode ser visto a seguir:
+
+$$
+(\mathit{tasks} \in \mathit{TASK} \cap
+\card(\mathit{tasks})\leq 10)) \land 
+(\mathit{task}\in \mathit{TASK} \land \mathit{task}\not\in \mathit{tasks})\\
+\Rightarrow \\
+([\mathit{tasks}:=\mathit{task}\cap\mathit{task}]((\mathit{tasks}
+\in \mathit{TASK} \cap \card(\mathit{tasks})\leq 10))))
+$$
+ 
 \section{Modularização}
 \section{Refinamento}
 
