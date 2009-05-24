@@ -24,20 +24,20 @@
 \contentsline {subsubsection}{Sem\'aforo/Mutex}{17}
 \contentsline {section}{\numberline {2.3}Cria\c c\~ao de uma aplica\c c\~ao utilizando o FreeRTOS}{18}
 \contentsline {chapter}{\numberline {3}M\'etodo B}{19}
-\contentsline {section}{\numberline {3.1}Nota\c c\~ao de M\'aquina Abstrata}{20}
-\contentsline {subsection}{\numberline {3.1.1}Especifica\c c\~ao do estado d\'a m\'aquina}{21}
-\contentsline {subsection}{\numberline {3.1.2}Especifica\c c\~ao das opera\c c\~oes da m\'aquina}{21}
-\contentsline {subsubsection}{Substitui\c c\~ao Simples}{22}
-\contentsline {subsubsection}{Substitui\c c\~ao Multipla}{23}
-\contentsline {subsubsection}{Substitui\c c\~ao Condicional}{23}
-\contentsline {subsubsection}{Substitui\c c\~ao n\~ao deterministica $\ANY $}{24}
-\contentsline {section}{\numberline {3.2}Obriga\c c\~ao de Prova}{26}
-\contentsline {subsection}{\numberline {3.2.1}Consist\^encia do Invariante}{26}
-\contentsline {subsection}{\numberline {3.2.2}Obriga\c c\~ao de prova da inicializa\c c\~ao}{27}
-\contentsline {subsection}{\numberline {3.2.3}Obriga\c c\~ao de prova das Opera\c c\~oes}{27}
-\contentsline {section}{\numberline {3.3}Modulariza\c c\~ao}{28}
-\contentsline {section}{\numberline {3.4}Refinamento}{28}
-\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{29}
-\contentsline {chapter}{\numberline {5}Proposta}{30}
-\contentsline {chapter}{\numberline {6}Atividades e Etapas}{31}
-\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{32}
+\contentsline {section}{\numberline {3.1}Etapas do desenvolvimento em B}{19}
+\contentsline {section}{\numberline {3.2}M\'aquina Abstrata}{21}
+\contentsline {subsection}{\numberline {3.2.1}Especifica\c c\~ao do estado d\'a m\'aquina}{22}
+\contentsline {subsection}{\numberline {3.2.2}Especifica\c c\~ao das opera\c c\~oes da m\'aquina}{22}
+\contentsline {subsubsection}{Substitui\c c\~ao Simples}{23}
+\contentsline {subsubsection}{Substitui\c c\~ao Multipla}{24}
+\contentsline {subsubsection}{Substitui\c c\~ao Condicional}{24}
+\contentsline {subsubsection}{Substitui\c c\~ao n\~ao deterministica $\ANY $}{25}
+\contentsline {section}{\numberline {3.3}Obriga\c c\~ao de Prova}{27}
+\contentsline {subsection}{\numberline {3.3.1}Consist\^encia do Invariante}{27}
+\contentsline {subsection}{\numberline {3.3.2}Obriga\c c\~ao de prova da inicializa\c c\~ao}{27}
+\contentsline {subsection}{\numberline {3.3.3}Obriga\c c\~ao de prova das Opera\c c\~oes}{28}
+\contentsline {section}{\numberline {3.4}Refinamento}{29}
+\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{30}
+\contentsline {chapter}{\numberline {5}Proposta}{31}
+\contentsline {chapter}{\numberline {6}Atividades e Etapas}{32}
+\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{33}

@@ -608,34 +608,77 @@ e alcançadas após a execução do mesmo, mudularização, abstração e refinamento,
 estratégia de construção/especificação de sistemas através de vários níveis de
 abstração.
 
-o método B proporciona uma criação de sistemas através de sucessiveis níveis de
-abstração, na qual inicialmente cria-se um modulo abstrato em uma linguagem de
-modelagem. Esse módulo é refinado através de vários outros módulos até chegar em
-uma linguagem algorítmica, denominada B0, que pode ser traduzida automaticamente
-em algumas linguagem de programação imperativa com C, Ada, Java, JavaCard e C\#.
+%o método B proporciona uma criação de sistemas através de sucessiveis níveis de
+%abstração, na qual inicialmente cria-se um modulo abstrato em uma linguagem de
+%modelagem. Esse módulo é refinado através de vários outros módulos até chegar
+%em uma linguagem algorítmica, denominada B0, que pode ser traduzida
+%automaticamente em algumas linguagem de programação imperativa com C, Ada,
+%Java, JavaCard e C\#.
 
-Cada módulo criado no desenvolvimento do sistema com o método B deve ser
-analisado estaticamente para saber se ele é implementável ou consistente, ou
-seja, que sua execução não leve a um estado não permitido pela especificação.
-Assim como também cada nível de abstração deve ser analisado estaticamente para
-saber se ele é coerente com o nível acima.
+%Cada módulo criado no desenvolvimento do sistema com o método B deve ser
+%analisado estaticamente para saber se ele é implementável ou consistente, ou
+%seja, que sua execução não leve a um estado não permitido pela especificação.
+%Assim como também cada nível de abstração deve ser analisado estaticamente para
+%saber se ele é coerente com o nível acima.
+
+\section{Etapas do desenvolvimento em B}
+
+O processo de desenvolvimento através do método B inicia-se com um módulo que
+define o modelo funcional de alto nível do sistema. Em B, esses módulos são
+denominados de Máquina Abstrata (MACHINE). Nessa fase de modelagem técnicas
+sémi-formais como UML podem ser utilizadas e em seguidas transfomadas para a
+notação formal do método B. Após a criação dos módulos esse são analisados
+estaticamentes para verificar se a sua especificação é coerênte e implementável.
+
+Uma vez estabelicido um modelo abstrato incial do sistema, o método B permite que
+seja construidos módulos mais concretos do sistema denominados refinamentos,
+sendo que um refinamento deve está sempre associado a um modelo mais abstrato. Um
+refinamento especifica uma decição de projeto que determina que partes das
+modelagem do sistema devem ser especificado em um nível mais concreto. Assim,
+para garantir a correta especificação de um refinamento este deve ser analisado
+estaticamente afim de comprovar a sua conformidade com o nível abstrato associado
+a ela.
+
+Com isso sucessíveis refinamentos são realizados até que modelagem do sistema
+adiquira um nível concreto o bastante para ser implementado. Nesse nível é criado
+um nível especial de refinamento denominado implementação (IMPLEMENTATION). Nele
+o nível de abstração da especificação assemelha se com a de uma linguagem
+algoritmica sendo assim possível da implementação para código em linguagem de
+programação como C, Java e JavaCard.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.9]{../fig/desenvolvimento_b.jpg}
+\caption{Etapas de desenvolvimento de sistema atravé do método B}
+\label{fig:desenvolvimento_b}
+\end{figure}
+
+Assim o desenvolvimento de sistemas utilizando o método B é feito como demonstra
+a figura~\ref{fig:desenvolvimento_b}. Nela os requisitos do sistema são
+especificados iniciandos em um nível abstrato e após sucessivos refinamentos um
+nível concreto e algoritmico do sistema é alcançado. Em seguida é feita a sintese
+da especificação para o código de linguagem de programação, sendo possível
+apartir da especificação funcional inicial gerar teste para o sistema
+desenvolvido. 
 
 Atualmente o desenvolvimento de sistemas utilizando o método B pode ser apoiado
 por diversas ferramentas que vão desde a analise estática da especificação até a
-geração de código executável. Devido a isso, o método B utrapassou a barreira
-acadêmica e passou a ser bastante difundido na indústria de sistemas críticos,
-principalmente na industrias ferroviárias e automobilistica, sendo utilizado em
-sistemas que atuam no metro de Paris e em subsistemas dos automóveis da Peugeot.
+geração de código de linguagem de programação. Devido a isso, o método B
+utrapassou a barreira acadêmica e passou a ser bastante difundido na indústria de
+sistemas críticos, principalmente na industrias ferroviárias e automobilistica,
+sendo utilizado em sistemas que atuam no metro de Paris e em subsistemas dos
+automóveis da Peugeot. Nas próximas seções serão demonstrada as principais
+etapas de desenvolvimento de um sistema utilizando o método B.
 
 
-\section{Notação de Máquina Abstrata}
+\section{Máquina Abstrata}
 
 A base do método B está na notação de máquina abstrada(em inglês:
 \textit{Abstract Machine Notation} - AMN) a qual disponibiliza um framework comum
 para a especificação e contrução de sistemas, permitindo também a verificação
 estática do mesmo.  Mais especificamente, a AMN trata-se de uma liguagem de
 especificação de sistemas formada por moódulos básicos de construção chamados de
-Máquina Abstrata ou simplemente Máquina. 
+Máquina Abstrata ou simplemente Máquina.
 
 Cada Máquina Abstrata é composta por diferentes seções, sendo que cada seção é
 responsável por definir um aspecto da especificação do sistema como: parâmetros,
@@ -1010,15 +1053,15 @@ Assim a definição dessa obrigação de prova pode ser vista da seguinte maneira:
 
 $$\mathit{I} \land \mathit{P} \Rightarrow [\mathit{S}]I$$
 
-Na definição acima $\mathit{I}$ representa o invariante da máquina,
-$\mathit{P}$ representa a pré-condição da operação analisada e $\mathit{S}$
-indica as substituições realizadas no corpo da operação. Assim, uma explicação
-mais precisa desa definição serai que quando a máquina estiver em um estado
-válido e a pré-condição da operação for satisfieta, a execução da operação deve
-manter a máquina em um estado válido. Nota-se assim que essa obrigação de prova
-não torna-se necessário ser avaliada para as operações que não alteram o estado
-da máquina, chamada operções de consulta como a da figura~\ref{fig:query_task},
-onde apenas o valor da parâmentro de retorno é alterado.
+Na definição acima $\mathit{I}$ representa o invariante da máquina, $\mathit{P}$
+representa a pré-condição da operação analisada e $\mathit{S}$ indica as
+substituições realizadas no corpo da operação. Assim, uma explicação mais precisa
+desa definição serai que quando a máquina estiver em um estado válido e a
+pré-condição da operação for satisfieta, a execução da operação deve manter a
+máquina em um estado válido. Nota-se assim que essa obrigação de prova não
+torna-se necessário ser avaliada para as operações que não alteram o estado da
+máquina, chamada operções de consulta como a da figura~\ref{fig:query_task}, onde
+apenas o valor da parâmentro de retorno é alterado.
 
 Um exemplo de uma obrigação de prova da operação $\mathit{add_task}$ da máquina
 da figura~\ref{fig:task_states} pode ser visto a seguir:
@@ -1032,7 +1075,12 @@ $$
 \in \mathit{TASK} \cap \card(\mathit{tasks})\leq 10))))
 $$
  
-\section{Modularização}
+
+ 
+
+
+
+
 \section{Refinamento}
 
 
