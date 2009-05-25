@@ -37,7 +37,13 @@
 \contentsline {subsection}{\numberline {3.3.2}Obriga\c c\~ao de prova da inicializa\c c\~ao}{27}
 \contentsline {subsection}{\numberline {3.3.3}Obriga\c c\~ao de prova das Opera\c c\~oes}{28}
 \contentsline {section}{\numberline {3.4}Refinamento}{29}
-\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{30}
-\contentsline {chapter}{\numberline {5}Proposta}{31}
-\contentsline {chapter}{\numberline {6}Atividades e Etapas}{32}
-\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{33}
+\contentsline {subsection}{\numberline {3.4.1}Refinamento do Estado}{29}
+\contentsline {subsection}{\numberline {3.4.2}Refinamento das Opera\c c\~oes}{30}
+\contentsline {subsection}{\numberline {3.4.3}Obriga\c c\~ao de Prova do refinamento}{31}
+\contentsline {subsubsection}{Obriga\c c\~ao de Prova da Inicializa\c c\~ao}{31}
+\contentsline {subsubsection}{Obriga\c c\~ao de prova da opera\c c\~ao sem par\^ametro de retorno}{32}
+\contentsline {subsubsection}{Obriga\c c\~ao de prova da opera\c c\~ao com par\^ametro de retorno}{32}
+\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{33}
+\contentsline {chapter}{\numberline {5}Proposta}{34}
+\contentsline {chapter}{\numberline {6}Atividades e Etapas}{35}
+\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{36}

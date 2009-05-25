@@ -683,7 +683,7 @@ Máquina Abstrata ou simplemente Máquina.
 Cada Máquina Abstrata é composta por diferentes seções, sendo que cada seção é
 responsável por definir um aspecto da especificação do sistema como: parâmetros,
 tipos, constantes, variáveis de estado, estados iniciais e transições do sistema.
-Como, por exemplo, a figura~\ref{fig:tarefas_maquina} contém uma Máquina
+Como, por exemplo, a figura~\ref{fig:maquina_kernel} contém uma Máquina
 Abstrata, chamada \textit{Kernel}, a qual especifica um sistema que permite
 incluir e excluir tarefas até o limite de 10 tarefas e possui as seguintes
 seções:
@@ -766,7 +766,7 @@ $$
 $$
 \end{small}
 \caption{Maquina abstrata de tarefas}
-\label{fig:tarefas_maquina}
+\label{fig:maquina_kernel}
 \end{figure}
 
 Com isso a especificação de sistemas utilizando o método B pode ser dividido em
@@ -781,7 +781,7 @@ estado válidos do sistema.
 
 No estado da máquina são especificados, por meio de calculo de predicados, da
 teoria do conjunto e relações, as propriedades estáticas que o sistema deve
-obedecer. Assim no exemplo da figura~\ref{fig:tarefas_maquina} o estado foi
+obedecer. Assim no exemplo da figura~\ref{fig:maquina_kernel} o estado foi
 especificado como sendo a variável $\mathit{tasks}$ e seu predicados
 $\mathit{tasks} \in \pow(\mathit{TASK})$ e $ \card(\mathit{tasks})\leq 10$
 
@@ -806,7 +806,7 @@ da operação e as condições que devem ser satisfeitas para que a operações sejá
 execultada. Com isso, a pré condição funciona como uma premissa que deve ser
 satisfeita para que a operação funcione corretamente. 
 
-Por exemplo, na figura~\ref{fig:tarefas_maquina} para que a operação
+Por exemplo, na figura~\ref{fig:maquina_kernel} para que a operação
 $\mathit(add_task)$ funcione corretamente e não leve a máquina para um estado
 inválido as pré-condições $\mathit{task}\in \mathit{TASK}$, $\mathit{task}\not\in
 \mathit{tasks}$ e $\card(\mathit{tasks})<10$ devem ser obedecidas.
@@ -1019,7 +1019,7 @@ entendida como: Deve existir pelo menos um valor para o vetor de variáveis
 $\mathit{v}$ que satisfaça o invariante
 
 Um exemplo da aplicação desse obrigação de prova na máquina da
-figura~\ref{fig:tarefas_maquina} seria: 
+figura~\ref{fig:maquina_kernel} seria: 
 
 $$\exists \mathit{tasks}.(\mathit{tasks} \in \mathit{TASK} \cap
 \card(\mathit{tasks})\leq 10 $$
@@ -1036,7 +1036,7 @@ $$\mathit[T]\mathit[I]$$
 
 Nela $\mathit[T]$ indica as substituições realizadas na inicialização da máquina
 e $\mathit[I]$ indica os predicados definidos no invariante. Assim a obrigação de
-prova da inicialização da máquina da figura~\ref{fig:tarefas_maquina} pode ser
+prova da inicialização da máquina da figura~\ref{fig:maquina_kernel} pode ser
 definido como sendo:
 
 $$[\mathit{task}:= \emptyset] (\mathit{tasks} \in \mathit{TASK} \cap
@@ -1067,25 +1067,189 @@ Um exemplo de uma obrigação de prova da operação $\mathit{add_task}$ da máquina
 da figura~\ref{fig:task_states} pode ser visto a seguir:
 
 $$
-(\mathit{tasks} \in \mathit{TASK} \cap
-\card(\mathit{tasks})\leq 10)) \land 
-(\mathit{task}\in \mathit{TASK} \land \mathit{task}\not\in \mathit{tasks})\\
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+(\mathit{tasks} \in \mathit{TASK} \land
+\card(\mathit{tasks})\leq 10) \land 
+(\mathit{task}\in \mathit{TASK} \land \mathit{task}\not\in \mathit{tasks})
 \Rightarrow \\
 ([\mathit{tasks}:=\mathit{task}\cap\mathit{task}]((\mathit{tasks}
 \in \mathit{TASK} \cap \card(\mathit{tasks})\leq 10))))
+\end{array}
+\end{array}
 $$
  
 
- 
-
-
-
-
 \section{Refinamento}
 
+A linguagem abstrata demonstratada até agora é usada para criar uma modelagem
+funcional de sistemas e componentes. Nela o principal objetivo é descrever o
+comportamento do sistema sem se preocupar com detalhes de como as informações
+serão manipuladas pelo computador. Entretanto, para realizar uma modelagem mais
+concrete e passível de implementação é necessário que notações matemáticas
+abstratas utilizadas na modelagem abstratado sistema como conjutos e não
+determinismo sejam descritas de forma mais concreta. Assim um sistema pode ser
+desenvolvido gradativamente, nos quais os estágios intermidiários entre a
+modelagem abstrata e a implementação, são combinações de especificações da
+construção e detalhes de implementação denominado refinamento.
+
+Refinamentos são decisos de projeto nas quais estruturas abstratas são detalhadas
+em um nível mais concreto. Com isso, um refinamento deve obrigatorialmente está
+ligado ao nível mais abstrato realizando as mesmo funcionalidades que este, só
+que um nível menos abstrato. Para garantir que essa ligação sejá realizada de
+forma correte existem mecânismo de analise estática denominados obrigações de
+prova do refinamento
+
+A construção de um refinamento é muito parecida com a construção de uma máquina
+abstrata. Ele, assim como a máquina abstrata, é dividos em seções onde são
+especificadas as informações do sistema, possuindo basicamente as mesma seção de
+uma máquina abstrata. A diferenteça está na seção $\REFINEMENT$ onde é coloca o
+nome do refinamento e na seção $\REFINES$ informa qual á máquina ou refinamento,
+será refinado. Além disso assim como a construção de uma máquina abstrata pode
+ser dividida em especificação do estado e especificação das operações, a
+construção um refinamento pode ser dividido refinamento dos estados e
+refinamentos das operações
+
+\subsection{Refinamento do Estado}
+No refinamento de dados, como é reconhecido o refinamento de estado, tem objetivo
+de especificar o estado dá máquina de uma maneira mais concreta. Assim as
+estruturas utilizadas na modelagem abstratas são especificadas de uma forma mais
+próxima utilizada pelo computador. Para isso na especificação do refinamento seus
+estados são criados de forma concreta e necessariamente esses devem possuir uma
+ligação com os estados da máquina abstrata chamada de \textit{relação de
+refinamento}
+
+Por exemplo, a máquina $mathit{Kernel}$ da figura~\ref{fig:maquina_kernel} possui
+o estado $\mathit{task}$ que um conjunto de elementos do tipo $\mathit{TASK}$. Um
+possível refinamento desse estado é demonstrado pelo refinamento
+$\mathit{KernelR}$ demonstrado na figura~\ref{fig:refinamento_kernelR}. Nele um
+estado $\mathit{task}$ é refinado pelo variável $\mathit{taskR}$ que representa
+uma sequência de tarefas, estrutura mais concreta do que um conjunto, sendo que a
+relação entre os dois estados, \textit{realação de refinamento} é especificada na
+preposição $\mathbf{ran}(\mathit{tasks\_r})=\mathit{tasks}$.
 
 
+\begin{figure}[!ht]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
 
+\mathbf{REFINEMENT}\\
+\quad \mathit{Kernel\_r}\\
+   
+\REFINES\\
+\quad \mathit{Kernel}\\
+   
+\VARIABLES\\
+\quad \mathit{tasks\_r}\\
+\end{array}
+
+    
+
+\begin{array}[t]{l}
+\INVARIANT\\
+\quad \mathit{tasks\_r} \in \mathbf{seq}(\mathit{TASK}) \land \\
+\quad \mathbf{ran}(\mathit{tasks\_r})=\mathit{tasks}\\
+    
+\INITIALISATION\\
+\quad \mathit{tasks\_r}:=[]\\
+\end{array}
+
+
+\begin{array}[t]{l}
+\OPERATIONS\\
+\mathit{task\_add}(\mathit{task}) = \\
+\quad \BEGIN\\
+\quad \quad \mathit{tasks\_r}:=\\
+\quad\quad\quad\quad\mathit{task} \to \mathit{tasks\_r}\\
+\quad \END\\
+    
+\END
+\end{array}
+
+\end{array}
+$$
+\end{small}
+\caption{Refinamento da maquina abstrata de $\mathit{Kernel}$}
+\label{fig:refinamento_kernelR}
+\end{figure}
+
+
+\subsection{Refinamento das Operações}
+
+Após feito o refinamento do estado da máquina é necessário agora especificar o
+refinamento das suas operações. O refinamento das operações de uma máquina deve
+garantir que está possua os mesmo comportamentos que suas operações abstratas,
+podem até fazer menos ações que a abstrata, sendo proprido apenas as ações
+adicionais.
+
+As operações de um refinamento devem possuir a mesma assinaturas das operações da
+máquina abstrata relacionada à ele, com os mesmo nomes e parâmetros de entrada e
+saida. Entretanto, nas operações de um refinamento não é necessário a declaração
+da pré condição $\PRE$, uma vez que essa foi definida em um nível mais abstrato e
+são suficientes para garantir que o tipo do parâmetro de entrada permaneça o
+mesmo e que o invariante da máquina seja mantindo quando a operação for
+execultada.
+
+Um exemplo do refinamento de uma operação pode ser visto na
+figura~\ref{fig:refinamento_kernelR}, na operação $\mathit{add\_task}$. Nela
+percebe-se a ausência da pré condição e que assinutura da operação permanece a
+mesma. A parte alterada foi apenas o corpo da operação que agora foi adaptada
+para trabalhar com o estado $\mathit{taskR}$.  
+
+Um exemplo do refinamento da máquina $\mathit{Kernel}$
+(figura~\ref{fig:maquina_kernel}) pode ser visto na
+figura~\ref{fig:refinamento_kernelR}. Nela o conjunto de tarefas da máquina
+$\mathit{Kernel}$ denominando $\mathit{task}$ é refinado como sendo uma sequência
+de tarefas denominada $\mathit{taskR}$, o que é uma estrutura mais próxima da
+implementação do que um conjunto. Assim as operações que utilizam-se dessa
+estrutura também devem ser alteradas com o objetivo de mandar a compatibilidade
+da operações com a nova representação do estado da máquina.
+
+\subsection{Obrigação de Prova do refinamento}
+A analise estática para saber se um refinamento e consistente com o nível
+abstrato acima dele é feita através de geração de obrigações de prova e pode
+ser dividida em das partes, obrigação de prova da inicialização e obrigação de
+prova das operações. Entratanto, a obrigação de prova das operações dois
+tratamentos possíveis, as obrigações de prova para as operações sem parâmentro
+de retorno e a obrigação de prova para as operações com parâmetro de retorno. A
+seguir é demonstrada como é realizada cadas umas dessas obrigações de prova.
+
+\subsubsection{Obrigação de Prova da Inicialização}
+
+Em um refinamento, a ligação entre os estados da máquina abstrata e o refinamento
+é feito através do \textit{relação de refinamento} a qual será denomida de
+$\mathit{J}$. Assim necessariamento a inicialização da máquina abstrata deve
+possuir algum estado que satisfaça essa ligação, ou melhor dizendo, essa
+$\mathit{J}$ deve possuir algum estado especificado pela inicialização de máquina
+abstrata, denominada $\mathit{T}$. Isso gera a seguinte asserção: 
+
+$$ \neg
+[\mathit{T}] \neg \mathit{J} $$ 
+
+O que define que $\mathit{T}$ deve possuir algum
+estado válido em $\mathit{J}$, ou que, $\mathit{J}$ possui algum estado que
+satisfaça a inicilização $\mathit{T}$.
+
+Além disso é necessário também que a inicialização do refinamento denominado de
+$\mathit{T1}$ esta liga a esse conjunto de estados válidos definidos por
+$\mathit{J}$ e $\mathit{T}$. Essa ligação ocorre da seguinte forma, todo estado
+gerado na inicialização de $\mathit{T1}$ deve possuir um correspondente válido
+de $\mathit{T}$. Isso gera a seguinte definição
+
+$$ [\mathit{T1}]\neg
+[\mathit{T}] \neg \mathit{J} $$
+
+Assim a obrigação de prova entre as máquina $\mathit{Kernel}$ e a máquina
+$\mathit{KernelR}$ fica como desmonstra a asserção abaixo:
+
+$$
+[\mathit{tasks\_r}:=[]]\neg[\mathit{tasks}:=\emptyset]\neg(\mathbf{ran}(\mathit{tasks\_r})=\mathit{tasks})
+$$
+
+\subsubsection{Obrigação de prova da operação sem parâmetro de retorno}
+\subsubsection{Obrigação de prova da operação com parâmetro de retorno}
 
 \begin{itemize}
   \item Explicar o que é o método B

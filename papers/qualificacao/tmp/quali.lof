@@ -8,3 +8,4 @@
 \contentsline {figure}{\numberline {3.2}{\ignorespaces Maquina abstrata de tarefas}}{22}
 \contentsline {figure}{\numberline {3.3}{\ignorespaces Opera\c c\~ao que consulta se uma tarefa pertece a m\'aquina $\mathit {Kernel}$}}{23}
 \contentsline {figure}{\numberline {3.4}{\ignorespaces Opera\c c\~ao que cria uma tarefa aleat\'oria na m\'aquina $\mathit {Kernel}$}}{26}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Refinamento da maquina abstrata de $\mathit {Kernel}$}}{30}
