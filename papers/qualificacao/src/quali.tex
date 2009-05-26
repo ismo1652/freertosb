@@ -541,52 +541,55 @@ pode ser vista a seguir.
 \section{Criação de uma aplicação utilizando o FreeRTOS}
 
 Para construir uma aplicação de tempo real utilizando o FreeRTOS o desenvolvedor
-deve seguir determinadas restrições imposta pelo sistema operacional para a
-aplicação desenvolvida possa funcionar coretamente. Entre essas restrições
-estão alguns parâmetros de configurações contento informações sobre o hardware,
-como tamanho da memória e velocidade clock, assim como restrições de templates
-para a criação de determinadas estruturas utilizadas pela a aplicação, como
-tarefas e fila de mensagem. Entretanto, para facilitar o trabalho e o
-entendimento do desenvolvedores iniciantes o FreeRTOS disponibilizou junto com
-seu código fonte várias aplicações exemplos que devem ser tomadas como base
-para o desenvolvimento de novas aplicações. Nelas são encontrados vários tipos
-de configurações diferentes para cada arquitetura alvo suportada, assim como
-vários padrões que tornam o desenvolvimento de aplicações através do FreeRTOS
-uma tarefa mais simples.
+deve seguir determinadas restrições imposta pelo sistema operacional
+possibilitando o correto funcinamento da aplicação desenvolvida. Alguma dessa
+restrições são restrições de configuração e modelos de criação de tarefa e fila
+de mensagem. Assim com o intuido de ajudar o desenvolvedor a criar suas
+primeiras aplicações O FreeRTOS disponibiliza em seu código fonte aplicações
+exemplos divididas em cada uma das plataforma alvo que o FreeRTOS suporta.
 
-Contudo explicar detalhadamente como é desenvolvida um novo sistema utilizando
-o FreeRTOS foge do escopo desse capítulo, que tem como objetivo realizar uma
-pequena introdução ao Sistema Operacional de Tempo Real. Assim, com o objetivo
-finalizar uma introdução a explicação sobre o FreeRTOS e demonstrar como as
-bibliotecas do sistema são utilizadas para a criação de uma nova aplicação,
-nessas seção será demonstrada uma explicação didática de como é criada uma
-aplicação no FreeRTOS.
+Entretanto, a criação e analise é uma atividade que necessita conhecimento
+maior do funcionamento e funcionalidades do FreeRTOS, fugindo assim o objetivo
+geral desse capitulo que é proporcionar ao leitor uma breve introdução ao
+FreRTOS. Assim para efeito de fixação exemplificação das funcionalidades
+apresentadas aqui necesse capítulo será demonstrado de forma ditática (abstrata)
+como é criada uma aplicação no FreeRTOS, concentrando principalmente na criação
+de tarefas e fila de mensagen, pois a utilização das demais funcionalidades
+assemelham-se bastante com essas.
+
+\subsection{Criação de tarefas}
+As tarefas são as partes mais importantes de um aplicação é nela onde são
+colocadas as rotinas que realizam as funcionalidades de uma aplicação. No
+FreeRTOS as rotinas de uma tarefa devem seguir um determinado modelo
+demonstrado a seguir.
+
+modelo de uma rotina de uma tarefa
+
+Após se criada um tarefa é necessário que essa seja cadastrada no Sistema
+Operacional, ou seja, a tarefa deve ser adcionada ao FreeRTOS. Esse trabalho é
+feito através da funcionalidade <<nome\_da\_funcionalidade>> (<<seção da
+funcionalidade>>), demonstrado na figura XXX. Nela é onde são identificados todos
+os parâmentros que compõem uma tarefa como prioridade, no exemplo <<prioridade>>,
+tamanho da pila, <<xxx>> no exemplo e demais parâmetros como nome e  XXX. Ao ser
+criada uma tarefa irá possuir o estado pronto, podendo a mesma mudar seu estada
+imediatamente para em execução dependendo de sua prioridade.
+
+Assim aplicação completa que define, cria e inicia a execução de uma tarefa é
+mostrada na figura XXX. Nela perecebe-se ainda a presença da funcionalidade XX
+usada para iniciar as atividades do escalonador e conseguentemente a do sistema.
+
+\subsection{Criação de filas de mensagem}
+
+Do mesmo mode que uma tarefa, a criação de uma fila de mensagem deve seguir o
+modelo determinado pelo FreeRTOS
+
+\subsection{Criação de semáforos}
+
+Do mesmo mode que uma tarefa, a criação de uma fila de mensagem deve seguir o
+modelo determinado pelo FreeRTOS
 
 
-Para criar-se uma aplicação no FreeRTOS deve-se inicialmente defenir e
-implementar as tarefas que são execultadas pela a aplicação. 
 
-
-
-  
-
-Inicialmente a construção de novas aplicações utilizando o FreeRTOS é feita
-através de modificações em exemplos disponibilizados junto com o seu código
-fonte. Assim o desenvolvedor 
-
-Com dito no inicio do capítulo, o FreeRTOS é um simples e portável, sendo o mesmo
-compatível com várias arquiteturas diferentes. Ele disponibiliza, junto com seu
-código fonte, exemplos de aplicações para vários tipos de arquiteturas
-diferentes. Inicialmente essas aplicações servem como base para o
-desenvolvimento de novos sistemas, pois vários detalhes como configuração do
-hardware e utilização ou não de certo recurso pelo o sistema já vem
-pre configurados nesses exemplos, sendo necessário o desenvolvedor apenas 
- 
- 
-Entretanto,
-
-demonstrar detalhamente como é construida uma aplicação no FreeRTOS foge do
-escopo desse trabalho. Desse
 
 
 \chapter{Método B}
@@ -1249,19 +1252,83 @@ $$
 $$
 
 \subsubsection{Obrigação de prova da operação sem parâmetro de retorno}
-\subsubsection{Obrigação de prova da operação com parâmetro de retorno}
+Geralmente uma operação é definada como $\PRE \mathit{P} \THEN \mathit{S} \END$
+sendo o seu refinamento $\PRE \mathit{P1} \THEN \mathit{S1} \END$, onde na
+maioria da vezes $\mathit{P1}$ é abstraído. Com isso, do mesmo modo que na
+inicialização tem-se que os estado gerados em $\mathit{S1}$ devem estar
+relacionado com alguma execução $\mathit{S}$, gerando:
+ 
+$$\mathit{S1} \neg \mathit{S} \neg \mathit{J}$$
 
-\begin{itemize}
-  \item Explicar o que é o método B
-  \item Explicar a base teórica de B (AMN e as substituições)
-  \item Explicar como é especificado um sistema em B (como é criado um módulo)
-  \item Falar das obrigações de prova
-  \item Falar dos mecânismo de composição e refinamento
-  \item Dizer que o refinamento pode chegar em um nível concreto que pode ser
-  sintetizado para algumas linguagens de programação.
-  \item Falar do uso de ferramentas
-  \item Falar do projeto B2ASM
-\end{itemize}
+Entretando, diferente da inicialização a execução de uma operação deve levar em
+consideração o estado da máquina anterior à sua realização. Com isso o estado
+da máquina abstrata junto com o seu refinamento devem ser um estado válido. Uma
+relevante ligação entre esse estados o invariante $\mathit{I}$ e a sua relação
+de refinamento $\mathit{J}$. Além disso, para a correta execução da operação a
+pré condição da mesma deve ser estabelecido. Assim, unido que uma operação só
+pode ser executada corretamente quando à uma ligação válida entre os estado da
+máquina e a sua pré condição for estabelicida, a obrigação de prova de uma
+operação é feita da seguinte forma:
+
+$$\mathit{I} \land \mathit{J} \land \mathit{P} \Rightarrow \mathit{S1} \neg
+\mathit{S} \neg \mathit{J}$$
+
+Por exemplo, a obrigação de prova do refinamento da operação
+$\mathit{add_task}$ da máquina Kernel pode é estabelicida como de acordo com a
+preprosição abaixo:
+
+
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+(\mathit{tasks} \in \pow(\mathit{TASK}) \land \card(\mathit{tasks})\leq10)\land \\ 
+\mathit{tasks\_r})=\mathit{tasks}  \land \\
+\mathit{task}\in \mathit{TASK} \land \\
+\mathit{task}\not\in \mathit{tasks} \land\\
+\card(\mathit{tasks})<10 \Rightarrow 
+[\mathit{tasks}:=\mathit{tasks}\cup \{\mathit{task}\}] \\
+\neg[\mathit{tasks\_r}:= \mathit{task} \to \mathit{tasks\_r}] \\
+\neg (\mathit{tasks\_r})=\mathit{tasks})
+\end{array}
+\end{array}
+$$
+
+\subsubsection{Obrigação de prova da operação com parâmetro de saida}
+
+As operações com parêmetros de saida necessitam de uma atenção especial devido a
+obrigação de que cada saiada possível para o refinamento deve está ligada a uma
+saida da especificação abstrata. Assim denominando $\mathit{out'}$ como sendo os
+parâmetros de saida do refinamento e $\mathit{out}$ os parâmentros de saida da
+especificação diz-se que cada valor de $\mathit{out'}$ deve possuir um
+correspondente em $\mathit{out}$. Em outra palavra, cada execução de
+$\mathit{S1}$ deve encontrar uma $\mathit{S}$, naqual $\mathit{out'}$ produzido
+por $\mathit{S1}$ sejá igual ao $\mathit{out}$ produzido por $\mathit{S}$.
+
+Além da ligação entre o parâmetros de saída, a obrigação de uma operação com
+retorno também deve obedecer todas as retrições impostas para as obrigações de
+prova das operações sem parâmetro de saida, ficando da seguinte maneira:
+
+$$\mathit{I} \land \mathit{J} \land \mathit{P} \Rightarrow
+\mathit{S1}[\mathit{out'}/\mathit{out}] \neg \mathit{S} \neg \mathit{J}$$
+
+Nela $[\mathit{out'}\mathit{out}]$ significa que na atribuições de $\mathit{S1}$
+os valores de $\mathit{out}$ devem ser substituidos por $\mathit{out'}$ e manter
+verdadeira a preposição, garantindo que cada produção de $\mathit{out}$ de
+$\mathit{S1}$ tenha uma correspondente no conjunto $\mathit{out}$.
+
+
+
+%\begin{itemize}
+%  \item Explicar o que é o método B
+%  \item Explicar a base teórica de B (AMN e as substituições)
+%  \item Explicar como é especificado um sistema em B (como é criado um módulo)
+%  \item Falar das obrigações de prova
+%  \item Falar dos mecânismo de composição e refinamento
+%  \item Dizer que o refinamento pode chegar em um nível concreto que pode ser
+%  sintetizado para algumas linguagens de programação.
+%  \item Falar do uso de ferramentas
+%  \item Falar do projeto B2ASM
+%\end{itemize}
 
 \chapter{Revisão Literária}
 

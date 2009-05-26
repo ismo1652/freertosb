@@ -23,27 +23,30 @@
 \contentsline {subsubsection}{Gerencialmente de fila de Mensagens}{17}
 \contentsline {subsubsection}{Sem\'aforo/Mutex}{17}
 \contentsline {section}{\numberline {2.3}Cria\c c\~ao de uma aplica\c c\~ao utilizando o FreeRTOS}{18}
-\contentsline {chapter}{\numberline {3}M\'etodo B}{19}
-\contentsline {section}{\numberline {3.1}Etapas do desenvolvimento em B}{19}
-\contentsline {section}{\numberline {3.2}M\'aquina Abstrata}{21}
-\contentsline {subsection}{\numberline {3.2.1}Especifica\c c\~ao do estado d\'a m\'aquina}{22}
-\contentsline {subsection}{\numberline {3.2.2}Especifica\c c\~ao das opera\c c\~oes da m\'aquina}{22}
-\contentsline {subsubsection}{Substitui\c c\~ao Simples}{23}
-\contentsline {subsubsection}{Substitui\c c\~ao Multipla}{24}
-\contentsline {subsubsection}{Substitui\c c\~ao Condicional}{24}
-\contentsline {subsubsection}{Substitui\c c\~ao n\~ao deterministica $\ANY $}{25}
-\contentsline {section}{\numberline {3.3}Obriga\c c\~ao de Prova}{27}
-\contentsline {subsection}{\numberline {3.3.1}Consist\^encia do Invariante}{27}
-\contentsline {subsection}{\numberline {3.3.2}Obriga\c c\~ao de prova da inicializa\c c\~ao}{27}
-\contentsline {subsection}{\numberline {3.3.3}Obriga\c c\~ao de prova das Opera\c c\~oes}{28}
-\contentsline {section}{\numberline {3.4}Refinamento}{29}
-\contentsline {subsection}{\numberline {3.4.1}Refinamento do Estado}{29}
-\contentsline {subsection}{\numberline {3.4.2}Refinamento das Opera\c c\~oes}{30}
-\contentsline {subsection}{\numberline {3.4.3}Obriga\c c\~ao de Prova do refinamento}{31}
-\contentsline {subsubsection}{Obriga\c c\~ao de Prova da Inicializa\c c\~ao}{31}
-\contentsline {subsubsection}{Obriga\c c\~ao de prova da opera\c c\~ao sem par\^ametro de retorno}{32}
-\contentsline {subsubsection}{Obriga\c c\~ao de prova da opera\c c\~ao com par\^ametro de retorno}{32}
-\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{33}
-\contentsline {chapter}{\numberline {5}Proposta}{34}
-\contentsline {chapter}{\numberline {6}Atividades e Etapas}{35}
-\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{36}
+\contentsline {subsection}{\numberline {2.3.1}Cria\c c\~ao de tarefas}{18}
+\contentsline {subsection}{\numberline {2.3.2}Cria\c c\~ao de filas de mensagem}{19}
+\contentsline {subsection}{\numberline {2.3.3}Cria\c c\~ao de sem\'aforos}{19}
+\contentsline {chapter}{\numberline {3}M\'etodo B}{20}
+\contentsline {section}{\numberline {3.1}Etapas do desenvolvimento em B}{20}
+\contentsline {section}{\numberline {3.2}M\'aquina Abstrata}{22}
+\contentsline {subsection}{\numberline {3.2.1}Especifica\c c\~ao do estado d\'a m\'aquina}{23}
+\contentsline {subsection}{\numberline {3.2.2}Especifica\c c\~ao das opera\c c\~oes da m\'aquina}{23}
+\contentsline {subsubsection}{Substitui\c c\~ao Simples}{24}
+\contentsline {subsubsection}{Substitui\c c\~ao Multipla}{25}
+\contentsline {subsubsection}{Substitui\c c\~ao Condicional}{25}
+\contentsline {subsubsection}{Substitui\c c\~ao n\~ao deterministica $\ANY $}{26}
+\contentsline {section}{\numberline {3.3}Obriga\c c\~ao de Prova}{28}
+\contentsline {subsection}{\numberline {3.3.1}Consist\^encia do Invariante}{28}
+\contentsline {subsection}{\numberline {3.3.2}Obriga\c c\~ao de prova da inicializa\c c\~ao}{28}
+\contentsline {subsection}{\numberline {3.3.3}Obriga\c c\~ao de prova das Opera\c c\~oes}{29}
+\contentsline {section}{\numberline {3.4}Refinamento}{30}
+\contentsline {subsection}{\numberline {3.4.1}Refinamento do Estado}{30}
+\contentsline {subsection}{\numberline {3.4.2}Refinamento das Opera\c c\~oes}{31}
+\contentsline {subsection}{\numberline {3.4.3}Obriga\c c\~ao de Prova do refinamento}{32}
+\contentsline {subsubsection}{Obriga\c c\~ao de Prova da Inicializa\c c\~ao}{32}
+\contentsline {subsubsection}{Obriga\c c\~ao de prova da opera\c c\~ao sem par\^ametro de retorno}{33}
+\contentsline {subsubsection}{Obriga\c c\~ao de prova da opera\c c\~ao com par\^ametro de saida}{33}
+\contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{35}
+\contentsline {chapter}{\numberline {5}Proposta}{36}
+\contentsline {chapter}{\numberline {6}Atividades e Etapas}{37}
+\contentsline {chapter}{Refer\^encias Bibliogr\'aficas}{38}
