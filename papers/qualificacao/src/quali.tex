@@ -308,6 +308,7 @@ quem decide o momento de sua interrupção, sendo que a próxima corotina a entrar
 em execução será a de maior prioridade entre as corotinas com o estado pronto
 
 \subsection{Bibliotecas}
+\label{subsection:api_tarefas_corotinas}
 
 Para disponibilizar as caraterísticas discutidas nesta seção o FreeRTOS disponhe
 das seguintes bibliotecas: Criação de Tarefas, Controle de Tarefas, Utilidades de
@@ -558,25 +559,84 @@ de tarefas e fila de mensagen, pois a utilização das demais funcionalidades
 assemelham-se bastante com essas.
 
 \subsection{Criação de tarefas}
+
 As tarefas são as partes mais importantes de um aplicação é nela onde são
 colocadas as rotinas que realizam as funcionalidades de uma aplicação. No
-FreeRTOS as rotinas de uma tarefa devem seguir um determinado modelo
-demonstrado a seguir.
+FreeRTOS as rotinas de uma tarefa devem seguir a estrutura demonstrada na
+figura~\ref{fig:estruta_rotina_tarefa}. Nela o código que realiza as atividades
+da tarefa deve é colocado dentro de um laço infinito.
+ 
+\begin{figure}[!h] \centering
+\begin{small}
+\begin{verbatim}
+void vATaskFunction( void *pvParameters ) 
+{
+      for( ;; )
+      {
+          -- Task application code here. --
+      }
+}
+\end{verbatim}
+\end{small}
+\caption{Estrutura da rotina de uma tarefa}
+\label{fig:estruta_rotina_tarefa}
+\end{figure}
 
-modelo de uma rotina de uma tarefa
+Após a criação da rotina da tarefa, é feita adição da nova tarefa ao sistema.
+Esse trabalho é feito através da funcionalidade \textit{xTaskCreate}
+(\ref{subsection:api_tarefas_corotinas}), a qual possui os seguintes parâmetros:
 
-Após se criada um tarefa é necessário que essa seja cadastrada no Sistema
-Operacional, ou seja, a tarefa deve ser adcionada ao FreeRTOS. Esse trabalho é
-feito através da funcionalidade <<nome\_da\_funcionalidade>> (<<seção da
-funcionalidade>>), demonstrado na figura XXX. Nela é onde são identificados todos
-os parâmentros que compõem uma tarefa como prioridade, no exemplo <<prioridade>>,
-tamanho da pila, <<xxx>> no exemplo e demais parâmetros como nome e  XXX. Ao ser
-criada uma tarefa irá possuir o estado pronto, podendo a mesma mudar seu estada
-imediatamente para em execução dependendo de sua prioridade.
+\begin{description}
+\item[cyclicalTasks]: Ponteiro para a rotina que deve ser executada
+pela função
+\item[``cyclicalTasks'']: Nome da função utilizados nos arquivos de log
+do sistema
+\item[STACK\_SIZE]: Tamanho da pilha de execução da função especificado
+de acordo com o número de variável declaradas na rotina da função
+\item[pvParameters]: Lista de valores dos parâmetros da rotina da
+função.
+\item[TASK\_PRIORITY]: Prioridade da tarefa
+\item[cyclicalTasksHandle]: Gancho de retorno da tarefa criada
+\end{description}
 
-Assim aplicação completa que define, cria e inicia a execução de uma tarefa é
-mostrada na figura XXX. Nela perecebe-se ainda a presença da funcionalidade XX
-usada para iniciar as atividades do escalonador e conseguentemente a do sistema.
+\begin{figure}[!h] \centering
+\begin{small}
+
+\begin{verbatim}
+void cyclicalTasks( void * pvParameters )
+{
+ portTickType xLastWakeTime;
+ const portTickType xFrequency = 10;
+     // Initialise the xLastWakeTime variable with the current time.
+     xLastWakeTime = xTaskGetTickCount();
+     for( ;; )
+     {
+         // Wait for the next cycle.
+         vTaskDelayUntil( &xLastWakeTime, xFrequency );
+         // Perform action here.
+     }
+ }
+xTaskHandle cyclicalTasksHandle;
+
+xTaskCreate( cyclicalTask, "cyclicalTasks", STACK_SIZE, 
+			( void * ) pvParameters, TASK_PRIORITY, &cyclicalTasksHandle);
+
+vTaskStartScheduler();
+
+\end{verbatim}
+\end{small}
+\caption{Aplicação formada por uma tarefa ciclica}
+\label{fig:app_tarefa_ciclica}
+\end{figure}
+
+
+Uma aplicação completa que define, cria e inicia a execução de uma tarefa é
+mostrada na figura~\ref{fig:app_tarefa_ciclica}. Nela a rotina de uma tarefa
+cíclica é criada com o nome de \textit{cyclicalTask}, a qual utiliza-se da
+funcionalidade  \textit{vTaskDelayUntil} que torna a tarefa cicla e onde é
+definido o perido do ciclo. Após isso a aplicação chama a rotina
+\textit{vTaskStartScheduler()} para inicializar as atividades do escalonador e
+consequentemente as atividades da aplicação.
 
 \subsection{Criação de filas de mensagem}
 

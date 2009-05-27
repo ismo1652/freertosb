@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2008.11.3)  26 MAY 2009 00:28
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2008.11.3)  27 MAY 2009 00:26
 entering extended mode
  Source specials enabled.
  %&-line parsing enabled.
@@ -451,30 +451,30 @@ File: ../fig/croutine_states.jpg Graphic file (type jpg)
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[14] [15] [16] [17] [18] [19]
+[14] [15] [16] [17] [18] [19] [20]
 Cap\'{\i }tulo 3.
-[20
+[21
 
-] <../fig/desenvolvimento_b.jpg, id=78, 363.60844pt x 273.27094pt>
+] <../fig/desenvolvimento_b.jpg, id=82, 363.60844pt x 273.27094pt>
 File: ../fig/desenvolvimento_b.jpg Graphic file (type jpg)
 
-<use ../fig/desenvolvimento_b.jpg> [21 <../fig/desenvolvimento_b.jpg>]
+<use ../fig/desenvolvimento_b.jpg> [22 <../fig/desenvolvimento_b.jpg>]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 723.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 783.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 723.
- [22]
-[23] [24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34]
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 783.
+ [23]
+[24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35]
 Cap\'{\i }tulo 4.
-[35
-
-]
-Cap\'{\i }tulo 5.
 [36
 
 ]
-Cap\'{\i }tulo 6.
+Cap\'{\i }tulo 5.
 [37
+
+]
+Cap\'{\i }tulo 6.
+[38
 
 ] (./quali.bbl
 
@@ -485,28 +485,29 @@ LaTeX Warning: Empty `thebibliography' environment on input line 8.
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
 +-------------------------------------------------------------------+
-[38
+[39
 
 ] (./quali.aux) ) 
 Here is how much of TeX's memory you used:
- 3207 strings out of 94101
- 40243 string characters out of 1165810
+ 3212 strings out of 94101
+ 40353 string characters out of 1165810
  98727 words of memory out of 1500000
- 6340 multiletter control sequences out of 10000+50000
- 91715 words of font info for 136 fonts, out of 1200000 for 2000
+ 6344 multiletter control sequences out of 10000+50000
+ 92029 words of font info for 137 fonts, out of 1200000 for 2000
  637 hyphenation exceptions out of 8191
  30i,15n,41p,258b,352s stack positions out of 5000i,500n,6000p,200000b,5000s
  </home/stepgalvao/.texmf-var/fonts/pk/ljfour/jknappen/ec/ectt
-1200.600pk>{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/te
-xmf-texlive/fonts/type1/bluesky/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/t
-ype1/bluesky/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmsy
-10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/ams/msbm10.pfb></usr/share
-/texmf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts
-/type1/urw/times/utmbi8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/ut
-mr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on quali.pdf (39 pages, 344840 bytes).
+1095.600pk> </home/stepgalvao/.texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1200.6
+00pk>{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-te
+xlive/fonts/type1/bluesky/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/type1/b
+luesky/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmsy10.pfb
+></usr/share/texmf-texlive/fonts/type1/bluesky/ams/msbm10.pfb></usr/share/texmf
+-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1
+/urw/times/utmbi8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr8a.p
+fb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
+Output written on quali.pdf (40 pages, 365467 bytes).
 PDF statistics:
- 185 PDF objects out of 1000 (max. 8388607)
+ 250 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 131072)
  26 words of extra memory for PDF output out of 10000 (max. 10000000)
 
