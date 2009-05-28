@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2008.11.3)  27 MAY 2009 00:26
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2008.11.3)  28 MAY 2009 01:48
 entering extended mode
  Source specials enabled.
  %&-line parsing enabled.
@@ -451,30 +451,45 @@ File: ../fig/croutine_states.jpg Graphic file (type jpg)
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[14] [15] [16] [17] [18] [19] [20]
-Cap\'{\i }tulo 3.
-[21
+[14] [15] [16] [17] [18]
 
-] <../fig/desenvolvimento_b.jpg, id=82, 363.60844pt x 273.27094pt>
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[19] [20]
+Overfull \hbox (778.28076pt too wide) in paragraph at lines 764--764
+[]\T1/cmtt/m/n/10.95 // We have finished accessing the shared resource. Release
+ the // semaphore. xSemaphoreGive( xSemaphore ); } else { // We could not obtai
+n the semaphore and can therefore not access // the shared resource safely. } }
+ }[] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[21] [22]
+Cap\'{\i }tulo 3.
+[23
+
+] <../fig/desenvolvimento_b.jpg, id=88, 363.60844pt x 273.27094pt>
 File: ../fig/desenvolvimento_b.jpg Graphic file (type jpg)
 
-<use ../fig/desenvolvimento_b.jpg> [22 <../fig/desenvolvimento_b.jpg>]
+<use ../fig/desenvolvimento_b.jpg> [24 <../fig/desenvolvimento_b.jpg>]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 783.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 902.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 783.
- [23]
-[24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35]
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 902.
+ [25]
+[26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36] [37]
 Cap\'{\i }tulo 4.
-[36
+[38
 
 ]
 Cap\'{\i }tulo 5.
-[37
+[39
 
 ]
 Cap\'{\i }tulo 6.
-[38
+[40
 
 ] (./quali.bbl
 
@@ -485,14 +500,14 @@ LaTeX Warning: Empty `thebibliography' environment on input line 8.
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
 +-------------------------------------------------------------------+
-[39
+[41
 
 ] (./quali.aux) ) 
 Here is how much of TeX's memory you used:
- 3212 strings out of 94101
- 40353 string characters out of 1165810
+ 3214 strings out of 94101
+ 40398 string characters out of 1165810
  98727 words of memory out of 1500000
- 6344 multiletter control sequences out of 10000+50000
+ 6346 multiletter control sequences out of 10000+50000
  92029 words of font info for 137 fonts, out of 1200000 for 2000
  637 hyphenation exceptions out of 8191
  30i,15n,41p,258b,352s stack positions out of 5000i,500n,6000p,200000b,5000s
@@ -505,9 +520,9 @@ luesky/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmsy10.pfb
 -texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1
 /urw/times/utmbi8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr8a.p
 fb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on quali.pdf (40 pages, 365467 bytes).
+Output written on quali.pdf (42 pages, 373387 bytes).
 PDF statistics:
- 250 PDF objects out of 1000 (max. 8388607)
+ 268 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 131072)
  26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

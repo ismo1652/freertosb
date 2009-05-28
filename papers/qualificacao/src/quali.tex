@@ -638,15 +638,134 @@ definido o perido do ciclo. Após isso a aplicação chama a rotina
 \textit{vTaskStartScheduler()} para inicializar as atividades do escalonador e
 consequentemente as atividades da aplicação.
 
-\subsection{Criação de filas de mensagem}
+\subsection{Utilização da fila de mensagens}
 
-Do mesmo mode que uma tarefa, a criação de uma fila de mensagem deve seguir o
-modelo determinado pelo FreeRTOS
+A utilização de uma fila de mensagens é resumidamente demonstra na aplicação da
+figura XX. Nela existem uma fila de mensagens, denomida XXX, e duas tarefa, XXX e
+XXX, com as funções, respectivamente, de enviar e receber mensagens da fila de
+mensagens XXX.
 
-\subsection{Criação de semáforos}
 
-Do mesmo mode que uma tarefa, a criação de uma fila de mensagem deve seguir o
-modelo determinado pelo FreeRTOS
+\begin{figure}[!h] \centering
+\begin{small}
+
+\begin{verbatim}
+  struct AMessage { portCHAR ucMessageID; portCHAR ucData[ 20 ]; } xMessage;
+
+xQueueHandle xQueue;
+
+// Task to create a queue and post a value. 
+void vATask( void *pvParameters ) { struct AMessage *pxMessage;
+
+//Create a queue capable of containing 10 pointers to AMessage structures. 
+//These should be passed by pointer as they contain a lot of data. 
+xQueue = xQueueCreate( 10, sizeof( struct AMessage * ) ); 
+  if( xQueue == 0 ) { // Failed to create the queue. }
+
+// ...
+
+// Send a pointer to a struct AMessage object. Don't block if the 
+// queue is already full. 
+pxMessage = & xMessage; xQueueSend( xQueue, ( void * ) 
+					&pxMessage, ( portTickType ) 0 );
+
+// ... Rest of task code. }
+
+// Task to receive from the queue. 
+void vADifferentTask( void *pvParameters ) { struct AMessage *pxRxedMessage;
+
+if( xQueue != 0 ) { 
+// Receive a message on the created queue. Block for 10 ticks if a 
+// message is not immediately available. 
+if( xQueueReceive( xQueue, &( pxRxedMessage ), ( portTickType ) 10 ) ) {
+// pcRxedMessage now points to the struct AMessage variable posted 
+// by vATask. 
+} 
+}
+
+// ... Rest of task code. } 
+
+\end{verbatim}
+\end{small}
+\caption{Aplicação que utiliza uma fila de mensagens}
+\label{fig:app_fila_de_mensagens}
+\end{figure}
+  
+
+A fila de mensagens xxx é criada através do método XXX. Esse método possui como
+parâmentros de entrada a quantidade de mensagens que podem ser manipuladas pela
+fila, no caso dez, e o tamanho de uma mensagem da fila, que no exemplo é o
+tamanho da estrutura XXX. Caso a fila seja criada com sucesso uma referência para
+a mesma é retornada.
+
+Após a criação da fila de mensagens, a rotina da tarefa XXX é desenvolvida. Nela
+a operação XX é utilizada para realizar a função de enviar as mensagens para a
+fila XX. Assim como parâmentro dessa operação são passados a fila para qual a
+mensagem será enviada, a mensagem que será enviada para a fila e tempo máximo
+que a tarefa pode ficar bloqueada aguardando para enviar uma mensagem para
+fila, caso ela esteja cheia. 
+
+Por último a tarefa XXX, responsável por receber mensagens da fila, é criada.
+Para receber as mensagens enviadas para a fila pela tarefa XXx, ela utiliza-se da
+operação XXX, a qual possiu como argumento a fila de onde será recebida a
+mensagem, o local que ira armazenar a mensagem e o tempo máximo que a tarefa pode
+ficar esperando pela fila, caso está esteja vazia.
+
+ 
+
+\subsection{Utilização do semáforo}
+
+Semáforos são estruturas de sicronização entre tarefas. Assim eles são
+utilizados para coordenar o uso de um recurso compartilhado por uma ou mais
+tarefas. Um exemplo de como é utilizado um semáforo no FreeRTOS pode ser visto
+na figura XXX. Nela primeiramente, através do método XXX, o semáforo XXX é
+criado. Em seguida, as tarefas xxx e xxx, são criadas para demonstrar a
+utilização do semáforo.
+
+Nas tarefa xxx e xxx, parte do seu código é protegido para ser executado somente
+quando o semáforo for retido. Assim para solicitar o semáforo essa tarefa
+utiliza-se do método xxx, que tem como parâmentro de entrada o XXX e retorna XX
+seu o semáforo estiver oculpado e xXX se este estive disponível. Com isso caso o
+semáforo estajá desponível e for retido pela tarefa a para X do código e
+executada e o semáforo é liberado em seguida. Caso contrário, a tarefa é
+bloqueada até que o semáforo está disponível.
+
+
+
+\begin{figure}[!h] \centering
+\begin{small}
+
+\begin{verbatim}
+  xSemaphoreHandle xSemaphore = NULL;
+
+// A task that creates a semaphore. 
+void vATask( void * pvParameters ) { 
+// Create the semaphore to guard a shared resource. As we are using 
+// the semaphore for mutual exclusion we create a mutex semaphore 
+// rather than a binary semaphore. 
+xSemaphore = xSemaphoreCreateMutex(); 
+}
+
+// A task that uses the semaphore. 
+void vAnotherTask( void * pvParameters ) { 
+// ... Do other things.
+
+if( xSemaphore != NULL ) {
+ // See if we can obtain the semaphore. If the semaphore is not available 
+// wait 10 ticks to see if it becomes free. 
+if( xSemaphoreTake( xSemaphore, ( portTickType ) 10 ) == pdTRUE ) { 
+// We were able to obtain the semaphore and can now access the 
+// shared resource.
+
+// ...
+
+// We have finished accessing the shared resource. Release the // semaphore. xSemaphoreGive( xSemaphore ); } else { // We could not obtain the semaphore and can therefore not access // the shared resource safely. } } } 
+
+\end{verbatim}
+\end{small}
+\caption{Aplicação que demonstra a utilização de um semáforo}
+\label{fig:app_semaforo}
+\end{figure}
 
 
 
