@@ -1,8 +1,8 @@
 \select@language {brazil}
 \contentsline {figure}{\numberline {2.1}{\ignorespaces Camada abstrata proporcionada pelo FreeRTOS}}{7}
 \contentsline {figure}{\numberline {2.2}{\ignorespaces Grafo de estados de uma tarefa}}{9}
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Funcionamento de um escalonador preemptivo baseado na prioridade}}{11}
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Grafo de estados de uma corotina}}{11}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Grafo de estados de uma corotina}}{10}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Funcionamento de um escalonador preemptivo baseado na prioridade}}{11}
 \contentsline {figure}{\numberline {2.5}{\ignorespaces Funcionamento de uma fila de mensagens}}{15}
 \contentsline {figure}{\numberline {2.6}{\ignorespaces Estrutura da rotina de uma tarefa}}{18}
 \contentsline {figure}{\numberline {2.7}{\ignorespaces Aplica\c c\~ao formada por uma tarefa ciclica}}{19}

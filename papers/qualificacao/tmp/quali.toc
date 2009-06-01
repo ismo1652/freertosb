@@ -8,8 +8,8 @@
 \contentsline {section}{\numberline {2.1}Gerenciamento de Tarefas e CoRotinas}{8}
 \contentsline {subsection}{\numberline {2.1.1}Tarefa}{8}
 \contentsline {subsubsection}{Tarefa Ociosa}{9}
-\contentsline {subsection}{\numberline {2.1.2}Escalonador de Tarefas}{10}
-\contentsline {subsection}{\numberline {2.1.3}Corotinas}{10}
+\contentsline {subsection}{\numberline {2.1.2}Corotinas}{9}
+\contentsline {subsection}{\numberline {2.1.3}Escalonador de Tarefas}{10}
 \contentsline {subsection}{\numberline {2.1.4}Bibliotecas}{12}
 \contentsline {subsubsection}{Cria\c c\~ao de Tarefas}{12}
 \contentsline {subsubsection}{Controle de tarefas}{12}
