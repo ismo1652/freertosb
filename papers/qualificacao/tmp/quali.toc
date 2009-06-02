@@ -24,8 +24,8 @@
 \contentsline {subsubsection}{Sem\'aforo/Mutex}{17}
 \contentsline {section}{\numberline {2.3}Cria\c c\~ao de uma aplica\c c\~ao utilizando o FreeRTOS}{18}
 \contentsline {subsection}{\numberline {2.3.1}Cria\c c\~ao de tarefas}{18}
-\contentsline {subsection}{\numberline {2.3.2}Utiliza\c c\~ao da fila de mensagens}{19}
-\contentsline {subsection}{\numberline {2.3.3}Utiliza\c c\~ao do sem\'aforo}{21}
+\contentsline {subsection}{\numberline {2.3.2}Utiliza\c c\~ao da fila de mensagens}{20}
+\contentsline {subsection}{\numberline {2.3.3}Utiliza\c c\~ao do sem\'aforo}{20}
 \contentsline {chapter}{\numberline {3}M\'etodo B}{23}
 \contentsline {section}{\numberline {3.1}Etapas do desenvolvimento em B}{23}
 \contentsline {section}{\numberline {3.2}M\'aquina Abstrata}{25}
