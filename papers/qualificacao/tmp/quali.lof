@@ -8,8 +8,8 @@
 \contentsline {figure}{\numberline {2.7}{\ignorespaces Aplica\c c\~ao formada por uma tarefa ciclica}}{19}
 \contentsline {figure}{\numberline {2.8}{\ignorespaces Aplica\c c\~ao que utiliza uma fila de mensagens}}{21}
 \contentsline {figure}{\numberline {2.9}{\ignorespaces Aplica\c c\~ao que demonstra a utiliza\c c\~ao de um sem\'aforo}}{22}
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Etapas de desenvolvimento de sistema atrav\'e do m\'etodo B}}{24}
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Maquina abstrata de tarefas}}{26}
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Opera\c c\~ao que consulta se uma tarefa pertece a m\'aquina $\mathit {Kernel}$}}{27}
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Opera\c c\~ao que cria uma tarefa aleat\'oria na m\'aquina $\mathit {Kernel}$}}{30}
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Refinamento da maquina abstrata de $\mathit {Kernel}$}}{34}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Etapas de desenvolvimento de sistema atrav\'e do m\'etodo B}}{25}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Maquina abstrata de tarefas}}{27}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Opera\c c\~ao que consulta se uma tarefa pertece a m\'aquina $\mathit {Kernel}$}}{28}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Opera\c c\~ao que cria uma tarefa aleat\'oria na m\'aquina $\mathit {Kernel}$}}{32}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Refinamento da maquina abstrata de $\mathit {Kernel}$}}{35}

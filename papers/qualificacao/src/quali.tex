@@ -773,25 +773,23 @@ fila, caso está esteja vazia.
 
 \subsection{Utilização do semáforo}
 
-Semáforos são estruturas de sicronização entre tarefas. Com isso, eles são
-utilizados para coordenar o uso de um recurso compartilhado por uma ou mais
-tarefas. Um exemplo de como é utilizado um semáforo no FreeRTOS pode ser visto na
-figura~\ref{fig:app_semaforo}. Nela primeiramente, através do método
-\textit{xSemaphoreCreateMutex}, o semáforo \textit{xSemaphore} é criado. Em
-seguida, a tarefas \textit{semaphoreTask} é criada para demonstrar a utilização
-do semáforo.
+Semáforos são estruturas de sicronização entre tarefas. Eles são utilizados para
+coordenar o uso de recurso compartilhado por uma ou mais tarefas. Assim, código
+da tarefa responsável por acessar o recurso compartilhado deve ser protegido para
+que a sua execução só ocorra quando o semáforo for retido pela tarefa.
 
-Nas tarefa \textit{semaphoreTask}, parte do seu código é protegido para ser
-executado somente quando o semáforo for retido. Assim para solicitar o semáforo
-essa tarefa utiliza-se do método \textit{xSemaphoreTake}, que tem como
-parâmentros de entrada o semâforo que deve ser solicitado e tempo que a tarefa
-pode ficar bloqueada aguardando pelo semáforo, no caso no semáforo estar
-oculpado. Assim, para informar se o semáforo foi obitido ou não a função
-``falso'' se o semáforo estiver oculpado e verdadeiro se este estive disponível.
-Com isso, caso o semáforo estajá desponível e for retido pela tarefa a para na
-tarefa protegida pelo semáforo é executada e o semáforo é liberado em seguida.
+A construção de uma aplicação que utiliza-se do mecanismo de semáforo, são
+necessário basicamente três funcionalidades da biblioteca de semáforos,
+\textit{vSemaphoreCreateBinary}, \textit{xSemaphoreTake} e
+\textit{xSemaphoreGive}. A primeira funcionalidade cria o semáforo e as demais
+solicitam e liberam o semáforo respectivamente.
 
-
+O exemplo de uma aplicação que utiliza-se de um semáforo para controlar o acesso
+a um recurso compartilhado pode ser visto na figura~\ref{fig:app_semaforo}. Nela
+inicialmente é criada a variável \textit{xSemaphore} para armazenar uma
+referência para o novo semáforo. Em seguida, o método
+\textit{vSemaphoreCreateBinary} é usado para criar o novo semáforo e retornar uma
+referência para o mesmo.
 
 \begin{figure}[!h] \centering
 \begin{small}
@@ -804,7 +802,7 @@ xSemaphoreHandle xSemaphore = NULL;
 // Create the semaphore to guard a shared resource. As we are using 
 // the semaphore for mutual exclusion we create a mutex semaphore 
 // rather than a binary semaphore. 
-xSemaphore = xSemaphoreCreateMutex();
+xSemaphore = xvSemaphoreCreateBinary();
 
 // A task that uses the semaphore. 
 void semaphoreTask( void * pvParameters ) { 
@@ -830,28 +828,63 @@ void semaphoreTask( void * pvParameters ) {
 \label{fig:app_semaforo}
 \end{figure}
 
+Após a criação do semáforo, a rotina da tarefa que utilizará o recurso
+compartilhado é desenvolvida. Nela o código que acessará tal recurso está
+protegido pelo segundo \textit{if}, o qual recebe o retorno do método
+\textit{xSemaphoreTake}, informando se o semáforo foi retido ou não. Ao final da
+rotina, o semáforo é liberado pelo método \textit{xSemaphoreGive}, permitindo que
+outra tarefa possa rete-lo e usar o recurso compartilhado.
 
 
+A utilização do mutex é bem parecida com a do semáforo binário. A diferença para
+o usuário entre os dois mecanismo está apenas no método de criação,
+\textit{vSemaphoreCreateBinary} no semáforo binário, que será
+\textit{xSemaphoreCreateMutex}. As formas e os métodos para solicitação do mutex
+é semelhante ao semáforo binário, sendo \textit{xSemaphoreTake} informando o
+mutex e o tempo máximo de bloqueio e \textit{xSemaphoreGive} informando o mutex
+que será liberado. Com isso para transformar a aplicação da
+figura~\ref{fig:app_semaforo} de semáforo pra mutex basta apenas trocar o método
+\textit{vSemaphoreCreateBinary} por \textit{xSemaphoreCreateMutex}.
 
 
 \chapter{Método B}
 
 Métodos Formais trata-se de uma abordagem formal para a especificação e
-construção de sistemas computacionais. Eles utilizam-se de conceitos
-matemáticos sólidos como lógica de primeira ordem e teorias dos conjuntos para
-a criação e verificação de sistemas consistentes, seguros e sem ambiguidades.
-Devido a sua rigosa construção os métodos formais tem sido bastante utilizados
-na criação de sistemas críticos como industria aeronaltica, programas médicos e
-programas lidam enormes valores monetários.
+construção de sistemas computacionais. Eles utilizam-se de conceitos matemáticos
+sólidos como lógica de primeira ordem e teorias dos conjuntos para a criação e
+verificação de sistemas consistentes, seguros e sem ambiguidades. Devido aos seus
+rigorosos métodos de construção a sua principal utilização, embora timidamente,
+tem sido na criação de sistemas críticos para as indústrias de aeronaltica,
+viação ferrea e de equipamentos médicos, além de empresas que movimentam grandes
+quantidade monetárias como os bancos.
 
-O método B trata-se de uma abordagem formal usado para especificar e construir
-sistema computacionais seguros. Ele foi criado por Jean-Raymond Abrial, com a
-colaboração de outros pesquisadores da universidade de Oxford. Na sua criação
-foram reunidaes várias qualidades presentes nos demais método formais. Entre elas
-estão as pré e pós condições, condições necessárias para a execução de um método
-e alcançadas após a execução do mesmo, mudularização, abstração e refinamento,
-estratégia de construção/especificação de sistemas através de vários níveis de
-abstração.
+%SG->DD:
+% Talvez seja melhor retirar o parágrafo abaixo, mas acho que ele da uma
+% atrativo a mais para a utilização de métodos formais
+% A base teórica dele esta em
+% www51.honeywell.com/aero/technology/common/documents/formal-methods.pdf
+% Não sei se é uma fonte bibligráfica válida
+
+Segundo a Honeywell \cite{honeywell},uma empresa que desenvolve sistemas para
+aeronaves, a atulização de métodos formais no processo de desenvolvimento prover
+várias vantagens, entre eles estão: a produção mensurada pela corretude, métodos
+formais prove uma forma objetiva de mensura a corretude do sistema; antecipação
+na detecção de erros, métodos formais são previamente usados em projetos de
+artefatos do sistema, permitindo assim uma detecção antecipada de erros; e
+garantia da corretude, através mecânismo de verificação é possível provar que
+sistema funcionará de forma coerente com a sua especificação inicial.
+
+O método B\cite{Abrial J.} trata-se de uma abordagem formal usado para
+especificar e construir sistema computacionais seguros. Seu criado Jean-Raymond
+Abrial, junto com a colaboração de outros pesquisadores da universidade de
+Oxford, procuraram reunir no método B várias qualidades presentes nos demais
+método formais como pré e pós condições\footnote{Pré e Pós condições são\ldots},
+refinamento\footnote{Refinamento trata-se de um técnica de desenvolvimento de
+sistema\ldots} e modularização. A seguir tem-se a etapas de desenvolvimento de
+sistemas utilizando o método B.
+
+
+
 
 %o método B proporciona uma criação de sistemas através de sucessiveis níveis de
 %abstração, na qual inicialmente cria-se um modulo abstrato em uma linguagem de
@@ -869,27 +902,29 @@ abstração.
 \section{Etapas do desenvolvimento em B}
 
 O processo de desenvolvimento através do método B inicia-se com um módulo que
-define o modelo funcional de alto nível do sistema. Em B, esses módulos são
-denominados de Máquina Abstrata (MACHINE). Nessa fase de modelagem técnicas
-sémi-formais como UML podem ser utilizadas e em seguidas transfomadas para a
-notação formal do método B. Após a criação dos módulos esse são analisados
-estaticamentes para verificar se a sua especificação é coerênte e implementável.
+define um modelo funcional de alto nível do sistema. Em B, esses módulos são
+denominados de Máquina Abstrata (\textit{MACHINE}). Nessa fase de modelagem
+técnicas sémi-formais como UML podem ser utilizadas e em seguidas transfomadas
+para a notação formal do método B. Após a criação dos módulos, eles são
+analisados estaticamentes para verificar se a sua especificação é coerênte e
+implementável.
 
 Uma vez estabelicido um modelo abstrato incial do sistema, o método B permite que
-seja construidos módulos mais concretos do sistema denominados refinamentos,
-sendo que um refinamento deve está sempre associado a um modelo mais abstrato. Um
-refinamento especifica uma decição de projeto que determina que partes das
-modelagem do sistema devem ser especificado em um nível mais concreto. Assim,
-para garantir a correta especificação de um refinamento este deve ser analisado
-estaticamente afim de comprovar a sua conformidade com o nível abstrato associado
-a ela.
+seja construidos módulos mais concretos do sistema denominados refinamentos. Mais
+especificamente refinamentos tratam-se de uma decisão de projetos quas partes da
+especificação abstrata do sistema devem ser especificadas em um nível mais
+concreto. Assim um refinamento deve necessáriamente estar relacionado com o
+módulo mais abstrato ligeiramente anterior. E, como ocorre na criação da máquinas
+abstratas, um refinamento também e passível uma análise estática, na qual é
+verificada a relação entre refinamento com seu nível abstrato anterior.
 
-Com isso sucessíveis refinamentos são realizados até que modelagem do sistema
-adiquira um nível concreto o bastante para ser implementado. Nesse nível é criado
-um nível especial de refinamento denominado implementação (IMPLEMENTATION). Nele
-o nível de abstração da especificação assemelha se com a de uma linguagem
-algoritmica sendo assim possível da implementação para código em linguagem de
-programação como C, Java e JavaCard.
+Devido a técnica de refinamentos, o desenvolvimento de sistemas utilizando o
+método B pode chegar a um nível de abstração semelhante aos das linguagens de
+programação. Para isso sucessíveis refinamentos devem ser desenvolvidos até a
+especificação chegar em um último nível de refinamento denominado implementação
+(\textit{IMPLEMENTATION}). Nesse nível a linguagem utilizada para a
+especificação, B0, trata-se de um formalismo algorítmico, capaz de ser
+sintetizados para linguagens de programação com C, Java e JavaCard.
 
 \begin{figure}[!h]
 \centering
@@ -900,38 +935,37 @@ programação como C, Java e JavaCard.
 
 Assim o desenvolvimento de sistemas utilizando o método B é feito como demonstra
 a figura~\ref{fig:desenvolvimento_b}. Nela os requisitos do sistema são
-especificados iniciandos em um nível abstrato e após sucessivos refinamentos um
-nível concreto e algoritmico do sistema é alcançado. Em seguida é feita a sintese
-da especificação para o código de linguagem de programação, sendo possível
-apartir da especificação funcional inicial gerar teste para o sistema
-desenvolvido. 
+especificados inicialmente em um alto nível abstrato e após sucessivos
+refinamentos um nível concreto e algoritmico do sistema é alcançado. Em seguida é
+feita a sintese da especificação para o código de linguagem de programação, sendo
+possível apartir da especificação funcional inicial gerar teste para o sistema
+desenvolvido.
 
 Atualmente o desenvolvimento de sistemas utilizando o método B pode ser apoiado
-por diversas ferramentas que vão desde a analise estática da especificação até a
-geração de código de linguagem de programação. Devido a isso, o método B
-utrapassou a barreira acadêmica e passou a ser bastante difundido na indústria de
-sistemas críticos, principalmente na industrias ferroviárias e automobilistica,
-sendo utilizado em sistemas que atuam no metro de Paris e em subsistemas dos
-automóveis da Peugeot. Nas próximas seções serão demonstrada as principais
-etapas de desenvolvimento de um sistema utilizando o método B.
+por diversas ferramentas que vão desde a análise estática da especificação até a
+geração de código em linguagens de programação. Fator que isentivou, o método B a
+utrapassar o mundo acadêmica e passar a ser usado também industrialemente. 
 
+Um exemplo de sistemas desenvolvidos através da abrogagem de B é o controle
+de porta do metor de paris, desenvolvido pela Clearsy\cite{clearsy}, empresa
+especilista em sistemas críticos. Esse sistema impede que o trem saida da
+estação quando a porta inda estiver aberta, evitando assim possíveis acidendes 
 
 \section{Máquina Abstrata}
 
 A base do método B está na notação de máquina abstrada(em inglês:
 \textit{Abstract Machine Notation} - AMN) a qual disponibiliza um framework comum
-para a especificação e contrução de sistemas, permitindo também a verificação
-estática do mesmo.  Mais especificamente, a AMN trata-se de uma liguagem de
-especificação de sistemas formada por moódulos básicos de construção chamados de
-Máquina Abstrata ou simplemente Máquina.
+para a especificação e contrução e verificação estática de sistemaso. Em outra
+palavras, a AMN trata-se de uma linguagem de especificação de sistemas formada
+por moódulos básicos de construção chamados de Máquina Abstrata ou simplemente
+Máquina.
 
 Cada Máquina Abstrata é composta por diferentes seções, sendo que cada seção é
 responsável por definir um aspecto da especificação do sistema como: parâmetros,
 tipos, constantes, variáveis de estado, estados iniciais e transições do sistema.
-Como, por exemplo, a figura~\ref{fig:maquina_kernel} contém uma Máquina
-Abstrata, chamada \textit{Kernel}, a qual especifica um sistema que permite
-incluir e excluir tarefas até o limite de 10 tarefas e possui as seguintes
-seções:
+Por exemplo, a figura~\ref{fig:maquina_kernel} contém uma Máquina Abstrata,
+chamada \textit{Kernel}, a qual especifica um sistema que permite incluir e
+excluir tarefas até o limite de 10 tarefas e possui as seguintes seções:
 
 
 \begin{description}
@@ -1014,42 +1048,53 @@ $$
 \label{fig:maquina_kernel}
 \end{figure}
 
-Com isso a especificação de sistemas utilizando o método B pode ser dividido em
-duas partes principais, a especificação do estado da máquina e a especificação
-das operações da máquina. Essas duas partes serão discutidas a seguir.
+Para uma melhor compreensão a especificação de sistemas através das maquinas
+abstratas será resulmidamente dividida em duas partes principais. Na primeira
+parte serão colocadas informação a respeito dos estados da máquina, suas variáveis e
+restrições. Na segunda parte, será especificado o comportamento da máquina, ou
+sejá a sua parte dinâmica com a inicialização e operações. Essas duas partes
+serão melhores discutidas a seguir.
 
-\subsection{Especificação do estado dá máquina}
-O estado de uma máquina abstrata pode ser definido em termos de suas variáveis
-e do seu invariante. Assim o estado de uma máquina é formado pelas as variáveis
-da máquina junto com suas definições e limitações. É no estado que é defino os
-estado válidos do sistema. 
+\subsection{Especificação do estado da máquina}
 
-No estado da máquina são especificados, por meio de calculo de predicados, da
-teoria do conjunto e relações, as propriedades estáticas que o sistema deve
-obedecer. Assim no exemplo da figura~\ref{fig:maquina_kernel} o estado foi
+Na parte do estado de uma máquina são colocados os estado que a máquina pode
+assumir.Este é definido através de suas variáveis e do seu invariante. Nas
+variável são colocados os nomes dos estados das máquinas e no invariantes suas
+restrições, sendo que uma especificação só pode garantir o correto funcionamento
+da máquina quando esta encontra-se em um estado válido, nada podendo afirmar para
+os demias estados.
+
+O estado de uma máquina é especifica, por meio de calculo de predicados, da
+teoria do conjunto e relações entre conjuntos, permitindo com isso a anásile
+estádo da máquina através de lógica matemática.No exemplo da
+figura~\ref{fig:maquina_kernel} o estado da máquina \textit{kernel} foi
 especificado como sendo a variável $\mathit{tasks}$ e seu predicados
-$\mathit{tasks} \in \pow(\mathit{TASK})$ e $ \card(\mathit{tasks})\leq 10$
+$\mathit{tasks} \in \pow(\mathit{TASK})$ e $ \card(\mathit{tasks})\leq 10$, os
+quais definem que $\mathit{tasks}$ deve ser um conjunto de $\mathit{TASK}$ e
+que o tamanho máximo permitido para o conjunto é de dez elementos.
 
 \subsection{Especificação das operações da máquina}
 
 Nas operações da máquina é especificado o comportamento dinâmico do sistema. É
 através das operações que o estado da máquina é alterado, respeitando sempre as
-restrições do estado da máquina, ou seja, as codições declaradas no invariante
-dá máquina deve ser sempre satisfeita no final da operação.
+suas restrições. Mais especificamente as codições declaradas no invariante dá
+máquina deve ser sempre satisfeita no final da operação, levando assim a
+máquina a um estado válido.
 
 O cabeçalho de uma operação é composto por um nome, uma lista de parâmetro de
 entra e uma lista de parâmentro de saida \footnote{A notação de máquina abstrata
 permite que uma operação retorne mais de um parâmetro}, sendo que os parâmetro de
-entrada e os parâmetros são argumentos opcionais. Assim o exemplo mais completo
-de uma operação pode ser visto na figura~\ref{fig:query_task}, a qual o nome da
-operação é $\mathit{query\_task}$, o parâmetro de entrada é $\mathit{task}$ e o
-parâmetro de saida é $\mathit{belong}$.
+entrada e os parâmetros de saida são argumentos opcionais. Assim o exemplo de um
+operação com parâmetros de entrada e saida pode ser visto na
+figura~\ref{fig:query_task}, na qual o nome da operação é $\mathit{query\_task}$,
+o parâmetro de entrada é $\mathit{task}$ e o parâmetro de saida é
+$\mathit{belong}$.
 
 A operação propriamente dita é formada por pré-condição e corpo da operação. Na
-pré-condição, são colocadas as informações sobre todos os parâmetros de entrada
-da operação e as condições que devem ser satisfeitas para que a operações sejá
-execultada. Com isso, a pré condição funciona como uma premissa que deve ser
-satisfeita para que a operação funcione corretamente. 
+pré-condição, são colocadas as informações sobre todos os parâmetros de entrada e
+as condições que devem ser satisfeitas para que a operações sejá execultada. Com
+isso, a pré condição funciona como uma premissa que deve ser suprida para que a
+operação funcione corretamente.
 
 Por exemplo, na figura~\ref{fig:maquina_kernel} para que a operação
 $\mathit(add_task)$ funcione corretamente e não leve a máquina para um estado
@@ -1077,41 +1122,48 @@ $$
 $\mathit{Kernel}$}
 \label{fig:query_task}
 \end{figure}
-No corpo da operação é especificado o seu comportamento. Nele os parametros de
-saida são obrigatoriamente valorados e os estados da máquina são alterado ou
-consultados. Assim, para realizar essas atualizações de modo formal a notação
-de máquina abstrata possui um conjunto de atribuiçoes abstratas, denominadas
-substituições, que possuem regras de como tal atribuições é realizada, o que
-permite uma analise estática da operações em realação a consistência da máquina.
-A seguir são demonstradas algumas das principais substituições da AMN.
+
+No corpo da operação é especificado o seu comportamento. Nele os parametros saida
+devem ser obrigatoriamente valorados e os estados da máquina são alterados ou
+consultados. Assim, para realizar as atualizações de estadas e definições de
+parâmetros de saida de modo formal, a notação de máquina abstrata possui um
+conjunto de atribuiçoes abstratas, denominadas substituições, que possuem regras
+de como tal atribuições é realizada, permitindo assim uma analise estática da
+operações em realação a consistência da máquina. A seguir são demonstradas
+algumas das principais substituições da AMN.
 
 
 \subsubsection{Substituição Simples}
 
 A substituição simples é definida da seguinte forma: $$\mathit{x}:= \mathit{E}$$
-Nela $\mathit{x}$ trata-se a variável ou parâmentro de saida, para o qual será
-atribuido o valor da expressão $\mathit{E}$. Mais precisamente uma substituição é
-interpreta da seguinte maneira $$[\mathit{x}:=\mathit{E}]\mathit{P}$$ Assim
-tem-se que o predicado $\mathit{P}$ deve ser mantido quando a variável
+Nela $\mathit{x}$ trata-se da variável da máquina ou parâmentro de saida, para o
+qual será atribuido o valor da expressão $\mathit{E}$. Mais precisamente uma
+substituição é interpreta da seguinte maneira:
+
+$$[\mathit{x}:=\mathit{E}]\mathit{P}$$ 
+
+Assim tem-se que o predicado $\mathit{P}$ deve ser mantido quando a variável
 $\mathit{x}$ for substituida por $\mathit{E}$. Por exemplo na operação
 $\mathit{add_task}$ a substuição $\mathit{tasks}:=\mathit{tasks}\cup
 \{\mathit{task}\}$ pode ser vista como $[\mathit{tasks}:=\mathit{tasks}\cup
 \{\mathit{task}\}] \card(\mathit{tasks})<10$, Na qual $\card(\mathit{tasks})<10$
 é o predicado, no caso o invariante da máquina, que deve ser obdecido quando a
 substituição for realizada, ficando ao final $\mathit{tasks}\cup
-\{\mathit{task}\}<10$
+\{\mathit{task}\}<10$.
 
 \subsubsection{Substituição Multipla}
 
 A substituição multipla trata-se de uma generalização da substituição simple. Ela
 permite que várias variáveis seja atribuidas simutaneamente. Assim uma
 substituição multipla utilizando duas variável tem a seguinte forma:
-$$\mathit{x},\mathit{y}:=\mathit{E},\mathit{F}$$ Onde paras variáveis
-$\mathit{x}$ e $\mathit{y}$ são atribuido os valores das exepressõe $\mathit{E}$
-e $\mathit{F}$, respectivamente. Assim da mesma forma que a substituição simples,
-a multipla substituição é definida da seguinte maneira:
-$$[\mathit{x}:=\mathit{E},\mathit{y}:=\mathit{F}]\mathit{P}$$ Na qual
-$\mathit{P}$ é o predicado que deve ser verdadeiro quando suas variáveis
+
+$$\mathit{x},\mathit{y}:=\mathit{E},\mathit{F}$$ 
+
+Na definição acima as variáveis $\mathit{x}$ e $\mathit{y}$ são atribuido os
+valores das exepressões $\mathit{E}$ e $\mathit{F}$, respectivamente. Assim da
+mesma forma que a substituição simples, a multipla substituição é definida da
+seguinte maneira: $$[\mathit{x}:=\mathit{E},\mathit{y}:=\mathit{F}]\mathit{P}$$
+Na qual $\mathit{P}$ é o predicado que deve ser verdadeiro quando suas variáveis
 $\mathit{x}$ e $\mathit{y}$ forem substituidas por $\mathit{E}$ e $\mathit{F}$,
 respectivamente. Por exemplo, uma máquina que possui o predicado
 $\mathit{x}<\mathit{y}$ e possui a seguinte substituição $\mathit{x},\mathit{y}
@@ -1120,63 +1172,69 @@ $\mathit{x}<\mathit{y}$ e possui a seguinte substituição $\mathit{x},\mathit{y}
 
 \subsubsection{Substituição Condicional}
 
-As substituições simples e multiplas permitem somente um opção de especificação
+As substituições simples e multiplas permitem somente uma opção de especificação
 onde uma atribuições é sempre feitas de maneira uniforme sem opções e sem levar
-consideração os estados iniciais na operação. Entretanto, as linguagens de
+consideração os estados iniciais da operação. Entretanto, as linguagens de
 programação convencionais disponibilizam um tipo condicional de atribuição na
 qual é permitido caminhos diferente de acordo com expressões lógicas que utilizam
 o valores iniciais das variáveis do sistema. Esse tipo de atribuição é
 feita através da formação $\IF$ $\THEN$ $\ELSE$.
 
-Assim como nas liguangens de programação, a notação de máquina abstrata também
-permite a construção de atribuições condição, as quais são feitas através da
+Como nas liguangens de programação, a notação de máquina abstrata também permite
+a construção de atribuições condicionais, as quais são feitas através da
 substituição condicional. Com isso, uma substituição condicional funciona da
-mesma forma que as linguagens de programação, não qual uma expressão lógica é
+mesma forma que nas linguagens de programação, não qual uma expressão lógica é
 avaliada para saber qual caminha a estrutura deve seguir, e qual atribução deve
 ser realizada. A forma como é especificada uma substituição condicional na ANM
 pode ser visto a seguir:
 
 $$\IF \quad \mathit{E}\quad \THEN\quad \mathit{S}\quad \ELSE\quad \mathit{T}$$
 
-NA especificação acima $\mathit{S}$ e $\mathit{T}$ são substituições tem suas
-execuções condicionadas pela exepressão lógica é $\mathit{E}$, na qual pode
-conter variáveis da máquina como também os parâmetros de entrada da operação. Com
-isso, caso $\mathit{E}$ sejá afirmativo a substituição $\mathit{S}$ é realizada
-e caso ele seja negativo a substituição $\mathit{T}$ é executada. Assim a
-substituição condicional pode ser interpretada da seguinte forma:
+Na especificação acima $\mathit{S}$ e $\mathit{T}$ são substituições de qualquer
+tipo e tem as suas execuções condicionadas pela exepressão lógica $\mathit{E}$,
+na qual pode conter variáveis da máquina como também os parâmetros de entrada da
+operação. Com isso, caso $\mathit{E}$ sejá afirmativo a substituição $\mathit{S}$
+é realizada e caso ele seja negativo a substituição $\mathit{T}$ é executada.
+Assim uma substituição condicional pode ser interpretada da seguinte forma:
 
 $$[\IF \quad \mathit{E} \quad \THEN \quad \mathit{S} \quad \ELSE
 \quad \mathit{T}] \mathit{P} \quad = \quad (\mathit{E} \Longrightarrow
-[\mathit{S}] P )\land (\neg\mathit{E} \Longrightarrow [\mathit{T}] P)$$.
+[\mathit{S}] P )\land (\neg\mathit{E} \Longrightarrow [\mathit{T}]
+\mathit{P})$$.
+
+Nessa intrepretação se é for verdadeiro a substituição $\mathit{S}$ deve
+satisfazer o predicado $\mathit{P}$. E caso o valor de $\mathit{E}$ seja negativo
+a substituição $\mathit{T}$ deve satisfazer o predicado $\mathit{P}$.
 
 Um exemplo simples da utilização dessa substituição pode ser visto na
 figura~\ref{fig:query_task}. Nela a expressão $\mathit{task} \in \mathit{TASK}$ é
 primeiramente analisada para decidir qual substituição simples deve ser
 execultada. Caso a o resultado da expressão sejá afirmativo $\mathit{ans} :=
-\mathit{yes}$ é execultado e caso a expressão sejá negativa $\mathit{ans} :=
-\mathit{no}$ é execultado.
+\mathit{yes}$ é execultada e caso a expressão sejá negativa $\mathit{ans} :=
+\mathit{no}$ é execultada.
  
 \subsubsection{Substituição não deterministica $\ANY$}
-Até agora foram vista apenas substituições deterministacas, ou sejá elas possuem
-um comportamento previsível que leva a apenas um resultado final é possível.
-Entretanto, as máquinas abstratas de B servem para fazer especificação abstrata
-de sistemas e componetes e as vezes em certo nível de abstração o comportamento
-das operações do sistema podem não ser tão previsíveis como as substituições
-deterministicas exigem. Para resolver esse problema foram criadas as
-substituições não deterministicas
 
-As substituições não deterministicas tratam-se de substituições que introduzem
-escolhas aleatórias no corpo das operações, levando a mesma não mais para um
-estado final previsível e sim para um conjunto de estados finais possíveis. Assim
-para uma determinada escolha a especificação apenas define em qual conjunto deve
-ser feita a escolha e não diz nenhuma informação de como tal escolha deve ser
-feita.
+Até agora foram vistas apenas substituições deterministicas, ou seja,
+substituições que possuem um comportamento previsível e que leva a apenas um
+resultado final é possível. Entretanto, as máquinas abstratas de B servem para
+fazer especificação abstrata de sistemas e componetes e as vezes em um nível alto
+de abstração o comportamento das operações do sistema podem não ser tão
+previsíveis como as substituições deterministicas exigem. Para resolver esse
+problema foram criadas as substituições não deterministicas
+
+As substituições não deterministicas são substituições que introduzem escolhas
+aleatórias no corpo das operações, levando a mesma não mais para um estado final
+previsível e sim para um conjunto de estados finais possíveis. Assim em uma
+substituição não determinística a especificação define apenas em qual conjunto
+deve ser feita a escolha abstraindo informações de como tal escolha deve ser
+realizada.
 
 Um exemplo de substituição não deterministica da AMN é a substituição $\ANY$.
 Essa substituição possui o seguinte formato:  
 $$\ANY\quad\mathit{x}\quad\WHERE \quad\mathit{Q}\quad\THEN\quad\mathit{T}\quad\END$$
 
-Através da especificação assim percebe-se que a substituição $\ANY$ é formada
+Através da especificação percebe-se que a substituição $\ANY$ é formada
 por três elementos:
 
 \begin{description}
@@ -1192,13 +1250,13 @@ ou atribuir valores para os parâmetros de saida de uma operação
 \end{description}
 
 Um exemplo da substituição $\ANY$ pode ser visto na
-figura~\ref{fig:random_create} naqual uma tarefa aleatória a adicionada na
+figura~\ref{fig:random_create} na qual uma tarefa aleatória é adicionada na
 máquina $\mathit{Kernel}$. Nela primeiramente a variável $\mathit{task}$ é criada
-para qual será atribuido um valor aleatório. Em seguida, tipo e uma restrição
-sobre $\mathit{task}$ é definida. Por ultimo a variável $\mathit{task}$ é
-adicionada ao conjunto $\mathit{tasks}$. Assim um comportamento não
-deterministico é atribudo a operação pois para cada execução da operação a
-variável $\mathit{task}$ pode assumir um valor aleatório.
+para atribuir-se um valor aleatório. Em seguida, o tipo e a restrição sobre
+$\mathit{task}$ é definida. Por ultimo a variável $\mathit{task}$ é adicionada ao
+conjunto $\mathit{tasks}$. Assim um comportamento não deterministico é atribudo a
+operação, pois para cada execução da operação a variável $\mathit{task}$ pode
+assumir um valor aleatório.
  
 
 \begin{figure}[!ht]
@@ -1230,33 +1288,39 @@ $\mathit{Kernel}$}
 \label{fig:random_create}
 \end{figure}
 
-Uma definição para a substituição $\ANY$ seria: $$\forall \mathit{x}.(Q
-\Rightarrow [\mathit{T}]P)$$ Indicando que para todo valor que for escolhido para
-o conjunto de variável $\mathit{x}$ as substituições $\mathit{T}$ devem garantir
-o predicado $\mathit{P}$.
+Uma definição para a substituição $\ANY$ seria: 
+
+$$\forall \mathit{x}.(\mathit{Q} \Rightarrow [\mathit{T}]\mathit{P})$$ 
+
+Indicando que para todo valor que for escolhido para o conjunto de variável
+$\mathit{x}$ as substituições $\mathit{T}$ devem garantir o predicado
+$\mathit{P}$.
 
 \section{Obrigação de Prova}
 
 Após a criação de uma máquina abstrata utilizando o método B essa deve ser
 avaliada estaticamente para saber se a mesma é coerente e passível de
-impementação. Para realizar tal análise o método B dispoem de um conjunto de
-obrigações de prova que são asserções criadas apartir da especificação de uma
-máquina abstrata e que devem provadas afim a corretude da especificação.
+impementação. Para realizar tal avaliação o método B dispoem de um conjunto de
+obrigações de prova, que são asserções criadas apartir da especificação de uma
+máquina abstrata, e que devem ser provadas para garantir a corretude da
+especificação.
 
-Resulmidamente a analise estática de uma máquina abstrata através das obrigações
-de prova avalia se essa possui estados válidos, ou seja, se pelo menos uma
+Resulmidamente a análise estática de uma máquina abstrata através das obrigações
+de prova avalia se a máquina possui estados válidos, ou seja, se pelo menos uma
 combinação de estados válidos é alcançada pela máquina e, caso afirmativos, se
-esses são mantidos pelos invariantes. Com isso as principais obrigações de prova
-gerada em uma máquina abstrata saõ: Consistência do Invariante, Obrigação de
-Prova da Inicialização e Obrigação de Prova das Operações. A seguir é detalhado o
-que significa cada uma dessas obrigações de prova e como elas são realizadas.
+esses estados são alcançados no final de cada operações. Com isso as principais
+obrigações de prova gerada em uma máquina abstrata são: Consistência do
+Invariante, Obrigação de Prova da Inicialização e Obrigação de Prova das
+Operações. A seguir tem-se em maior detalhe cada uma dessa obrigações de prova e
+como elas são geradas.
 
 \subsection{Consistência do Invariante}
-Nessa obrigação de prova é analisado se o invariante da máquina possui pelo
-menos uma combinação naqual todos os estados são válidos. Assim essa obrigação
-de prova é definida da seguinte maneira :
+
+Nessa obrigação de prova é analisado se o invariante da máquina possui pelo menos
+uma combinação em que todos os estados são válidos, ou seja, possui pelo menos um
+estado válido. Assim essa obrigação de prova é definida da seguinte maneira :
  
-$$\exists\mathit{v}.\mathit{I}$$ 
+$$\exists\mathit{v}.\mathit{I}$$
 
 Onde $\mathit{v}$ indica o vetor de todos as variáveis da máquina e $\mathit{I}$
 representa o Invariante da máquina. Com isso, a definição acima pode ser
@@ -1267,31 +1331,34 @@ Um exemplo da aplicação desse obrigação de prova na máquina da
 figura~\ref{fig:maquina_kernel} seria: 
 
 $$\exists \mathit{tasks}.(\mathit{tasks} \in \mathit{TASK} \cap
-\card(\mathit{tasks})\leq 10 $$
+\card(\mathit{tasks})\leq 10)$$
 
 O que pode ser provador como verdadeiro para $\mathit{tasks} = \emptyset $
 
 
 \subsection{Obrigação de prova da inicialização}
-Outro obrigação de prova necessária para uma máquina abstrata é saber se seu
-estado inicial satisfaz o invariante. Em outras palavras significa verificar se
-o estado inicial da máquina é um estado válido. Assim essa obrigação de prova é
-definida da seguinte maneira :
-$$\mathit[T]\mathit[I]$$
+
+Outra obrigação de prova necessária para uma máquina abstrata é saber se seu
+estado inicial satisfaz o invariante. Isso significa verificar se o estado
+inicial da máquina é um estado válido. Assim, essa obrigação de prova é definida
+da seguinte maneira : 
+
+$$[\mathit{T}]\mathit{I}$$
 
 Nela $\mathit[T]$ indica as substituições realizadas na inicialização da máquina
-e $\mathit[I]$ indica os predicados definidos no invariante. Assim a obrigação de
-prova da inicialização da máquina da figura~\ref{fig:maquina_kernel} pode ser
-definido como sendo:
+e $\mathit[I]$ indica os predicados definidos no invariante. Com isso, a
+obrigação de prova da inicialização da máquina da figura~\ref{fig:maquina_kernel}
+pode ser definida como sendo:
 
 $$[\mathit{task}:= \emptyset] (\mathit{tasks} \in \mathit{TASK} \cap
 \card(\mathit{tasks})\leq 10) \quad \Rightarrow\quad \emptyset \in \mathit{TASK}
-\cap \card(\emptyset)\leq 10 $$
+\cap \card(\emptyset)\leq 10$$
 
 O que pode ser facilmente visto como uma verdade.
 
 
 \subsection{Obrigação de prova das Operações}
+
 Na obrigação de prova das operações deve ser analisado se, quando satisfeita a
 sua pré-condição, a execução da operação levará a máquina a um estado válido.
 Assim a definição dessa obrigação de prova pode ser vista da seguinte maneira:
