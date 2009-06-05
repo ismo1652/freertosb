@@ -195,15 +195,21 @@ OPERATIONS
     **/
     t_resume (atask) =
     BEGIN   
-        IF t_priority(atask) >= t_priority(running) THEN
+        IF t_priority(atask) > t_priority(running) THEN
             ready := ready \/ { running } ||
             running := atask
+        ELSIF t_priority(atask) = t_priority(running) THEN
+            CHOICE
+	            ready := ready \/ { running } ||
+    	        running := atask
+    	    OR
+    	        ready := ready \/ { atask }
+    	    END
         ELSE
             ready := ready \/ { atask }
         END ||
         suspended := suspended - { atask }	
     END;
-    
     /**
     \brief	Get Task Priority
     
