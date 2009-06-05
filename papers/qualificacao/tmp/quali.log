@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2008.11.3)  4 JUN 2009 00:17
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2008.11.3)  5 JUN 2009 14:02
 entering extended mode
  Source specials enabled.
  %&-line parsing enabled.
@@ -429,8 +429,13 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 150.
  [7
 
- <../fig/rtos.jpg>] [8] <../fig/task_states.jpg, id=37, 392.4261pt x 414.8298pt
->
+ <../fig/rtos.jpg>] [8]
+Overfull \hbox (9.62787pt too wide) in paragraph at lines 208--214
+[][]\T1/ptm/m/n/12 Entretanto, vale en-fa-ti-zar que por tratar-se de um SOTR p
+ara ar-qui-te-tu-ras mono-processadores
+ []
+
+<../fig/task_states.jpg, id=37, 392.4261pt x 414.8298pt>
 File: ../fig/task_states.jpg Graphic file (type jpg)
 
 <use ../fig/task_states.jpg> [9 <../fig/task_states.jpg>]
@@ -441,18 +446,26 @@ File: ../fig/croutine_states.jpg Graphic file (type jpg)
 <../fig/scheduler.jpg, id=45, 752.8125pt x 292.84406pt>
 File: ../fig/scheduler.jpg Graphic file (type jpg)
 
-<use ../fig/scheduler.jpg> [11 <../fig/scheduler.jpg>] [12] [13]
-File: ../fig/croutine_states.jpg Graphic file (type jpg)
-
-<use ../fig/croutine_states.jpg>
+<use ../fig/scheduler.jpg>
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[14] [15] [16] [17] [18] [19]
+[11] [12 <../fig/scheduler.jpg>] [13] [14]
+<../fig/queue.jpg, id=59, 449.68pt x 37.13875pt>
+File: ../fig/queue.jpg Graphic file (type jpg)
+ <use ../fig/queue.jpg>
+[15 <../fig/queue.jpg>] [16] [17]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[20] [21] [22] [23]
+[18]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[19] [20] [21] [22] [23]
 Cap\'{\i }tulo 3.
 
 LaTeX Warning: Citation `honeywell' on page 24 undefined on input line 868.
@@ -462,7 +475,7 @@ LaTeX Warning: Citation `Abrial J.' on page 24 undefined on input line 877.
 
 [24
 
-] <../fig/desenvolvimento_b.jpg, id=92, 363.60844pt x 273.27094pt>
+] <../fig/desenvolvimento_b.jpg, id=93, 363.60844pt x 273.27094pt>
 File: ../fig/desenvolvimento_b.jpg Graphic file (type jpg)
 
 <use ../fig/desenvolvimento_b.jpg> [25 <../fig/desenvolvimento_b.jpg>]
@@ -474,7 +487,11 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 999.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 999.
- [27] [28] [29] [30] [31] [32] [33] [34] [35] [36] [37] [38] [39]
+ [27] [28] [29] [30] [31] [32] [33] [34]
+
+LaTeX Warning: Reference `s' on page 35 undefined on input line 1431.
+
+[35] [36] [37] [38] [39]
 Cap\'{\i }tulo 4.
 [40
 
@@ -503,10 +520,10 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 3222 strings out of 94101
- 40527 string characters out of 1165810
- 98727 words of memory out of 1500000
- 6354 multiletter control sequences out of 10000+50000
+ 3228 strings out of 94101
+ 40656 string characters out of 1165810
+ 100727 words of memory out of 1500000
+ 6360 multiletter control sequences out of 10000+50000
  92029 words of font info for 137 fonts, out of 1200000 for 2000
  637 hyphenation exceptions out of 8191
  30i,15n,41p,258b,352s stack positions out of 5000i,500n,6000p,200000b,5000s
@@ -519,9 +536,9 @@ xmf-texlive/fonts/type1/bluesky/ams/msbm10.pfb></usr/share/texmf-texlive/fonts/
 type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmb
 i8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr8a.pfb></usr/share/
 texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on quali.pdf (44 pages, 379948 bytes).
+Output written on quali.pdf (44 pages, 397745 bytes).
 PDF statistics:
- 275 PDF objects out of 1000 (max. 8388607)
+ 276 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 131072)
- 26 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 31 words of extra memory for PDF output out of 10000 (max. 10000000)
 

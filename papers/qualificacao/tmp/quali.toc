@@ -5,36 +5,36 @@
 \contentsline {section}{\numberline {1.1}Objetivos}{6}
 \contentsline {section}{\numberline {1.2}Metodologia}{6}
 \contentsline {chapter}{\numberline {2}FreeRTOS}{7}
-\contentsline {section}{\numberline {2.1}Gerenciamento de Tarefas e CoRotinas}{8}
+\contentsline {section}{\numberline {2.1}Gerenciamento de Tarefas e Co-Rotinas}{8}
 \contentsline {subsection}{\numberline {2.1.1}Tarefa}{8}
 \contentsline {subsubsection}{Tarefa Ociosa}{9}
-\contentsline {subsection}{\numberline {2.1.2}Corotinas}{9}
-\contentsline {subsection}{\numberline {2.1.3}Escalonador de Tarefas}{10}
-\contentsline {subsection}{\numberline {2.1.4}Bibliotecas}{12}
+\contentsline {subsection}{\numberline {2.1.2}Co-rotinas}{10}
+\contentsline {subsection}{\numberline {2.1.3}Escalonador de Tarefas}{11}
+\contentsline {subsection}{\numberline {2.1.4}Bibliotecas}{11}
 \contentsline {subsubsection}{Cria\c c\~ao de Tarefas}{12}
-\contentsline {subsubsection}{Controle de tarefas}{12}
+\contentsline {subsubsection}{Controle de tarefas}{13}
 \contentsline {subsubsection}{Utilit\'arios de tarefas}{13}
 \contentsline {subsubsection}{Controle do Escalonador}{14}
-\contentsline {section}{\numberline {2.2}Comunica\c c\~ao e sicroniza\c c\~ao entre tarefa}{14}
-\contentsline {subsection}{\numberline {2.2.1}Fila de Mensagens}{14}
-\contentsline {subsection}{\numberline {2.2.2}Sem\'aforo}{15}
+\contentsline {section}{\numberline {2.2}Comunica\c c\~ao e sincroniza\c c\~ao entre tarefa}{14}
+\contentsline {subsection}{\numberline {2.2.1}Fila de Mensagens}{15}
+\contentsline {subsection}{\numberline {2.2.2}Sem\'aforo}{16}
 \contentsline {subsection}{\numberline {2.2.3}Mutex}{16}
-\contentsline {subsection}{\numberline {2.2.4}Bibliotecas}{16}
+\contentsline {subsection}{\numberline {2.2.4}Bibliotecas}{17}
 \contentsline {subsubsection}{Gerencialmente de fila de Mensagens}{17}
 \contentsline {subsubsection}{Sem\'aforo/Mutex}{17}
 \contentsline {section}{\numberline {2.3}Cria\c c\~ao de uma aplica\c c\~ao utilizando o FreeRTOS}{18}
 \contentsline {subsection}{\numberline {2.3.1}Cria\c c\~ao de tarefas}{18}
-\contentsline {subsection}{\numberline {2.3.2}Utiliza\c c\~ao da fila de mensagens}{20}
-\contentsline {subsection}{\numberline {2.3.3}Utiliza\c c\~ao do sem\'aforo}{20}
+\contentsline {subsection}{\numberline {2.3.2}Utiliza\c c\~ao da fila de mensagens}{19}
+\contentsline {subsection}{\numberline {2.3.3}Utiliza\c c\~ao do sem\'aforo}{21}
 \contentsline {chapter}{\numberline {3}M\'etodo B}{24}
 \contentsline {section}{\numberline {3.1}Etapas do desenvolvimento em B}{24}
 \contentsline {section}{\numberline {3.2}M\'aquina Abstrata}{26}
 \contentsline {subsection}{\numberline {3.2.1}Especifica\c c\~ao do estado da m\'aquina}{27}
 \contentsline {subsection}{\numberline {3.2.2}Especifica\c c\~ao das opera\c c\~oes da m\'aquina}{28}
 \contentsline {subsubsection}{Substitui\c c\~ao Simples}{29}
-\contentsline {subsubsection}{Substitui\c c\~ao Multipla}{29}
+\contentsline {subsubsection}{Substitui\c c\~ao M\'ultipla}{29}
 \contentsline {subsubsection}{Substitui\c c\~ao Condicional}{30}
-\contentsline {subsubsection}{Substitui\c c\~ao n\~ao deterministica $\ANY $}{31}
+\contentsline {subsubsection}{Substitui\c c\~ao n\~ao determin\IeC {\'\i }stica $\ANY $}{31}
 \contentsline {section}{\numberline {3.3}Obriga\c c\~ao de Prova}{32}
 \contentsline {subsection}{\numberline {3.3.1}Consist\^encia do Invariante}{33}
 \contentsline {subsection}{\numberline {3.3.2}Obriga\c c\~ao de prova da inicializa\c c\~ao}{33}
@@ -45,7 +45,7 @@
 \contentsline {subsection}{\numberline {3.4.3}Obriga\c c\~ao de Prova do refinamento}{36}
 \contentsline {subsubsection}{Obriga\c c\~ao de Prova da Inicializa\c c\~ao}{37}
 \contentsline {subsubsection}{Obriga\c c\~ao de prova da opera\c c\~ao sem par\^ametro de retorno}{37}
-\contentsline {subsubsection}{Obriga\c c\~ao de prova da opera\c c\~ao com par\^ametro de saida}{38}
+\contentsline {subsubsection}{Obriga\c c\~ao de prova da opera\c c\~ao com par\^ametro de sa\IeC {\'\i }da}{38}
 \contentsline {chapter}{\numberline {4}Revis\~ao Liter\'aria}{40}
 \contentsline {chapter}{\numberline {5}Proposta}{41}
 \contentsline {chapter}{\numberline {6}Atividades e Etapas}{42}
