@@ -1,0 +1,168 @@
+THEORY BalanceX IS
+  Task_r,46,11,0,25,10,0,0;
+  Properties,1,1,0,0,0,0,0;
+  Invariants,3,0,0,3,0,0,0;
+  t_deleteSubstitution,3,1,0,1,1,0,0;
+  t_suspendSubstitution,3,1,0,1,1,0,0;
+  t_resumeSubstitution,8,0,0,8,0,0,0;
+  t_getNumberOfTasksSubstitution,1,0,0,1,0,0,0;
+  t_delayTaskSubstitution,3,1,0,1,1,0,0;
+  t_startSchedulerSubstitution,3,1,0,1,1,0,0;
+  t_resumeAllSubstitution,9,3,0,3,3,0,0;
+  t_unblockSubstitution,4,0,0,4,0,0,0;
+  t_setPrioritySubstitution,8,3,0,2,3,0,0
+END
+&
+THEORY ProofState IS
+  Proved(Util);
+  Proved(1);
+  Proved(Util);
+  Proved(1);
+  Proved(Util);
+  Proved(1);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(Util);
+  Proved(1);
+  Proved(0);
+  Proved(Util);
+  Proved(1);
+  Proved(0);
+  Proved(Util);
+  Proved(1);
+  Proved(0);
+  Proved(Util);
+  Proved(1);
+  Proved(0);
+  Proved(Util);
+  Proved(1);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(Util);
+  Proved(1);
+  Proved(0);
+  Proved(Util);
+  Proved(1);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(Util)
+END
+&
+THEORY MethodList IS
+  dd & ah(t_priority[ready]: FIN(NATURAL)) & ah(t_priority: TASK +-> PRIORITY & PRIORITY <: NATURAL) & pr & pr & ah(ready: FIN(TASK)) & pr & pr;
+  pr;
+  dd & ah(t_priority[ready]: FIN(NATURAL)) & ah(t_priority: TASK +-> PRIORITY & PRIORITY <: NATURAL) & pr & pr & ah(ready: FIN(TASK)) & pr & pr;
+  pr;
+  dd & ah(t_priority[ready]: FIN(NATURAL)) & ah(t_priority: TASK +-> PRIORITY & PRIORITY <: NATURAL) & pr & pr & ah(ready: FIN(TASK)) & pr & pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  dd & ah(t_priority[unblocked]: FIN(NATURAL)) & ah(t_priority: TASK +-> PRIORITY & PRIORITY <: NATURAL & unblocked: FIN(TASK)) & pr & pr & pr & pr & pr;
+  pr;
+  pr;
+  dd & ah(t_priority[unblocked]: FIN(NATURAL)) & ah(t_priority: TASK +-> PRIORITY & PRIORITY <: NATURAL & unblocked: FIN(TASK)) & pr & pr & pr & pr & pr;
+  pr;
+  pr;
+  dd & ah(t_priority[unblocked]: FIN(NATURAL)) & ah(t_priority: TASK +-> PRIORITY & PRIORITY <: NATURAL & unblocked: FIN(TASK)) & pr & pr & pr & pr & pr;
+  pr;
+  pr;
+  dd & ah(t_priority[ready]: FIN(NATURAL)) & ah(t_priority: TASK +-> PRIORITY & PRIORITY <: NATURAL) & pr & pr & ah(ready: FIN(TASK)) & pr & pr;
+  pr;
+  pr;
+  dd & ah(t_priority[ready]: FIN(NATURAL)) & ah(t_priority: TASK +-> PRIORITY & PRIORITY <: NATURAL) & pr & pr & ah(ready: FIN(TASK)) & pr & pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  dd & ah(t_priority[ready]: FIN(NATURAL)) & ah(t_priority: TASK +-> PRIORITY & PRIORITY <: NATURAL) & pr & pr & ah(ready: FIN(TASK)) & pr & pr;
+  pr;
+  pr;
+  dd & ah(t_priority[ready]: FIN(NATURAL)) & ah(t_priority: TASK +-> PRIORITY & PRIORITY <: NATURAL) & pr & pr & ah(ready: FIN(TASK)) & pr & pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  dd & ah({tmp_mprt_ready,t_prt}: FIN(NATURAL)) & pr & pr
+END
+&
+THEORY PassList IS
+  Force(0),(?;0;1;2;3);
+  Force(1),(?;0);
+  Force(0),(?;0;1;2;3);
+  Force(1),(?;0);
+  Force(0),(?;0;1;2;3);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),(?;0;1;2;3);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(0),(?;0;1;2;3);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(0),(?;0;1;2;3);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(0),(?;0;1;2;3);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(0),(?;0;1;2;3);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),(?;0;1;2;3);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(0),(?;0;1;2;3);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),(?;0;1;2;3)
+END
+&
+THEORY ManForms 
+END
+&
+THEORY Version IS
+  PRVersion("V3.3.3.p39")(CLT == "V3.7.6")
+END
