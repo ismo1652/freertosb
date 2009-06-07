@@ -64,7 +64,7 @@ THEORY ListAssertionsX IS
   Expanded_List_Assertions(Machine(Task))==(btrue);
   Abstract_List_Assertions(Machine(Task))==(btrue);
   Context_List_Assertions(Machine(Task))==(configMAX_PRIORITIES: NATURAL & BIT <: NATURAL);
-  List_Assertions(Machine(Task))==(active = TRUE => idle: tasks;active = TRUE => tasks/={};active = TRUE => idle/:blocked;active = TRUE => idle/:suspended)
+  List_Assertions(Machine(Task))==(active = TRUE => idle: tasks;active = TRUE => tasks/={};active = TRUE => idle/:blocked;active = TRUE => idle/:suspended;active = TRUE => (ready = {} => running = idle))
 END
 &
 THEORY ListInitialisationX IS

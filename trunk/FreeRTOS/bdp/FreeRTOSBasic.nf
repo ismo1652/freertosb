@@ -62,7 +62,7 @@ END
 &
 THEORY ListAssertionsX IS
   Abstract_List_Assertions(Machine(FreeRTOSBasic))==(btrue);
-  Expanded_List_Assertions(Machine(FreeRTOSBasic))==(active = TRUE => idle: tasks;active = TRUE => tasks/={};active = TRUE => idle/:blocked;active = TRUE => idle/:suspended);
+  Expanded_List_Assertions(Machine(FreeRTOSBasic))==(active = TRUE => idle: tasks;active = TRUE => tasks/={};active = TRUE => idle/:blocked;active = TRUE => idle/:suspended;active = TRUE => (ready = {} => running = idle));
   Context_List_Assertions(Machine(FreeRTOSBasic))==(BIT <: NATURAL & configMAX_PRIORITIES: NATURAL);
   List_Assertions(Machine(FreeRTOSBasic))==(btrue)
 END

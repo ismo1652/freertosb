@@ -78,7 +78,8 @@ ASSERTIONS
     active = TRUE => idle : tasks;
     active = TRUE => tasks /= {};
     active = TRUE => idle /: blocked;
-    active = TRUE => idle /: suspended
+    active = TRUE => idle /: suspended;
+    active = TRUE => ((ready = {}) => (running = idle))
     
 INITIALISATION
     active := FALSE ||
