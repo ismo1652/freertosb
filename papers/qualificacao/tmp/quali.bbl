@@ -5,4 +5,41 @@
 \providecommand{\abntbstabout}[1]{}
 \abntbstabout{1.53 }
 
+\bibitem[Abrial 1996]{abrial96}
+\abntrefinfo{Abrial}{ABRIAL}{1996}
+{ABRIAL, J.~R. \emph{The B-book: assigning programs to meanings}. [S.l.]:
+  Cambridge University Press, 1996.}
+
+\bibitem[{Bartira Dantas} et al. 2008]{dantas08}
+\abntrefinfo{{Bartira Dantas} et al.}{{Bartira Dantas} et al.}{2008}
+{{Bartira Dantas} et al. Proposta e avaliacao de uma abordagem de
+  desenvolvimento de software fidedigno por construcao com o método b. In:
+  \emph{Anais do XXVIII Congresso da SBC}. [S.l.: s.n.], 2008.}
+
+\bibitem[{ClearSY} 2002]{atelierb}
+\abntrefinfo{{ClearSY}}{{ClearSY}}{2002}
+{{ClearSY}. \emph{atelieb manuel-reference}. 2002.
+URL:http://www.atelierb.eu.}
+
+\bibitem[{David Kalinsky} 2003]{Kalinsky03}
+\abntrefinfo{{David Kalinsky}}{{David Kalinsky}}{2003}
+{{David Kalinsky}. \emph{Basic concepts of real-time operating systems}.
+[S.l.], 2003.}
+
+\bibitem[{Honeywell} 2005]{honeywell03}
+\abntrefinfo{{Honeywell}}{{Honeywell}}{2005}
+{{Honeywell}. \emph{Formal Method: analysis of complex systems to ensure
+  correctenes and reduce cost}.
+[S.l.], 2005.}
+
+\bibitem[{Qing Li} e {Carolyn Yao} 2003]{Li03}
+\abntrefinfo{{Qing Li} e {Carolyn Yao}}{{Qing Li}; {Carolyn Yao}}{2003}
+{{Qing Li}; {Carolyn Yao}. \emph{Real-Time Concepts for Embedded Systems}.
+  [S.l.]: CMP Books, 2003.}
+
+\bibitem[{Richard Barry} 2009]{Barry09}
+\abntrefinfo{{Richard Barry}}{{Richard Barry}}{2009}
+{{Richard Barry}. \emph{Using the FreeRTOS Real Time Kernel - A Pratical
+  Guide}. [S.l.]: FreeRTOS.org, 2009.}
+
 \end{thebibliography}

@@ -18,7 +18,8 @@
 \autor{Stephenson de S. L. Galvão}
 
 
-\titulo{Modelagem do Sistema Operacional de Tempo Real FreeRTOS}
+\titulo{Modelagem Formal do Sistema Operacional de Tempo Real FreeRTOS
+Utilizando o Método B}
 
 \orientador{Prof. Dr. David Déharbe}
 
@@ -79,8 +80,67 @@ Aplicada \par Programa de Pós-graduação em Sistemas e Computação}
 
 \chapter{Introdução\label{cap:introducao}}
 
-Falar dos grandes desafios (SBC) e do desafio do compilador ``Verifiging
-compile'', ``Verified Software repository'' desafio de Jim Woodcock
+A área da computação é uma área relativamente jovem que ainda necessita de
+esforços para torna-se matura e confiável como as demais áreas da ciência. Assim
+para um melhor planejamento da evolução da computação e para agrupar esforços em
+objetivos comuns, vários pesquisadores procuraram identificar alguns dos
+principais desafios que a sociedade gostaria de ver desenvolvidos a curto e médio
+prazo.
+
+Um pesquisador bastante conhecido pela computação, mais especificamente na
+disciplina de métodos formais, responsável por definir necessidades através de
+desafios, é o britânico Jim Woodcock. No âmbito nacional existe a Sociedade
+Brasileira de Computação (SBC) que também está preocupada em definir diretrizes
+para a área em forma de desafio. Assim, um desafio comum entre as duas partes
+(SBC e Jim), lançado recentemente por Jim, é o de especificar formalmente o
+Sistema Operacional de Tempo Real FreeRTOS.
+
+Sistemas de tempo real são sistema que necessitam responder, em tempos bem
+definidos, aos estímulos causados por eventos externos. Esse tipo de sistema
+está presente em quase todo o cotidiano da sociedade atual e tem sido utilizado
+principalmente em ambientes críticos como o controle de transportes (aeronaves,
+trens e automóveis), monitoramento de aparelhos hospitalares e controle da
+linha de produção de fábricas.
+
+O FreeRTOS é um software que tem o objetivo de facilitar o desenvolvimento dos
+sistemas de tempo real. Ele, através de funcionalidades disponibilizadas na forma
+de bibliotecas, abstrai do desenvolvedor os detalhes do hardware no qual o
+sistema será utilizado. Uma das principais característica desse software está na
+sua simplicidade e portabilidade, pois o seu código, feito em \textit{C} com
+partes em assembler, possui cerca 2.200 linhas de código e é oficialmente
+portável para dezessete arquiteturas diferentes de mono-processadores.
+
+A especificação formal de um sistema é uma metodologia de especificação,
+construção e verificação de sistemas capaz de deixa-los mais confiável e
+fidedigno. Isso é feito utilizando-se conceitos matemáticos sólidos como a teoria
+do conjunto e a lógica de primeira ordem. Com isso, uma especificação formal do
+FreeRTOS tornaria mais fidedigno não só próprio sistema operacional mas também os
+sistemas que utilizam-se dele para realizar suas tarefas.
+
+Nesse contexto o presente trabalho pretende, através de uma especificação formal
+do FreeRTOS, resolver os desafios proposto por Jim e pela SBC. O formalismo
+utilizado na resolução desse problema será o método B, que trata-se de uma
+metodologia de construção de sistemas por técnicas de refinamentos. Nessa técnica
+um sistema concreto é gerado a partir de uma especificação abstrata do mesmo e
+cada etapa de abstração do desenvolvimento é passível de uma verificação
+estática para garantir a corretude do sistema.
+
+O plano desenvolvido para a resolução desse desafio foi divido em três partes
+principais. Inicialmente tem-se o estudo do FreeRTOS para descobrir suas
+características, estruturas e comportamentos. Depois disso, uma especificação
+abstrata do mesmo é desenvolvida com a finalidade de especificar os seus
+comportamentos e estruturas mais relevantes. Em seguida, na terceira parte, essa
+especificação abstrata é refinada de acordo com decisões de projetos para que
+determinadas estruturas e funcionalidades do sistema torne-se mais concreta e
+passível de verificação.
+
+Atualmente a primeira e a segunda parte do trabalho estão bem desenvolvidos. Como
+fruto desse trabalho inicial tem-se uma especificação abstrata de algumas das
+principais funcionalidades do sistema restando apenas a especificação das demais
+funcionalidades e o refinamento em um nível concreto da especificação do sistema.
+
+%Falar dos grandes desafios (SBC) e do desafio do compilador ``Verifiging
+%compile'', ``Verified Software repository'' desafio de Jim Woodcock
 
 \section{Objetivos}
 Falar do objetivo da dissertação e não só da qualificação. Itens a serem
@@ -121,8 +181,8 @@ Metodologia da dissertação, no contexto do que já foi feito
 
 \chapter{FreeRTOS}
 
-O FreeRTOS é um sistema operacional de tempo real enxuto, simples e de fácil uso.
-O seu código fonte, feito em \textit{C} com partes em \textit{assembly}, é aberto
+O FreeRTOS é um sistema operacional de tempo real (SOTR) enxuto, simples e de
+fácil uso. O seu código fonte, feito em \textit{C} com partes em \textit{assembly}, é aberto
 e possui pouco mais de 2.200 linhas de código, que são essencialmente
 distribuídas em quatro arquivos: \texttt{task.c}, \texttt{queue.c},
 \texttt{croutine.c} e \texttt{list.c}. Uma outra característica marcante desse
@@ -131,126 +191,135 @@ arquiteturas mono-processadores diferentes, entre elas a PIC, ARM e Zilog Z80,
 as quais são amplamente difundidas em produtos comerciais através de sistemas
 computacionais embutidos.
 
-Como a maioria dos sistemas operacionais de tempo real, o FreeRTOS provê para os
-desenvolvedores de  sistemas concorrentes de tempo-real acesso aos recursos de
-\textit{hardware}, facilitando com isso o desenvolvimento dos mesmo. Assim,
-FreeRTOS trabalha como na figura \ref{fig:rtos}, fornecendo uma camada de
-abstração localizada entre a aplicação e o hardware, que tem como papel esconder
-dos desenvolvedores de aplicações os detalhes do hardware que será utilizado.
+Assim como a maioria dos sistemas operacionais, o FreeRTOS provê para os
+desenvolvedores de sistemas acesso aos recursos de \textit{hardware},
+facilitando com isso o desenvolvimento de sistemas de tempo real. Assim, FreeRTOS
+trabalha como na figura \ref{fig:rtos}, fornecendo uma camada de abstração localizada
+entre a aplicação e o hardware, que tem o papel esconder dos desenvolvedores
+de aplicações detalhes do hardware que será utilizado.
+
 
 \begin{figure}[!h]
 \centering
 \includegraphics[scale=0.8]{../fig/rtos.jpg}
-\caption{Camada abstrata proporcionada pelo FreeRTOS}
+\caption{Camada abstrata proporcionada pelo FreeRTOS \cite{Kalinsky03}}
 \label{fig:rtos}
 \end{figure}
 
 Para prover tal abstração o FreeRTOS é composto por um conjunto de bibliotecas de
 tipos e funções que devem ser linkeditadas\footnote{Processo que liga o código da
-aplicação ao código das funcionalidades de outras bibliotecas utilizada por ela}
+aplicação ao código das funcionalidades de outras bibliotecas utilizada por ela.}
 com o código da aplicação a ser desenvolvida. Juntas, essas bibliotecas fornecem
 para o desenvolvedor serviços como gerenciamento de tarefa, comunicação e
 sincronização entre tarefas, gerenciamento de memória e controle dos dispositivos
-de entrada e saída.
+de entrada e saída. A seguir tem-se em detalhe os principais serviços providos
+pelo o FreeRTOS junto com a biblioteca que os disponibilizam.
 
-A criação de uma aplicação utilizando o FreeRTOS pode ser divida em duas partes.
-Na primeira parte são criadas, de acordo com modelos fornecidos pelo FreeRTOS, as
-tarefas e demais estruturas disponibilizadas pelo FreeRTOS que serão utilizadas
-pela a aplicação. Na segunda parte é feito o cadastramento das tarefas utilizadas
-pelo o sistema assim como a inicialização do mesmo. Por fim, o sistema é
-transformado em uma aplicação da arquitetura desejada.
+%A criação de uma aplicação utilizando o FreeRTOS pode ser divida em duas
+%partes. Na primeira parte, são criadas, de acordo com modelos fornecidos pelo
+%FreeRTOS, as tarefas e demais estruturas disponibilizadas pelo FreeRTOS que
+%serão utilizadas pela a aplicação. Na segunda parte é feito o cadastramento
+%das tarefas utilizadas pelo o sistema assim como a inicialização do mesmo. Por
+%fim, o sistema é transformado em uma aplicação da arquitetura desejada.
 
-A seguir tem-se em detalhe os principais serviços providos pelo o FreeRTOS junto
-com a biblioteca que os disponibilizam.
+
 
 \section{Gerenciamento de Tarefas e Co-Rotinas}
 
 \subsection{Tarefa}
 \label{subsec:tarefa}
-%SG->DD
-% Eu devo explicar o que é contexto?
+% SG->DD Eu devo explicar o que é contexto?
 Para entender como funciona o gerenciamento de tarefas do FreeRTOS é necessário
 primeiramente entender-se o conceito de tarefa. Uma tarefa é uma unidade básica
-de execução, com contexto próprio, que compõem as aplicações, que geralmente são
-multitarefas. Para o FreeRTOS uma tarefa é composta por :
+de execução, com contexto próprio, que compõem as aplicações, as quais geralmente
+são multitarefas. Para o FreeRTOS uma tarefa é composta por :
 
 \begin{itemize}
-  \item Um estado que demonstra a atual situação da tarefa
+  \item Um estado que demonstra a atual situação da tarefa;
   \item Uma prioridade que varia de zero até uma constante máxima definida pelo
-  o usuário
+  projetista;
   \item Uma pilha na qual é armazenada o ambiente de execução (estado dos
-  registradores) da tarefa quando está é interrompida.
+  registradores) da tarefa quando esta é interrompida.
 \end{itemize}
 
-Em um sistema uma tarefa pode assumir vários estados de acordo com a sua
-circunstância. Assim o FreeRTOS disponibiliza quatro tipos de estados diferentes
-para uma tarefa. Os estados que uma tarefa pode assumir no FreeRTOS são:
+Em um sistema, uma tarefa pode assumir vários estados que variam de acordo com a
+sua atual situação. O FreeRTOS disponibiliza quatro tipos de estados diferentes
+para uma tarefa, sendo eles:
 
-%SG->DD
-% Acho que eu deveria mudar o nome do estado em execução para executando
+% SG->DD 
+% Estou confuso quanto aos nomes que devo botar para o estados de uma tarefa
 \begin{itemize}
-  \item \textbf{Em execução}: Indica que a tarefa esta sendo executada pelo
-  processado
-  \item \textbf{Pronta}: Indica que a tarefa está pronta para entrar em execução
-  mas não está sendo executada
-  \item \textbf{Bloqueada}:Indica que a tarefa esta esperando por algum evento
-  para continuar a sua execução
-  \item \textbf{Suspensa}:Indica que a tarefa foi suspensa pelo kernel
-  através da chamada de uma funcionalidade usada para controlar as tarefas 
+  \item \textbf{Em execução}: Indica que a tarefa está em execução;
+  \item \textbf{Pronta}: Indica que a tarefa está pronta para entrar em
+  execução, mas não está sendo executada;
+  \item \textbf{Bloqueada}: Indica que a tarefa está esperando por algum evento
+  para continuar a sua execução;
+  \item \textbf{Suspensa}: Indica que a tarefa foi suspensa pelo gerenciador de
+  tarefas através da chamada de uma funcionalidade usada para controlar as
+  tarefas.
 \end{itemize}
 
-A permutação que ocorre no estado de uma tarefa funciona como demonstra a figura
-\ref{fig:task_states}. Nela uma tarefa com o estado ``em execução'' pode ir para
-o estado pronta, bloqueado ou suspenso. Uma tarefa com o estado pronto pode ser
-suspensa ou entrar em execução. E as tarefa com o estado bloqueada ou suspensa só
-podem ir para o estado pronto.
-
-Entretanto, vale enfatizar que por tratar-se de um SOTR para arquiteturas
-mono-processadores o FreeRTOS não permite que mais de uma tarefa seja executada ao
-mesmo tempo. Assim,em um determinado instante, apenas uma tarefa pode assumir o
-estado pronto, restando as demais os outros estado. Com isso, para decidir qual
-tarefa será executada o FreeRTOS possui um mecanismo denominado escalonador, o
-qual será detalhado na sessão \ref{sec:escalonador}.
+No FreeRTOS a alteração do estado de uma tarefa funciona como demonstra o
+diagrama da figura~\ref{fig:task_states}. Nela uma tarefa com o estado ``em
+execução'' pode ir para o estado pronta, bloqueado ou suspenso. Uma tarefa com o
+estado pronto pode ser suspensa ou entrar em execução, e as tarefa com o estado
+bloqueada ou suspensa só podem ir para o estado pronto.
 
 \begin{figure}[!h]
 \centering
 \includegraphics[scale=0.6]{../fig/task_states.jpg}
-\caption{Grafo de estados de uma tarefa}
+\caption{Diagrama de estados de uma tarefa no FreeRTOS \cite{Barry09}}
 \label{fig:task_states}
 \end{figure}
 
+Entretanto, vale enfatizar que por tratar-se de um SOTR para arquiteturas
+mono-processadores o FreeRTOS não permite que mais de uma tarefa seja executada
+ao mesmo tempo. Assim, em um determinado instante, apenas uma das tarefa com
+estado ``pronto'' pode assumir o processador e entrar no estado ``em execução''.
+Com isso, para decidir qual tarefa entrará em executação o FreeRTOS possui um
+mecanismo denominado escalonador, o qual será detalhado na sessão \ref{sec:escalonador}.
+
 \subsubsection{Tarefa Ociosa}
 \label{subsubsection:tarefa_ociosa}
-No FreeRTOS existe também uma tarefa denominada de tarefa ociosa, a qual é
-executada quando nenhuma tarefa está em execução. A tarefa ociosa tem como
-principal finalidade excluir da memória tarefas que não serão mais usadas pelo
-sistema. Assim, quando uma aplicação informa para o sistema que uma tarefa não
-será mais utilizada, esta tarefa só será excluída quando a tarefa ociosa entrar
-em execução. A tarefa ociosa possui a menor prioridade dentre as tarefas que
-compõem um sistema.
+
+No FreeRTOS existe uma tarefa especial denominada Tarefa Ociosa que é executada,
+como o próprio nome já diz, quando o processador encontra-se ocioso, ou seja,
+quando nenhuma tarefa estiver em execução. Essa tarefa tem como principal
+finalidade liberar áreas de memórias que não estão sendo mais utilizadas pelo
+sistema. Por exemplo, quando uma aplicação cria uma nova tarefa, uma área da
+memória é reservada à nova tarefa, em seguinda, quando essa tarefa é excluída
+pelo sistema, a memória destinada ela continua oculpada, sendo esta liberada
+somente quando a tarefa ocioso entra em execução. A tarefa ociosa deve possui
+menor igual às demais tarefas do sistema e por isso só é executada quando
+nenhuma tarefa estiver em execução.
 
 
 \subsection{Co-rotinas}
 \label{subsec:corotinas}
-Outro conceito importante suportado pelo FreeRTOS é o de Co-rotina. Assim como as
-tarefas, co-rotinas são unidades de execução independentes que formam uma
-aplicação. Por isso assim como as tarefas, uma co-rotina é formada por uma
-prioridade e um estado. Entretanto, devido ao fato de co-rotinas não possuírem
-contexto de execução próprio, ela não possuem uma pilha para armazenar o
-contexto de execução, como ocorre nas tarefas.
+Outro conceito importante suportado pelo FreeRTOS é o conceito de co-rotina.
+Co-rotinas, assim como as tarefas, são unidades de execução independentes que
+formam uma aplicação. Elas também são formada por uma prioridade e um estado
+responsáveis respectivamente pela importância da co-rotina no sistema e pela
+situação da mesma. 
+
+Uma diferença crucial entre corotinas e tarefas está na presença da pilha de
+armazenamento do contexto. Co-rotinas não possuem contexto de execução próprio.
+Consequentemente, elas também não possuem uma pilha para o armazenar do contexto
+de execução. Diferentemente das tarefas que possuem contexto próprio devido a sua
+pilha de armazenamento do contexto.
 
 Os estados que uma co-rotina pode assumir são:
 \begin{itemize}
   %SG->DD: Acho que eu deveria mudar o nome do estado ``em execução'' para
   % executando
-  \item \textbf{Em execução}: Quando a co-rotina está sendo executada
+  \item \textbf{Em execução}: Quando a co-rotina está em execução;
   \item \textbf{Pronta}: Quando a co-rotina está pronta para ser executada, mas
-  não está em execução
+  não está em execução;
   \item \textbf{Bloqueada}: Quando a co-rotina está bloqueada esperando por
-  algum evento para continuar a sua execução. 
+  algum evento para continuar a sua execução; 
 \end{itemize}
 
-As transições entre os estados de uma co-rotina ocorre como demonstra a figura
+As transições entre os estados de uma co-rotina ocorrem como demonstra a figura
 \ref{fig:croutine_states}. Nela uma co-rotina em execução pode ir tanto para o
 estado bloqueado como para o estado suspenso. Uma co-rotina de estado bloqueado
 só pode ir para o estado pronto e uma co-rotina de estado pronto só pode ir para
@@ -263,22 +332,22 @@ o estado ``em execução''.
 \label{fig:croutine_states}
 \end{figure}
 
-Assim como nas tarafes, a decisão de qual co-rotina irá entrar em execução também
-é feita pelo o escalonador, que será explicado na seção \ref{sec:escalonador}
+Assim como nas tarefas, a decisão de qual co-rotina irá entrar em execução é
+feita pelo o escalonador, o qual será demonstrado na seção \ref{sec:escalonador}
 
 \subsection{Escalonador de Tarefas}
 \label{sec:escalonador}
 
-%SG->DD
-%Não sei se esse termo ``unidade de execução'' ficou bem. Só botar
-%um termo genérico para tarefas e corotinas
+% SG->DD Não sei se esse termo ``unidade de execução'' ficou bem. Só queria
+% botar um termo genérico para tarefas e corotinas
  
 O escalonador é a parte mais importante de um sistema. É ele quem decide qual
 unidade de execução\footnote{Aqui o termo ``unidade de execução'', as vezes
-sitado apenas como unidade, refere-se a todas as tarefas e co-rotinas(seção
-\ref{subsec:corotinas}) do sistema} irá entrar execução. Além disso, é ele que
-faz a troca entre a unidade em execução e nova unidade que irá entrar em
-execução. No FreeRTOS o escalonador pode funcionar de três modos diferentes:
+citado apenas como unidade, refere-se a todas as
+tarefas(seção~\ref{subsec:tarefa}) e co-rotinas (seção~\ref{subsec:corotinas}) do
+sistema} irá entrar execução. Além disso, é ele que faz a troca entre a unidade
+em execução e nova unidade que irá entrar em execução. No FreeRTOS o escalonador
+pode funcionar de três modos diferentes:
 
 \begin{itemize}
   \item \textbf{Preemptivo}: Quando o escalonador interrompe a unidade em
@@ -323,168 +392,178 @@ crescente de prioridade, disputam a execução do processador.
 \end{enumerate}
 }
 
-\caption{Funcionamento de um escalonador preemptivo baseado na prioridade}
+\caption{Funcionamento de um escalonador preemptivo baseado na prioridade
+\cite{Li03}}
 \label{fig:scheduler}
 \end{figure}
 
-Para as co-rotinas o escalonador funciona de forma cooperativa e baseada na
-prioridade. Com isso, a co-rotina em execução é quem decide o momento de sua
-interrupção, sendo que a próxima co-rotina a entrar em execução será a de maior
-prioridade entre as co-rotinas com o estado pronto
+Para as co-rotinas o escalonador funciona de forma cooperativa e baseado na
+prioridade. Assim, a co-rotina em execução é quem decide o momento da sua
+interrupção, sendo que a próxima co-rotina em entrar em execução será a co-rotina
+de maior prioridade entre as co-rotinas de estado pronto.
 
 
 \subsection{Bibliotecas}
 \label{subsection:api_tarefas_corotinas}
 
-Para disponibilizar as caraterísticas discutidas nesta seção o FreeRTOS dispõe
-das seguintes bibliotecas: Criação de Tarefas, Controle de Tarefas, Utilidades de
-Tarefas, Controle do Kernel e Co-rotinas. A seguir tem-se em detalhe a descrição
-de cada uma dessas bibliotecas junto com as funcionalidades que as compõem
+Para disponibilizar as caraterísticas discutidas nesta seção o FreeRTOS contem
+de um conjunto de bibliotecas de tipos e funções, as quais estão classificadas da
+seguinte forma: Criação de tarefas, controle de tarefas, utilidades de tarefas,
+controle do kernel e co-rotinas. A seguir tem-se em detalhe a descrição de cada
+uma dessas bibliotecas junto com os tipos e funcionalidades que as compõem.
 
 \subsubsection{Criação de Tarefas}
-Essa biblioteca é responsável pelo conceito de tarefa. Nela estão presente, um
-tipo, responsável por representar uma tarefa do sistema, e duas funcionalidades,
-uma para a criação de uma tarefa e outra para a remoção de uma tarefa do sistema.
-Em seguida, tem-se a lista de todos os tipos e funcionalidades disponibilizados
-por essa biblioteca.
+
+Essa biblioteca é responsável pelo tipo tarefa e sua criação. Nela estão
+presente, um tipo, responsável por representar uma tarefa do sistema, e duas
+funcionalidades, uma para a criação e outra para a remoção de tarefa do sistema.
+Em seguida, tem-se em detalhes a composição da biblioteca criação de tarefas.
 
 \begin{itemize}
   \item \textbf{xTaskHandle} - Tipo pelo qual uma tarefa e referenciada. Por
   exemplo, quando uma tarefa é criada através do método \textit{xTaskCreate},
-  este retorna uma referência para nova tarefa através do tipo
+  este retorna uma referência para nova tarefa através do tipo;
   \textit{xTaskHandle}
   
   \item \textbf{xTaskCreate} - Funcionalidade usada para criar uma nova tarefa
-  para o sistema.
+  para o sistema;
   
-  \item \textbf{vTaskDelete} - Funcionalidade usada para indicar ao sistema que
-  uma tarefa deve ser removida\footnote{A remoção de uma tarefa do
-  sistema só é feita pela tarefa ociosa \ref{subsubsection:tarefa_ociosa}, nesse
-  método é apenas indicado para o sistema quais as tarefas que devem ser
-  removidas}
+  \item \textbf{vTaskDelete} - Funcionalidade usada para remover uma tarefa do
+  sistemas\footnote{A memória alocada pela tarefa será liberada somente
+  quando a tarefa ociosa entrar em execução \ref{subsubsection:tarefa_ociosa}};
 \end{itemize}
 
 \subsubsection{Controle de tarefas}
 \label{subsubsec:controle_tarefa}
 A biblioteca de controle de tarefas realiza operações sobre as tarefas do
-sistema. Ela disponibiliza funcionalidades capazes de bloquear, suspender e
-retornar uma tarefa do estado suspenso.Além dessas ela também possui
-funcionalidades capazes de alterar e informar a prioridade de uma determinada
-tarefa. A lista das principais funcionalidades presentes nessa biblioteca pode
-ser vista a seguir:
+sistema. Ela disponibiliza funcionalidades capazes de bloquear, suspender,
+retornar, informar a prioridade e alterar a prioridade de uma tarefa no sistema.
+A lista das principais funcionalidades presentes nessa biblioteca pode ser vista
+a seguir:
 
 \begin{itemize}
-  \item \textbf{vTaskDelay} - Método usada para suspender uma tarefa por um
-  determinado tempo. Nesse método, para calcular qual será o tempo que a tarefa
-  deve retornar, é levando em consideração o tempo relativo, ou seja, o tempo
-  que o método foi chamado. E por isso, é uma método não indicado para a criação de
-  tarefas cíclicas, pois o tempo que o método é chamado pode variar em cada
-  execução da tarefa devido as interrupções que a mesma pode sofrer.
-  \item \textbf{vTaskDelayUntil} - Método usado para suspender uma tarefa por
+  \item \textbf{vTaskDelay} - Método usada para bloquear uma tarefa por um
+  determinado tempo. Nesse método, para calcular o tempo que a tarefa
+  deve permanecer bloqueada, é levado em consideração o tempo relativo, ou seja,
+  o instante em que o método de bloqueio foi chamado. Esse método não é
+  recomendado para a criação de tarefas cíclicas, pois o instante em que o
+  método é chamado pode variar a cada execução da tarefa devido as interrupções
+  que a mesma pode sofrer;
+  
+  \item \textbf{vTaskDelayUntil} - Método usado para bloquear uma tarefa por
   um determinado tempo. Esse método difere do \textit{vTaskDelay} pelo o
-  fato de que tempo em que a tarefa deve retornar é calculado com base no tempo
-  do último retorno da tarefa. Assim, se ocorrer uma interrupção o tempo que a
-  tarefa foi retornada não ira mudar, o que torna esse método recomendável para
-  tarefas cíclicas
+  fato de que o tempo que a tarefa deve permanecer desbloqueada é
+  calculado com base no instante do último desbloqueio da tarefa. Assim, se
+  ocorrer uma interrupção no momento da chamada ao método o instante que a
+  tarefa foi desbloqueada não ira mudar. Por isso esse método
+  torna-se recomendável para a criação de tarefas cíclicas;
+  
   \item \textbf{uxTaskPriorityGet} - Método usado para informar a prioridade de
-  uma determinada tarefa
+  uma determinada tarefa;
+  
   \item \textbf{vTaskPrioritySet} - Método usado mudar a prioridade de uma
-  determinada tarefa
+  determinada tarefa;
+  
   \item \textbf{vTaskSuspend} - Método usado para suspender uma determinada
-  tarefa
-  \item \textbf{vTaskResume} - Método usado retornar uma tarefa
+  tarefa;
+  
+  \item \textbf{vTaskResume} - Método usado retornar uma tarefa suspensa.
 \end{itemize}
 
 \subsubsection{Utilitários de tarefas}
-É através dessa biblioteca que o FreeRTOS disponibiliza para o usuário informações
-importantes a respeito das tarefas e do escalonador do sistema . Nela estão
-presentes funcionalidades com a de retornar uma referência para a atual tarefa
-em execução, retornar o tempo de funcionamento e o estado do escalonador e
+É através dessa biblioteca que o FreeRTOS disponibiliza, para o usuário,
+informações importantes a respeito das tarefas e do escalonador de tarefas. Nela
+estão presentes funcionalidades capazes de retornar uma referência para a atual
+tarefa em execução, retornar o tempo de funcionamento e o estado do escalonador e
 retornar o número e a lista das tarefas que estão sendo gerenciadas pelo sistema.
-Uma listagem das principais funcionalidades dessa biblioteca é encontrada a
-seguir:
+Uma lista das principais funcionalidades dessa biblioteca é encontrada a seguir:
 
 \begin{itemize}
   \item \textbf{xTaskGetCurrentTaskHandle} - Retorna a uma referência para
-  atual tarefa em execução
+  atual tarefa em execução;
   \item \textbf{xTaskGetTickCount} - Retorna o tempo decorrido desde a
-  inicialização do escalonador
-  \item \textbf{xTaskGetSchedulerState} - Retorna o estado do escalonador 
-  \item \textbf{uxTaskGetNumberOfTasks} - Retorna o número de tarefas do sistema
-  \item \textbf{vTaskList} - Retorna uma lista de tarefas do sistema
+  inicialização do escalonador;
+  \item \textbf{xTaskGetSchedulerState} - Retorna o estado do escalonador; 
+  \item \textbf{uxTaskGetNumberOfTasks} - Retorna o número de tarefas do
+  sistema;
+  \item \textbf{vTaskList} - Retorna uma lista de tarefas do sistema.
 \end{itemize}
 
 \subsubsection{Controle do Escalonador}
 Nessa biblioteca estão presentes as funcionalidades responsáveis por controlar as
-atividades do escalonador do sistema. Nela encontramos funcionalidades que
-iniciam e finalizam as atividades do escalonador, e também, suspendem e retornam
-a atividades do mesmo. As principais funcionalidades presente nessa biblioteca
-são :
+atividades do escalonador de tarefas. Nela encontramos funcionalidades que
+iniciam, finalizam, suspendem e retornam as atividades do escalonador. As
+principais funcionalidades presente nessa biblioteca são :
 
 \begin{itemize}
   \item \textbf{vTaskStartScheduler} - Método que inicia as atividades do
-  escalonador. Usado para a inicialização do sistema
+  escalonador. Usado para a inicialização do sistema;
   \item \textbf{vTaskEndScheduler} - Método que termina as atividades do
-  escalonador. Usado para a finalização das atividades do sistema também 
+  escalonador. Usado para a finalização das atividades do sistema também; 
   \item \textbf{vTaskSuspendAll} - Método que suspende as atividades do
-  escalonador
+  escalonador;
   \item \textbf{xTaskResumeAll} - Método que retorna as atividades de uma
-  escalonador suspenso
+  escalonador suspenso.
 \end{itemize}
 
+\subsection{Co-rotinas}
+Biblioteca de co-rotinas
+
 \section{Comunicação e sincronização entre tarefa}
-Frequentemente tarefas necessitam se comunicar um com as outras. Por exemplo a
-tarefa ``A'' depende da leitura do teclado feito pela tarefa ``B''. Com isso, a
-uma necessidade de que está comunicação seja feita de maneira bem estruturada e sem
-interrupções. 
+Frequentemente tarefas necessitam se comunicar entre si. Por exemplo a tarefa
+``A'' depende da leitura do teclado feito pela tarefa ``B'' para disponibilizar
+em uma tela as teclas digitadas pelo usuário. Com isso, percebe-se uma
+necessidade de que tal comunicação seja feita de maneira bem estruturada e sem
+interrupções.
 
 A maioria dos sistemas operacionais oferecem vários tipos de comunicação entre as
-tarefas. Que podem ocorrer da seguinte forma: uma tarefa deseja passar
-informações para outra, duas ou mais tarefas querem utilizar o mesmo recurso e
-uma tarefa dependo do resultado produzido por outra tarefa.
+tarefas. Estas podem ocorrer da seguinte forma: Tarefas trocando informações
+entre si; Tarefas utilizando, de forma sicronizada, o mesmo recurso; Tarefas
+dependentes dos resultados produzidos por outras.
 
-No FreeRTOS assim como nos demais sistemas operacionais os mecanismos
-responsáveis pela a comunicação entre as tarefas são a fila de mensagem, o
-semáforo e o mutex (\textit{Mutal Exclusion}). Para entender melhor como
-funciona a comunicação entre tarefas no FreeRTOS, cada um desses mecanismo serão
-detalhados a seguir
+No FreeRTOS, assim como nos demais sistemas operacionais, os mecanismos
+responsáveis por realizar a comunicação entre as tarefas são as filas de
+mensagens, os semáforos e o mutexes (\textit{Mutal Exclusion}). Para entender
+melhor como funciona a comunicação entre tarefas no FreeRTOS, cada um desses
+mecanismo será detalhado a seguir.
 
 \subsection{Fila de Mensagens}
 
 Filas de mensagens são estruturas primitivas de comunicação entre tarefas. Elas
-funcionam como, demonstra a figura \ref{fig:fila_de_mensagens}, um túnel no qual
-tarefas enviam e recebem mensagem. Assim, quando uma tarefa necessita
-comunicar-se com outra primeiramente ela envia uma mensagem para o túnel para que
-a outra tarefa, possa ler a mensagem.
+funcionam como, um túnel no qual tarefas enviam e recebem mensagem
+(figura~\ref{fig:fila_de_mensagens}). Assim, quando uma tarefa necessita
+comunicar-se com outra, ela envia uma mensagem para o túnel para que a outra
+tarefa possa ler a mensagem enviada.
  
 
-\begin{figure}[!h] \centering
-\includegraphics[scale=0.7]{../fig/queue.jpg}
+\begin{figure}[!h] \centering \includegraphics[scale=0.7]{../fig/queue.jpg}
 \caption{Funcionamento de uma fila de mensagens}
 \label{fig:fila_de_mensagens}
 \end{figure} 
  
  
 No FreeRTOS, uma fila de mensagens é formada por uma lista de tamanho fixo que
-armazena as mensagens,também de tamanhos fixos, enviadas para a lista. Assim,
-quando uma mensagem é envida para uma fila, uma cópia dela é armazenada na lista
-de mensagens para que outra tarefa possa utiliza-lá. Entretanto, no lugar de copiar
-toda mensagem para a lista de mensagens, é possível também armazenar-se apenas
-uma referência para a mesma, o que torna mais complicado um trabalho do
-desenvolvedor, pois assim o acesso à mensagem ficará compartilhado entre as
-tarefas, necessitando com isso de uma estrutura de sincronização para coordenar a
-utilização da mensagem pelas tarefas. Na maioria da aplicação a troca de
-mensagens é feita por cópia.
+armazena as mensagens, também de tamanhos fixos, enviadas para a lista. Assim,
+quando uma mensagem é envida para uma fila, uma cópia dessa mensagem é
+armazenada na lista para que posteriormente a outra tarefa possa ler a mensagem.
+Entretanto, contrária a copiar toda mensagem para a lista de mensagens, existe
+também a possibilidade de armazenar-se apenas uma referência da mensagem na
+lista, economizando assim a memória do sistema. Contudo, a técnica de armazenar
+apenas a referência da mensagen na lista torna mais complicado um trabalho
+do projetista, pois deste modo o acesso à mensagem na fila será
+compartilhado entre as tarefas interessadas, necessitando com isso de uma
+estrutura para sincronização o acesso da mensagem pelas tarefas.
+Na maioria das aplicações os projetistas utilizam a troca de mensagens
+através de cópia.
 
-Além da lista de mensagens uma fila de mensagens é composta por mais duas
-outras lista, uma para armazenar as tarefas que estão aguardando enviar uma
-mensagens para a fila e outra para armazenar as tarefas que estão aguardando
-receber uma mensagem da fila. Assim, quando uma tarefa tenta enviar uma
-mensagem para uma fila cheia a tarefa é bloqueada e colocada na lista de tarefa
-aguardam para enviar uma mensagem para fila até que um lugar na fila seja
-liberado. O mesmo acontece quando uma tarefa tenta ler uma mensagem de uma fila
-vazia, sendo que nesse caso, ela vai para a lista de tarefas aguardando por uma
-mensagem da fila.
+Além da lista de mensagens, uma fila de mensagens é composta por mais duas lista,
+uma para armazenar as tarefas que estão aguardando enviar uma mensagens para a
+fila e outra para armazenar as tarefas que estão aguardando receber uma mensagem
+da fila. Assim, quando uma tarefa tenta enviar uma mensagem para uma fila
+cheia, a tarefa é bloqueada e colocada na lista de tarefa que aguardam para
+enviar uma mensagem para fila até que um lugar na fila seja liberado. O mesmo acontece
+quando uma tarefa tenta ler uma mensagem de uma fila vazia, neste caso,
+a tarefa vai para a lista de tarefas aguardando por uma mensagem da fila.
 
 No FreeRTOS, é possíveis definir o tempo máximo que uma tarefa pode ficará
 bloqueada esperado por uma fila (liberação de espaço ou chega de mensagem). E
@@ -493,23 +572,31 @@ fila, as tarefas de maior prioridade têm preferência sobre as demais.
 
 \subsection{Semáforo}
 
-Semáforos são mecanismos usados na sincronização entre tarefas. Eles funcionam
-como uma chave que libera, ou não, o uso de um determinado recurso compartilhado.
-Assim, quando uma tarefa deseja acessar um recurso compartilhado, ela
-primeiramente deve solicitar o semáforo que coordena o uso do recurso, caso o
-semáforo esteja livre, a tarefa tem a permissão de utilizar o recurso e, em
-seguida, libera o semáforo, caso contrário, a tarefa é bloqueada até que o
-semáforo seja liberado.
+Os semáforos são mecanismos usados para realizar a sincronização entre tarefas.
+Eles funcionam como uma chave que permite à tarefa executar uma operação ou
+acessar um recurso compartilhado. Assim, para uma tarefa acessar um recurso
+compartilhado, ela primeiramente deve solicitar o semáforo responsável pelo
+recurso, caso o semáforo esteja disponível, a tarefa utiliza o recurso, caso
+contrário, a tarefa é bloqueada até que o semáforo seja liberado.
 
-O FreeRTOS disponibiliza dois tipo de semáforos: os semáforo binário e o semáforo
-com contador. A diferença entre os dois está apenas no número de tarefas que
-podem reter o semáforo ao mesmo tempo. No semáforo binário apenas uma tarefa
-pode reter o semáforo e acessar o recurso compartilhado. E no semáforo com
-contador existe um número fixo de tarefa, determinado por um contador, que podem
-reter o semáforo. Assim, no semáforo com contador, para cada tarefa que retêm o
-semáforo, o contador é decrementado de ``um'', e para cada tarefa que libera o
-semáforo, o contador é incrementado de ``um''. O semáforo torna-se indisponível
-quando o contador for igual a zero e disponível caso contrário.
+O FreeRTOS disponibiliza dois tipo de semáforos, o semáforo binário e o semáforo
+com contador, sendo a diferença entre eles apenas o número de tarefas que podem
+manter o semáforo ao mesmo tempo. No semáforo binário é permitido que apenas uma
+tarefa mantenha o semáforo. Entretanto, no semáforo com contador existe um número
+fixo de tarefa, determinado por uma variável denominada contador, que podem reter
+o semáforo. Por exemplo no semáforo binário apenas uma tarefa pode acessar um
+recurso do sistema controlado por ele (conter o semáforo), diferente do semáforo
+com contador que um número de tarefas determinado pelo contador pode ter acesso
+ao recuros compartilhado por ele ao mesmo tempo.
+
+O funcionamento do semáforo com contador ocorre da seguinte maneira. Primeiro o
+semáforo é criado com um contador que ira determinar o número de tarefas que
+podem reter o semáforo ao mesmo tempo. Em seguida, quando um tarefa retem o
+semáforo essa variáveis é decrementada de uma unidade. Assim ocorre até que o
+contador fique zerado, indicando que o semáforo está indisponível e o número
+máximo de tarefas foi atingido. Consequentemente, quando as tarefas liberam o
+semáforo, o seu contador é incrementado. O semáforo binário trata-se de um
+semáforo com o contador igual à um.
 
 No FreeRTOS o semáforo binário funciona como uma fila de mensagens com um único
 item. Assim, quando a fila estiver vazia, indica que o semáforo está sendo usado
@@ -520,56 +607,57 @@ tamanho inicial do contador
 
 \subsection{Mutex}
 
-Mutexes são parecidos com os semáforos binário. A única diferença entre os dois é
-que o mutex implementa um mecanismo de herança de prioridade, o qual impede que
-uma tarefa de maior prioridade fique bloqueada a espera de um semáforo ocupado
-por uma tarefa de menor prioridade, causando uma inversão de prioridade.
+Mutexes são estruturas parecidas com os semáforos binário. A única diferença
+entre os dois é que o mutex implementa um mecanismo de herança de prioridade, o
+qual impede que uma tarefa, de maior prioridade, fique bloqueada a espera de um
+semáforo ocupado por outra tarefa, de menor prioridade, causando uma situação de
+bloqueio por inversão de prioridade.
 
 O mecanismo de herança de prioridade funciona da seguinte forma, quando uma
-tarefa solicita o semáforo ele verifica se a tarefa solicitante possui prioridade
-maior que a tarefa com o semáforo. Caso afirmativo, a tarefa que retém o semáforo
-tem, momentaneamente, a sua prioridade elevada, para que assim ela possa realizar
-a suas funções sem interrupções e, conseqüentemente, liberar mais rapidamente o
-semáforo.
+tarefa solicita o semáforo, ele primeiro verifica se a tarefa solicitante possui
+prioridade maior que a tarefa com o semáforo. Caso afirmativo, a tarefa que retém
+o semáforo tem, momentaneamente, a sua prioridade elevada, para que assim ela
+possa realizar a suas funções sem interrupções e, conseqüentemente, liberar o
+semáforo mais rápido.
 
 \subsection{Bibliotecas}
-A característica de comunicação e sincronização entre tarefas está dividida em
+As características de comunicação e sincronização entre tarefas está dividida em
 duas bibliotecas, Gerenciamento de fila de mensagens e Semáforo/Mutex. A seguir
-tem-se a explicação de cada uma dessas bibliotecas.
+tem-se uma explicação de cada uma dessas bibliotecas.
 
 \subsubsection{Gerencialmente de fila de Mensagens}
 A biblioteca gerenciamento de fila de mensagens é responsável pela criação e
-utilização da estrutura fila de mensagens. Ela é composta por funcionalidades que
-instanciam e removem filas de mensagens do sistema e pelas funcionalidades que
-enviam/recebem mensagens para/de uma fila de mensagens desejada. Abaixo tem-se
-uma lista com as principais funcionalidades dessas biblioteca.
+utilização da estrutura de fila de mensagens. Ela é composta por funcionalidades
+que instanciam e removem filas de mensagens do sistema e pelas funcionalidades
+que enviam/recebem mensagens para/de uma fila de mensagens. Abaixo tem-se uma
+lista com as principais funcionalidades dessa biblioteca.
 
 \begin{itemize}
-  \item \textbf{xQueueCreate} - Cria uma nova instância de uma fila de
-  mensagens.
-  \item \textbf{vQueueDelete} - Remove uma fila de mensagem do sistema.
-  \item \textbf{xQueueSend} - Envia um mensagem para a fila. 
-  \item \textbf{xQueueSendToBack} - Envia uma mensagem para o fim da fila.  
-  \item \textbf{xQueueSendToFront} - Envia uma mensagem para o início da fila.
-  \item \textbf{xQueueReceive} - Lê e remove uma mensagem da fila .
+  \item \textbf{xQueueCreate} - Criar uma nova instância de fila de
+  mensagens;
+  \item \textbf{vQueueDelete} - Remover uma fila de mensagens do sistema;
+  \item \textbf{xQueueSend} - Enviar uma mensagem para uma fila;
+  \item \textbf{xQueueSendToBack} - Enviar uma mensagem para o fim da fila;  
+  \item \textbf{xQueueSendToFront} - Envia uma mensagem para o início da fila;
+  \item \textbf{xQueueReceive} - Lê e remove uma mensagem da fila;
   \item \textbf{xQueuePeek} - Apenas lê uma mensagem da fila, sem remove-lá.
 \end{itemize}
 
 \subsubsection{Semáforo/Mutex}
-Na biblioteca de semáforo e mutex são implementadas as características de
-sincronização entre tarefas (semáforo e mutex) junto com as suas operações. Assim
-nesta biblioteca estão presentes funcionalidades que criam e removem semáforos e
-mutex, além das funcionalidades que solicitam e liberam os semáforos e os mutex.
-As principais funcionalidades desta biblioteca pode ser vista a seguir.
+Na biblioteca de semáforo e mutex estão implementadas as estruturas de
+sincronização entre tarefas (semáforo e mutex), junto com as suas operações.
+Assim, nesta biblioteca estão presentes funcionalidades que criam e removem
+semáforos e mutex, e funcionalidades que solicitam e liberam os semáforos e os
+mutex. As principais funcionalidades desta biblioteca pode ser vista a seguir.
 
 
 \begin{itemize}
-  \item \textbf{vSemaphoreCreateBinary} - Cria um semáforo binário
-  \item \textbf{vSemaphoreCreateCounting} - Cria um semáforo com contador 
-  \item \textbf{xSemaphoreCreateMutex} - Cria um mutex 
-  \item \textbf{xSemaphoreTake} - Solicita a retensão de um semáforo ou de um
-  mutex
-  \item \textbf{xSemaphoreGive} - Libera um semáforo ou um mutex retido
+  \item \textbf{vSemaphoreCreateBinary} - Criar um semáforo binário;
+  \item \textbf{vSemaphoreCreateCounting} - Criar um semáforo com contador; 
+  \item \textbf{xSemaphoreCreateMutex} - Criar um mutex; 
+  \item \textbf{xSemaphoreTake} - Solicitar a retensão de um semáforo ou de um
+  mutex;
+  \item \textbf{xSemaphoreGive} - Libera um semáforo ou um mutex retido.
 \end{itemize}
 
 
@@ -579,18 +667,19 @@ Para construir uma aplicação de tempo real utilizando o FreeRTOS o desenvolvedor
 deve seguir determinadas restrições imposta pelo sistema operacional. A maioria
 destas restrições são parâmetros de configuração e modelos para a criação de
 tarefas, rotinas, filas de mensagens e demais estruturas disponibilizadas pelo
-FreeRTOS. Assim, com o intuído de ajudar o desenvolvedor a criar suas primeiras
-aplicações O FreeRTOS disponibilizou em seu código fonte aplicações exemplos
-organizadas de acordo com as plataformas alvo que o FreeRTOS suporta.
+sistema operacional. Assim, com o intido de ajudar o desenvolvedor a criar suas
+primeiras aplicações, o FreeRTOS disponibilizou em seu código fonte aplicações
+exemplos organizadas de acordo com as plataformas alvo que ele suporta.
 
 Entretanto, a criação e analise de uma nova aplicação no FreeRTOS é uma atividade
 que necessita de maior conhecimento sobre o funcionamento de suas
 funcionalidades, fugindo assim do objetivo geral desse capitulo que é
 proporcionar uma breve introdução ao FreeRTOS, demonstrando a suas principais
-funcionalidades. Com isso, para efeito de exemplificação de como são utilizadas
-as funcionalidades apresentadas neste capítulo, será demonstrado de forma
-abstrata nessa seção com é criada uma aplicação no FreeRTOS, abordando
-principalmente a criação e utilização de tarefas, filas de mensagens e semáforos.
+funcionalidades e características. Com isso, para efeito de exemplificação de
+como são utilizadas as funcionalidades apresentadas neste capítulo, será
+demonstrado nessa seção, de forma abstrata, com é criada uma aplicação no
+FreeRTOS, abordando principalmente a criação e utilização de tarefas, filas de
+mensagens e semáforos.
 
    
  
@@ -598,15 +687,15 @@ principalmente a criação e utilização de tarefas, filas de mensagens e semáforos
 \label{subsec:criacao_tarefa}
 
 A tarefa é a parte mais importante de uma aplicação. É nela que são colocadas as
-rotinas que realizam as atividades de uma aplicação. No FreeRTOS a rotina que
-compõem uma tarefa devem seguir a estrutura demonstrada pela
-figura~\ref{fig:estruta_rotina_tarefa}. Nele tem-se inicialmente o nome da
-rotina, \textit{functionName}, seguido da lista de parâmetros utilizados ela,
-\textit{vParameters}. O código que realiza as finalidades da tarefa é colocado
+rotinas que realizam as atividades da aplicação. No FreeRTOS, a rotina que compõe
+uma tarefa devem seguir a estrutura demonstrada pela
+figura~\ref{fig:estruta_rotina_tarefa}. Nela tem-se inicialmente o nome da
+rotina, \textit{functionName}, seguido de uma lista de parâmetros utilizados por
+ela, \textit{vParameters}. O código que realiza as finalidades da tarefa é colocado
 dentro de um laço infinito, forçando assim que a tarefa só finalize a sua
 execução quando for excluída pelo sistema\footnote{A execução além de ser
-finalizada pelo sistema pode também ser suspensa ou bloqueada como demonstrado
-na seção \ref{subsec:tarefa}}.
+finalizada pelo sistema pode também ser suspensa ou bloqueada como demonstrado na
+seção \ref{subsec:tarefa}.}.
  
 \begin{figure}[!h] \centering
 \begin{small}
@@ -626,29 +715,29 @@ void functionName( void *vParameters )
 
 Um exemplo concreto da criação de uma rotina pode ser visto na figura
 \ref{fig:app_tarefa_ciclica}. Nela tem-se a rotina \textit{cyclicalTasks}, que
-utiliza-se da funcionalidade \textit{vTaskDelayUntil} (seção
+utiliza a funcionalidade \textit{vTaskDelayUntil} (seção
 \ref{subsubsec:controle_tarefa}) para bloquear a execução da tarefa em intervalos
-cíclicos de tempo. Essa funcionalidade possui como parâmetros, respectivamente, o
+iguais de tempo. Essa funcionalidade possui como parâmetros, respectivamente, o
 último tempo que a tarefa foi retornada e o período que a tarefa deve permanecer
 bloqueada.
 
-Entretanto o desenvolvimento de uma rotina é apenas um dos passos para a criação
+Entretanto, o desenvolvimento de uma rotina é apenas um dos passos para a criação
 de uma tarefa. É necessário ainda que a tarefa seja cadastrada no sistema junto
-com sua prioridade e pilha de contexto. Essa função é feito através do método
+com sua prioridade e pilha de contexto. Essa função é feita através do método
 \textit{xTaskCreate}, demonstrado na figura~\ref{fig:app_tarefa_ciclica} que
 possui como parâmetros os seguintes argumentos:
 
 \begin{description}
 \item[cyclicalTasks]: Ponteiro para a rotina que deve ser executada
-pela função
-\item[``cyclicalTasks'']: Nome da função utilizados nos arquivos de log
-do sistema
+pela tarefa;
+\item[``cyclicalTasks'']: Nome da função utilizada nos arquivos de log
+do sistema;
 \item[STACK\_SIZE]: Tamanho da pilha de execução da função especificado
-de acordo com o número de variável declaradas na rotina da função
+de acordo com o número de variáveis declaradas na rotina da função;
 \item[pvParameters]: Lista de valores dos parâmetros da rotina da
-função.
-\item[TASK\_PRIORITY]: Prioridade da tarefa
-\item[cyclicalTasksHandle]: Gancho de retorno da tarefa criada
+função;
+\item[TASK\_PRIORITY]: Prioridade da tarefa;
+\item[cyclicalTasksHandle]: Gancho de retorno da tarefa criada;
 \end{description}
 
 \begin{figure}[!h] \centering
@@ -689,15 +778,15 @@ da aplicação demonstrada pela figura~\ref{fig:app_tarefa_ciclica}.
 
 \subsection{Utilização da fila de mensagens}
 
-A utilização de uma fila de mensagens é resumidamente demonstra na aplicação da
-figura~\ref{fig:app_fila_de_mensagens}. Nela inicialmente tem-se que a estrutura
+A utilização de uma fila de mensagens é resumidamente demonstrada na aplicação da
+figura~\ref{fig:app_fila_de_mensagens}. Nela, inicialmente tem-se que a estrutura
 \textit{AMessage} define o tipo da mensagem que será utilizada. Em seguida,
 através do método \textit{xQueueCreate} é criada uma fila de mensagens que será
 referenciada pela variável \textit{xQueue}, do tipo \textit{xQueueHandle}, tipo
-usado para referenciar fila de mensagem. Para isso o método create recebe como
-parâmetros, respectivamente, a quantidade de mensagens que a fila pode armazenar
-e o tamanho da mensagens manuseadas por ela, atributos necessários para um fila
-de mensagens.
+usado para referenciar uma fila de mensagens. Para isso o método \textit{create}
+recebe como parâmetros, respectivamente, a quantidade de mensagens que a fila
+pode armazenar e o tamanho da mensagens manuseadas por ela, atributos necessários
+para a criação de uma fila de mensagens.
 
 
 \begin{figure}[!h] \centering
@@ -750,42 +839,44 @@ struct AMessage *pxRxedMessage;
 \end{figure}
   
 
-Estabelecida a fila de mensagens, é necessário agora, definir-se as tarefas que
-irão enviar e receber mensagens da mesma. Na
-figura~\ref{fig:app_fila_de_mensagens} estão presentes apenas as rotinas de cada uma dessa tarefas, sendo que a explicação completa de como é criar uma tarefa foi
-demonstrada na seção~\ref{subsec:criacao_tarefa}. 
+Estabelecida a fila de mensagens, é necessário agora, definir as tarefas que irão
+enviar e receber mensagens da mesma. Na figura~\ref{fig:app_fila_de_mensagens}
+estão presentes apenas as rotinas de cada uma dessa tarefas, sendo que a
+explicação completa de como é criada uma tarefa foi demonstrada na
+seção~\ref{subsec:criacao_tarefa}.
 
 Para criar a tarefa que enviará mensagens para a fila, a rotina da tarefa
 \textit{sendTask} é desenvolvida. Nela esse trabalho é feita através da operação
-\textit{xQueueSend} , que possui como parâmetros a fila para qual a mensagem
-será enviada, a mensagem que será enviada para a fila e tempo máximo que a tarefa
-poderá ficar bloqueada aguardando para enviar uma mensagem para fila, caso ela
+\textit{xQueueSend}, que possui como parâmetros a fila para qual a mensagem será
+enviada, a mensagem que será enviada para a fila e o tempo máximo que a tarefa
+poderá ficar bloqueada aguardando para enviar uma mensagem para fila, caso esta
 esteja cheia.
 
 Por último, na figura~\ref{fig:app_fila_de_mensagens} a rotina da tarefa
-responsável por receber mensagens da fila, é criada. Ela é denominada de
-\textit{sendTask}. Para receber as mensagens enviadas para a fila,
-\textit{sendTask} utiliza a operação \textit{xQueueReceive}, a qual possui como
-argumentos, respectivamente, a fila de onde será recebida a mensagem, o local que
-irá armazenar a mensagem e o tempo máximo que a tarefa pode ficar esperando pela
-fila, caso está esteja vazia.
+responsável por receber mensagens da fila, \textit{sendTask}, é criada. Para
+receber as mensagens enviadas para a fila, a função \textit{sendTask} utiliza a
+operação \textit{xQueueReceive}, a qual possui como argumentos, respectivamente,
+a fila de onde será recebida a mensagem, o local que irá armazenar a mensagem e o
+tempo máximo que a tarefa pode ficar esperando pela fila, caso está esteja vazia.
 
 
 \subsection{Utilização do semáforo}
 
 Semáforos são estruturas de sincronização entre tarefas. Eles são utilizados para
-coordenar o uso de recurso compartilhado por uma ou mais tarefas. Assim, código
-da tarefa responsável por acessar o recurso compartilhado deve ser protegido para
-que a sua execução só ocorra quando o semáforo for retido pela tarefa.
+coordenar o uso de recurso compartilhado por uma ou mais tarefas e para coordenar
+a execução de uma determinada função. Assim, o código da tarefa responsável por
+acessar o recurso compartilhado ou executar uma função sicronizada deve ser
+protegido de maneira que a sua execução só ocorra quando a tarefa possuir o
+semáforo.
 
-A construção de uma aplicação que utiliza-se do mecanismo de semáforo, são
-necessário basicamente três funcionalidades da biblioteca de semáforos,
+Para a construção de uma aplicação que utiliza-se do semáforo são necessários
+basicamente três funcionalidades da biblioteca de semáforos,
 \textit{vSemaphoreCreateBinary}, \textit{xSemaphoreTake} e
 \textit{xSemaphoreGive}. A primeira funcionalidade cria o semáforo e as demais
 solicitam e liberam o semáforo respectivamente.
 
-O exemplo de uma aplicação que utiliza-se de um semáforo para controlar o acesso
-a um recurso compartilhado pode ser visto na figura~\ref{fig:app_semaforo}. Nela
+Um exemplo de uma aplicação que utilizando um semáforo para controlar o acesso de
+um recurso compartilhado pode ser visto na figura~\ref{fig:app_semaforo}. Nela
 inicialmente é criada a variável \textit{xSemaphore} para armazenar uma
 referência para o novo semáforo. Em seguida, o método
 \textit{vSemaphoreCreateBinary} é usado para criar o novo semáforo e retornar uma
@@ -836,27 +927,27 @@ rotina, o semáforo é liberado pelo método \textit{xSemaphoreGive}, permitindo qu
 outra tarefa possa reté-lo e usar o recurso compartilhado.
 
 
-A utilização do mutex é bem parecida com a do semáforo binário. A diferença para
-o usuário entre os dois mecanismo está apenas no método de criação,
+A utilização do mutex é bem parecida com a do semáforo binário. A diferença, para
+o usuário, entre os dois mecanismos está apenas no método de criação,
 \textit{vSemaphoreCreateBinary} no semáforo binário, que será
 \textit{xSemaphoreCreateMutex}. As formas e os métodos para solicitação do mutex
-é semelhante ao semáforo binário, sendo \textit{xSemaphoreTake} informando o
-mutex e o tempo máximo de bloqueio e \textit{xSemaphoreGive} informando o mutex
-que será liberado. Com isso para transformar a aplicação da
-figura~\ref{fig:app_semaforo} de semáforo pra mutex basta apenas trocar o método
+são semelhante ao semáforo binário, sendo que \textit{xSemaphoreTake} solita o
+mutex, informando o mutex e o tempo máximo de bloqueio e \textit{xSemaphoreGive}
+libera o mutex. Com isso, para transformar a aplicação da
+figura~\ref{fig:app_semaforo} de semáforo para mutex basta apenas trocar o método
 \textit{vSemaphoreCreateBinary} por \textit{xSemaphoreCreateMutex}.
 
 
 \chapter{Método B}
 
-Métodos Formais trata-se de uma abordagem formal para a especificação e
-construção de sistemas computacionais. Eles utilizam-se de conceitos matemáticos
-sólidos como lógica de primeira ordem e teorias dos conjuntos para a criação e
-verificação de sistemas consistentes, seguros e sem ambiguidades. Devido aos seus
-rigorosos métodos de construção a sua principal utilização, embora timidamente,
-tem sido na criação de sistemas críticos para as indústrias de aeronáutica,
-viação férrea e de equipamentos médicos, além de empresas que movimentam grandes
-quantidade monetárias como os bancos.
+Métodos Formais proveêm abordagens formais para a especificação e construção de
+sistemas computacionais. Eles utilizam-se de conceitos matemáticos sólidos como
+lógica de primeira ordem e teorias dos conjuntos para a criação e verificação de
+sistemas consistentes, seguros e sem ambiguidades. Devido aos seus rigorosos
+métodos de construção, a sua principal utilização, embora timidamente, tem sido
+na criação de sistemas críticos para as indústrias de aeronáutica, viação férrea,
+equipamentos médicos e empresas que movimentam uma grandes quantidade
+monetárias, como os bancos.
 
 %SG->DD:
 % Talvez seja melhor retirar o parágrafo abaixo, mas acho que ele da uma
@@ -865,23 +956,28 @@ quantidade monetárias como os bancos.
 % www51.honeywell.com/aero/technology/common/documents/formal-methods.pdf
 % Não sei se é uma fonte bibligráfica válida
 
-Segundo a Honeywell \cite{honeywell},uma empresa que desenvolve sistemas para
-aeronaves, a utilização de métodos formais no processo de desenvolvimento prover
-várias vantagens, entre eles estão: a produção mensurada pela corretude, métodos
-formais prove uma forma objetiva de mensura a corretude do sistema; antecipação
-na detecção de erros, métodos formais são previamente usados em projetos de
-artefatos do sistema, permitindo assim uma detecção antecipada de erros; e
-garantia da corretude, através mecanismo de verificação é possível provar que
-sistema funcionará de forma coerente com a sua especificação inicial.
-
-O método B\cite{Abrial J.} trata-se de uma abordagem formal usado para
-especificar e construir sistema computacionais seguros. Seu criado Jean-Raymond
-Abrial, junto com a colaboração de outros pesquisadores da universidade de
-Oxford, procuraram reunir no método B várias qualidades presentes nos demais
-método formais como pré e pós condições\footnote{Pré e Pós condições são\ldots},
-refinamento\footnote{Refinamento trata-se de um técnica de desenvolvimento de
-sistema\ldots} e modularização. A seguir tem-se a etapas de desenvolvimento de
-sistemas utilizando o método B.
+Segundo a Honeywell \cite{honeywell03},uma empresa que desenvolve sistemas para
+aeronaves, a utilização de métodos formais no processo de desenvolvimento prove
+várias vantagens, entre eles estão:
+\begin{itemize}
+  \item A produção mensurada pela corretude, métodos formais provê uma forma
+  objetiva de mensura a corretude do sistema;  
+  \item Antecipação na detecção de erros, métodos formais são previamente
+  usados em projetos de artefatos do sistema, permitindo assim uma detecção
+  antecipada de erros;  
+  \item Garantia da corretude, através mecanismo de verificação é possível
+  provar que sistema funcionará de forma coerente com a sua especificação inicial.
+\end{itemize} 
+  
+O método B\cite{abrial96} é uma abordagem formal usado para especificar e
+construir sistemas computacionais seguros. Seu criador Jean-Raymond Abrial, junto
+com a colaboração de outros pesquisadores da universidade de Oxford, procurou
+reunir no método B vários conceitos presentes nos demais métodos formais. Entre
+esses conceitos destacam-se as pré e pós condições\footnote{Pré e Pós condições
+são\ldots}, o desenvolvimento incremental através de
+refinamentos\footnote{Refinamento trata-se de um técnica de desenvolvimento de
+sistema\ldots} e a modularização da especificação. A seguir tem-se a explicação
+de como e feito o desenvolvimento de sistemas utilizando o método B.
 
 
 
@@ -901,61 +997,67 @@ sistemas utilizando o método B.
 
 \section{Etapas do desenvolvimento em B}
 
-O processo de desenvolvimento através do método B inicia-se com um módulo que
-define um modelo funcional de alto nível do sistema. Em B, esses módulos são
-denominados de Máquina Abstrata (\textit{MACHINE}). Nessa fase de modelagem
-técnicas semi-formais como UML podem ser utilizadas e em seguidas transformadas
-para a notação formal do método B. Após a criação dos módulos, eles são
-analisados estaticamente para verificar se a sua especificação é coerente e
-implementável.
+O processo de desenvolvimento através do método B inicia-se com a criação de um
+módulo que define, em alto nível, um modelo funcional do sistema. Em B, esses
+módulos são denominados de Máquina Abstrata (\textit{MACHINE}). Nessa fase de
+modelagem, técnicas semi-formais como UML podem ser utilizadas e em seguidas
+transformadas para a notação formal do método B. Após a criação dos módulos,
+esses são analisados estaticamente para verificar se são coerentes e
+implementáveis.
 
-Uma vez estabelecido um modelo abstrato inicial do sistema, o método B permite que
-seja construídos módulos mais concretos do sistema denominados refinamentos. Mais
-especificamente refinamentos tratam-se de uma decisão de projetos na qual partes da
-especificação abstrata do sistema devem ser especificadas em um nível mais
+Uma vez estabelecido o modelo abstrato inicial do sistema, o método B permite que
+sejam construídos módulos mais concretos do sistema, denominados refinamentos.
+Mais especificamente, refinamentos correspondem a uma decisão de projetos na qual
+partes da especificação abstrata do sistema devem ser modeladas em um nível mais
 concreto. Assim um refinamento deve necessariamente estar relacionado com o
-módulo mais abstrato ligeiramente anterior. E, como ocorre na criação da máquinas
-abstratas, um refinamento também e passível uma análise estática, na qual é
+módulo mais abstrato imediatamente anterior. Como ocorre na criação da máquinas
+abstratas, um refinamento também e passível de uma análise estática, na qual é
 verificada a relação entre refinamento com seu nível abstrato anterior.
 
 Devido a técnica de refinamentos, o desenvolvimento de sistemas utilizando o
 método B pode chegar a um nível de abstração semelhante aos das linguagens de
-programação. Para isso sucessíveis refinamentos devem ser desenvolvidos até a
-especificação chegar em um último nível de refinamento denominado implementação
-(\textit{IMPLEMENTATION}). Nesse nível a linguagem utilizada para a
-especificação, B0, trata-se de um formalismo algorítmico, capaz de ser
-sintetizados para linguagens de programação com C, Java e JavaCard.
+programação imperativas e sequenciais. Para isso sucessíveis refinamentos devem
+ser desenvolvidos até a especificação chegar em um último nível de refinamento
+denominado implementação (\textit{IMPLEMENTATION}). Nesse nível a linguagem
+utilizada, chamada B0, é um formalismo algorítmico, passível
+de ser sintetizado para linguagens de programação com C, Java e JavaCard.
 
 \begin{figure}[!h]
 \centering
 \includegraphics[scale=0.9]{../fig/desenvolvimento_b.jpg}
-\caption{Etapas de desenvolvimento de sistema através do método B}
+\caption{Etapas do desenvolvimento de sistema através do método B
+\cite{dantas08}}
 \label{fig:desenvolvimento_b}
 \end{figure}
 
 Assim o desenvolvimento de sistemas utilizando o método B é feito como demonstra
-a figura~\ref{fig:desenvolvimento_b}. Nela os requisitos do sistema são
-especificados inicialmente em um alto nível abstrato e após sucessivos
-refinamentos um nível concreto e algorítmico do sistema é alcançado. Em seguida é
-feita a síntese da especificação para o código de linguagem de programação, sendo
-possível a partir da especificação funcional inicial gerar teste para o sistema
-desenvolvido.
+a figura~\ref{fig:desenvolvimento_b}. Nela, os requisitos do sistema são
+inicialmente especificados em um alto nível de abstração e, após sucessivos
+refinamentos, um nível algorítmico do sistema é alcançado. Em seguida, essa
+especificação é sintetisada para um código de linguagem de programação, para o
+qual é possível, a partir da especificação funcional inicial, gerar teste para
+validar a sua correta transformação.
 
-Atualmente o desenvolvimento de sistemas utilizando o método B pode ser apoiado
-por diversas ferramentas que vão desde a análise estática da especificação até a
-geração de código em linguagens de programação. Fator que isentivou, o método B a
-ultrapassar o mundo acadêmica e passar a ser usado também industrialmente. 
+Atualmente, o desenvolvimento de sistemas utilizando o método B pode ser apoiado
+por diversas ferramentas com funcionalidades que vão da análise estática da
+especificação até a geração de código em linguagens de programação. Atualmente
+uma das mais famosas e completas ferramentas de apoio ao desenvolvimento de
+sistemas utilizando o método B é o AtelierB \cite{atelierb}. Nela é possível,
+além da análise sintática e estática da especificação, gerenciar-se projetos,
+controlando as dependências entre os vários módulo que geralmente constituem uma
+especificação. Devido a suas vastas funcionalidades e popularidade o AtelierB
+será adotado como ferramenta padrão desse trabalho.
 
-Um exemplo de sistemas desenvolvidos através da abordagem de B é o controle
-de porta do metrô de paris, desenvolvido pela Clearsy\cite{clearsy}, empresa
-especialista em sistemas críticos. Esse sistema impede que o trem saída da
-estação quando a porta inda estiver aberta, evitando assim possíveis acidentes 
+Um exemplo de sistemas desenvolvidos através da abordagem de B é o controle de
+porta do metrô de paris, desenvolvido pela Clearsy\cite{clearsy}, empresa
+especialista em sistemas críticos. Esse sistema impede que o trem saia da estação
+quando a porta do mesmo estiver aberta, evitando assim possíveis acidentes.
 
 \section{Máquina Abstrata}
 
-A base do método B está na notação de máquina abstrata(em inglês:
+A base do método B está na notação de máquina abstrata (em inglês:
 \textit{Abstract Machine Notation} - AMN) a qual disponibiliza um framework comum
-para a especificação e construção e verificação estática de sistemas. Em outra
+para a especificação, construção e verificação estática de sistemas. Em outra
 palavras, a AMN trata-se de uma linguagem de especificação de sistemas formada
 por módulos básicos de construção chamados de Máquina Abstrata ou simplesmente
 Máquina.
@@ -969,29 +1071,30 @@ excluir tarefas até o limite de 10 tarefas e possui as seguintes seções:
 
 
 \begin{description}
-\item[MACHINE] Nessa seção inicia-se
-o código da máquina abstrata. Ela identifica a natureza e o nome do módulo,
-seguido opcionalmente por um ou mais parâmetros separados por vírgula e
-limitados por parenteses
-\item[SETS] introduz um novo tipo de entidade, no exemplo é
-  $\mathit{TASK}$. Nesse momento, nenhum detalhe é fornecido quanto à
-  maneira como essa entidade será implementada.
-\item[VARIABLES] informa o nome das diferentes variáveis que compõem o estado.
-No exemplo, apenas há uma variável de estado: $\mathit{tasks}$.
-\item[INVARIANT] especifica o tipo das variáveis de estado assim
-  também como os estados válidos do sistema. Aqui, $\mathit{tasks}$ é
-  um conjunto de até 10 elementos do tipo $\mathit{TASK}$. A
-  caracterização lógica do conjunto dos estados válidos é uma das
-  atividades mais importantes da especificação.
+\item[MACHINE] é onde inicia-se o código da máquina abstrata. Nela identifica-se
+a natureza e o nome do módulo, seguido opcionalmente por um ou mais parâmetros
+de máquina, os quais são separados por vírgula e limitados por parenteses;
+\item[SETS] introduz um novo tipo de entidade, como é o caso de 
+  $\mathit{TASK}$ no exemplo em questão. Nesse momento, nenhum detalhe é
+  fornecido quanto à maneira como essa entidade será implementada;
+\item[VARIABLES] informa o nome das diferentes variáveis que compõem o estado
+da máquina. No exemplo da figura~\ref{fig:maquina_kernel}, há apenas uma
+variável de estado, $\mathit{tasks}$;
+\item[INVARIANT] especifica o tipo das variáveis de estado
+  e os estados válidos do sistema. No exemplo em questão a
+  variável $\mathit{tasks}$ é um conjunto de até 10 elementos do tipo
+  $\mathit{TASK}$. A caracterização lógica do conjunto dos estados válidos é
+  uma das atividades mais importantes da especificação;
 \item[INITIALISATION] identifica quais são os possíveis estados
-  iniciais do sistema. No caso, $\mathit{tasks}$ é o conjunto vazio.
+  iniciais do sistema. No caso da figura~\ref{fig:maquina_kernel} ,
+  $\mathit{tasks}$ inicializado como um o conjunto vazio; e
 \item[OPERATIONS] determina os diferentes tipo de eventos que o
   sistema pode sofrer. No nosso exemplo, temos operações para
   adicionar e eliminar um elemento de $\mathit{tasks}$. Uma operação
   pode ter parâmetros, resultados e pode alterar o valor de variáveis
   de estado. Um ponto importante encontrados nas operações são as pré-condições,
   a quais são condições que devem ser satisfeitas para que a operação seja
-  realizada
+  realizada.
 \end{description}  
 \begin{figure}[!ht]
 \begin{small}
@@ -1048,25 +1151,25 @@ $$
 \label{fig:maquina_kernel}
 \end{figure}
 
-Para uma melhor compreensão a especificação de sistemas através das maquinas
+Para uma melhor compreensão, a especificação de sistemas através das maquinas
 abstratas será resumidamente dividida em duas partes principais. Na primeira
-parte serão colocadas informação a respeito dos estados da máquina, suas variáveis e
-restrições. Na segunda parte, será especificado o comportamento da máquina, ou
-seja a sua parte dinâmica com a inicialização e operações. Essas duas partes
-serão melhores discutidas a seguir.
+parte, serão colocadas informação a respeito dos estados da máquina, suas
+variáveis e restrições. Na segunda parte, será especificado o comportamento da
+máquina, ou seja, a sua parte dinâmica como a inicialização e as operações.
+Essas duas partes serão melhor discutidas a seguir.
 
 \subsection{Especificação do estado da máquina}
 
-Na parte do estado de uma máquina são colocados os estado que a máquina pode
-assumir.Este é definido através de suas variáveis e do seu invariante. Nas
-variável são colocados os nomes dos estados das máquinas e no invariantes suas
-restrições, sendo que uma especificação só pode garantir o correto funcionamento
-da máquina quando esta encontra-se em um estado válido, nada podendo afirmar para
-os demias estados.
+Na parte do estado de uma máquina são definidos os estado que a máquina pode
+assumir. Estes são definidos através de suas variáveis e dos seu invariante. As
+variáveis são os diferentes elementos que compõem o estado do sistema. O
+invariante define os valores que essas variáveis podem assumir. Assim uma
+especificação só pode garantir o correto funcionamento da máquina quando esta
+encontra-se em um estado válido, nada podendo afirmar para os demais estados.
 
-O estado de uma máquina é especifica, por meio de calculo de predicados, da
-teoria do conjunto e relações entre conjuntos, permitindo com isso a análise
-estática da máquina através de lógica matemática.No exemplo da
+O estado de uma máquina é especifico, por meio de calculo de predicados, da
+teoria do conjunto e relações entre conjuntos, permitindo com isso uma análise
+estática da máquina através da lógica matemática. No exemplo da
 figura~\ref{fig:maquina_kernel} o estado da máquina \textit{kernel} foi
 especificado como sendo a variável $\mathit{tasks}$ e seu predicados
 $\mathit{tasks} \in \pow(\mathit{TASK})$ e $ \card(\mathit{tasks})\leq 10$, os
@@ -1077,29 +1180,29 @@ que o tamanho máximo permitido para o conjunto é de dez elementos.
 
 Nas operações da máquina é especificado o comportamento dinâmico do sistema. É
 através das operações que o estado da máquina é alterado, respeitando sempre as
-suas restrições. Mais especificamente as condições declaradas no invariante dá
-máquina deve ser sempre satisfeita no final da operação, levando assim a
-máquina a um estado válido.
+suas restrições. Mais especificamente, as condições declaradas no invariante da
+máquina devem ser sempre satisfeita ao final da operação, levando assim a máquina
+a um estado válido.
 
-O cabeçalho de uma operação é composto por um nome, uma lista de parâmetro de
-entra e uma lista de parâmetro de saída \footnote{A notação de máquina abstrata
-permite que uma operação retorne mais de um parâmetro}, sendo que os parâmetro de
-entrada e os parâmetros de saída são argumentos opcionais. Assim o exemplo de um
-operação com parâmetros de entrada e saída pode ser visto na
+O cabeçalho de uma operação é composto por um nome, uma lista de parâmetros de
+entra e uma lista de parâmetros de saída \footnote{A notação de máquina abstrata
+permite que uma operação retorne mais de um parâmetro.}, sendo que os parâmetro
+de entrada e os parâmetros de saída são argumentos opcionais. Assim o exemplo de
+uma operação com parâmetros de entrada e saída pode ser visto na
 figura~\ref{fig:query_task}, na qual o nome da operação é $\mathit{query\_task}$,
-o parâmetro de entrada é $\mathit{task}$ e o parâmetro de saída é
-$\mathit{belong}$.
+o parâmetro de entrada é $\mathit{task}$ e o parâmetro de saída é $\mathit{ans}$.
 
 A operação propriamente dita é formada por pré-condição e corpo da operação. Na
 pré-condição, são colocadas as informações sobre todos os parâmetros de entrada e
-as condições que devem ser satisfeitas para que a operações seja executada. Com
+as condições que devem ser satisfeitas para que a operação seja executada. Com
 isso, a pré condição funciona como uma premissa que deve ser suprida para que a
 operação funcione corretamente.
 
 Por exemplo, na figura~\ref{fig:maquina_kernel} para que a operação
-$\mathit(add_task)$ funcione corretamente e não leve a máquina para um estado
-inválido as pré-condições $\mathit{task}\in \mathit{TASK}$, $\mathit{task}\not\in
-\mathit{tasks}$ e $\card(\mathit{tasks})<10$ devem ser obedecidas.
+$\mathit(add\_task)$ funcione corretamente e não leve a máquina para um estado
+inválido, as pré-condições $\mathit{task}\in \mathit{TASK}$,
+$\mathit{task}\not\in \mathit{tasks}$ e $\card(\mathit{tasks})<10$ devem ser
+obedecidas.
 
 \begin{figure}[!ht]
 \begin{small}
@@ -1123,88 +1226,95 @@ $\mathit{Kernel}$}
 \label{fig:query_task}
 \end{figure}
 
-No corpo da operação é especificado o seu comportamento. Nele os parâmetros saída
-devem ser obrigatoriamente valorados e os estados da máquina são alterados ou
-consultados. Assim, para realizar as atualizações de estadas e definições de
-parâmetros de saída de modo formal, a notação de máquina abstrata possui um
-conjunto de atribuições abstratas, denominadas substituições, que possuem regras
-de como tal atribuições é realizada, permitindo assim uma analise estática da
-operações em relação a consistência da máquina. A seguir são demonstradas
-algumas das principais substituições da AMN.
+No corpo da operação é especificado o seu comportamento. Nele os parâmetros de
+saída devem ser obrigatoriamente valorados e os estados da máquina podem ser
+alterados ou consultados. Assim, para realizar as atualizações de estado e
+definições de parâmetros de saída de modo formal, a notação de máquina abstrata
+possuí um conjunto de atribuições abstratas, denominadas substituições as quais
+serão declaradas explicadas a seguir.
 
+Formalmente uma substituição é um transformador de predicados (ou de formulas).
+Assim se $\mathit{P}$ for um predicado, $[\mathit{S}]\mathit{P}$ é um
+predicado resultado da aplicação da substituição de $\mathit{S}$ a $\mathit{P}$.
+A seguir são demonstrados algumas das princiais substituições da AMN e como são
+transformados os predicados utilizados por elas.
 
 \subsubsection{Substituição Simples}
 
 A substituição simples é definida da seguinte forma: $$\mathit{x}:= \mathit{E}$$
-Nela $\mathit{x}$ trata-se da variável da máquina ou parâmetro de saída, para o
+Nela $\mathit{x}$ é uma variável de máquina ou parâmetro de saída, para o
 qual será atribuído o valor da expressão $\mathit{E}$. Mais precisamente uma
 substituição é interpreta da seguinte maneira:
 
-$$[\mathit{x}:=\mathit{E}]\mathit{P}$$ 
+$$[\mathit{x}:=\mathit{E}]\mathit{P} \Rightarrow \mathit{P}(\mathit{x}\setminus
+\mathit{E})$$
 
-Assim tem-se que o predicado $\mathit{P}$ deve ser mantido quando a variável
-$\mathit{x}$ for substituída por $\mathit{E}$. Por exemplo na operação
-$\mathit{add_task}$ a substituição $\mathit{tasks}:=\mathit{tasks}\cup
-\{\mathit{task}\}$ pode ser vista como $[\mathit{tasks}:=\mathit{tasks}\cup
-\{\mathit{task}\}] \card(\mathit{tasks})<10$, Na qual $\card(\mathit{tasks})<10$
-é o predicado, no caso o invariante da máquina, que deve ser obedecido quando a
-substituição for realizada, ficando ao final $\mathit{tasks}\cup
-\{\mathit{task}\}<10$.
+Assim tem-se que no predicado $\mathit{P}$ a variável
+$\mathit{x}$ deve ser substituída por $\mathit{E}$. 
+
+%Por exemplo na operação
+%$\mathit{add\_task}$ a substituição $\mathit{tasks}:=\mathit{tasks}\cup
+%\{\mathit{task}\}$ pode ser vista como $[\mathit{tasks}:=\mathit{tasks}\cup
+%\{\mathit{task}\}] \card(\mathit{tasks})<10$, Na qual
+%$\card(\mathit{tasks})<10$ é o predicado, no caso o invariante da máquina, que
+%deve ser obedecido quando a substituição for realizada, ficando ao final
+%$\mathit{tasks}\cup \{\mathit{task}\}<10$.
 
 \subsubsection{Substituição Múltipla}
 
-A substituição múltipla trata-se de uma generalização da substituição simples. Ela
-permite que várias variáveis seja atribuídas simultaneamente. Assim uma
+A substituição múltipla é uma generalização da substituição simples. Ela
+permite que várias variáveis sejam atribuídas simultaneamente. Assim uma
 substituição múltipla utilizando duas variável tem a seguinte forma:
 
-$$\mathit{x},\mathit{y}:=\mathit{E},\mathit{F}$$ 
+$$\mathit{x},\mathit{y}:=\mathit{E},\mathit{F} $$
 
-Na definição acima as variáveis $\mathit{x}$ e $\mathit{y}$ são atribuído os
+Na definição acima às variáveis $\mathit{x}$ e $\mathit{y}$ são atribuídos os
 valores das expressões $\mathit{E}$ e $\mathit{F}$, respectivamente. Assim da
 mesma forma que a substituição simples, a múltipla substituição é definida da
-seguinte maneira: $$[\mathit{x}:=\mathit{E},\mathit{y}:=\mathit{F}]\mathit{P}$$
-Na qual $\mathit{P}$ é o predicado que deve ser verdadeiro quando suas variáveis
-$\mathit{x}$ e $\mathit{y}$ forem substituídas por $\mathit{E}$ e $\mathit{F}$,
-respectivamente. Por exemplo, uma máquina que possui o predicado
-$\mathit{x}<\mathit{y}$ e possui a seguinte substituição $\mathit{x},\mathit{y}
-:=\mathit{x}+10,\mathit{y}+5$ é reduzida a seguinte forma $[\mathit{x},\mathit{y}
-:=x+10,y+5]\mathit{x}<\mathit{y}$, o que resulta em $\mathit{x}+10<\mathit{y}+5$
+seguinte maneira: 
+
+$$[\mathit{x}:=\mathit{E},\mathit{y}:=\mathit{F}] \mathit{P} \Rightarrow
+\mathit{P}[\mathit{E},\mathit{F} \setminus \mathit{x},\mathit{y}]$$ Na qual no
+predicado $\mathit{P}$ as variáveis $\mathit{x}$ e $\mathit{y}$ são substituidos
+por $\mathit{E}$ e $\mathit{F}$, respectivamente. Por exemplo,
+$\mathit{x},\mathit{y} :=\mathit{y}+5 , \mathit{x}+10$ resulta em
+$\mathit{y}+5<\mathit{x}+10$.
 
 \subsubsection{Substituição Condicional}
 
-As substituições simples e múltiplas permitem somente uma opção de especificação
-onde uma atribuições é sempre feitas de maneira uniforme sem opções e sem levar
+As substituições simples e múltipla permitem somente uma opção de especificação
+onde uma atribuiçõe é sempre feita de maneira uniforme, sem opções e sem levar em
 consideração os estados iniciais da operação. Entretanto, as linguagens de
 programação convencionais disponibilizam um tipo condicional de atribuição na
-qual é permitido caminhos diferente de acordo com expressões lógicas que utilizam
-o valores iniciais das variáveis do sistema. Esse tipo de atribuição é
-feita através da formação $\IF$ $\THEN$ $\ELSE$.
+qual é permitido caminhos diferentes de acordo com expressões lógicas que
+utilizam os valores iniciais das variáveis do sistema e os parâmetros passados.
 
 Como nas linguagens de programação, a notação de máquina abstrata também permite
 a construção de atribuições condicionais, as quais são feitas através da
 substituição condicional. Com isso, uma substituição condicional funciona da
-mesma forma que nas linguagens de programação, não qual uma expressão lógica é
-avaliada para saber qual caminha a estrutura deve seguir, e qual atribuição deve
-ser realizada. A forma como é especificada uma substituição condicional na ANM
-pode ser visto a seguir:
+mesma forma que nas linguagens de programação. Nela uma expressão lógica é
+avaliada para saber qual caminho a estrutura deve seguir, e qual atribuições
+devem ser realizada. A forma como é especificada uma substituição condicional
+na ANM pode ser visto a seguir:
 
-$$\IF \quad \mathit{E}\quad \THEN\quad \mathit{S}\quad \ELSE\quad \mathit{T}$$
+$$\IF \quad \mathit{E}\quad \THEN\quad \mathit{S}\quad \ELSE\quad \mathit{T}
+\END$$
 
-Na especificação acima $\mathit{S}$ e $\mathit{T}$ são substituições de qualquer
-tipo e tem as suas execuções condicionadas pela expressão lógica $\mathit{E}$,
-na qual pode conter variáveis da máquina como também os parâmetros de entrada da
-operação. Com isso, caso $\mathit{E}$ seja afirmativo a substituição $\mathit{S}$
-é realizada e caso ele seja negativo a substituição $\mathit{T}$ é executada.
-Assim uma substituição condicional pode ser interpretada da seguinte forma:
+Na especificação acima $\mathit{S}$ e $\mathit{T}$ são substituições quaisquer.
+Elas tem as suas aplicações condicionadas pela expressão lógica $\mathit{E}$, que
+pode conter variáveis da máquina e parâmetros de entrada. Com isso, caso
+$\mathit{E}$ seja afirmativo a substituição $\mathit{S}$ é realizada e, caso ele
+seja, negativo a substituição $\mathit{T}$ é executada. Assim uma substituição
+condicional pode ser interpretada da seguinte forma:
 
 $$[\IF \quad \mathit{E} \quad \THEN \quad \mathit{S} \quad \ELSE
 \quad \mathit{T}] \mathit{P} \quad = \quad (\mathit{E} \Longrightarrow
 [\mathit{S}] P )\land (\neg\mathit{E} \Longrightarrow [\mathit{T}]
 \mathit{P})$$.
 
-Nessa interpretação se é for verdadeiro a substituição $\mathit{S}$ deve
-satisfazer o predicado $\mathit{P}$. E caso o valor de $\mathit{E}$ seja negativo
-a substituição $\mathit{T}$ deve satisfazer o predicado $\mathit{P}$.
+Nessa interpretação se $\mathit{E}$ for verdadeiro a substituição $\mathit{S}$
+é aplicada ao predicado $\mathit{P}$. Caso contrário, a substituição
+$\mathit{T}$ é aplicada ao predicado $\mathit{P}$.
 
 Um exemplo simples da utilização dessa substituição pode ser visto na
 figura~\ref{fig:query_task}. Nela a expressão $\mathit{task} \in \mathit{TASK}$ é
@@ -1217,21 +1327,21 @@ executada. Caso a o resultado da expressão seja afirmativo $\mathit{ans} :=
 
 As substituições vistas até agora seguem uma metodologia determinística, ou seja,
 são substituições que possuem um comportamento previsível, que levam a apenas um
-resultado final é pré-determinado. Entretanto, as máquinas abstratas em B são
-utilizadas para fazer especificações iniciais de sistemas ou componentes e,
-maioria das vezes, no início de uma especificação o comportamento do sistema não
+resultado final e pré-determinado. Entretanto, as máquinas abstratas em B são
+utilizadas para fazer especificações iniciais de sistemas ou componentes e, na
+maioria das vezes, no início de uma especificação, o comportamento do sistema não
 é totalmente conhecido. Assim, para especificar o indeterminismo inicial de um
-sistema a notação de máquina abstrata disponibiliza um tipo
-especial de substituições determinadas como substituições não determinísticas.
+sistema a notação de máquina abstrata disponibiliza um tipo especial de
+substituições determinadas como substituições não determinísticas.
 
-As substituições não determinísticas são substituições que introduzem escolhas
-aleatórias no corpo das operações, levando a mesma não mais para um estado final
-previsível e sim para um conjunto de estados finais diferentes para cada execução
-da operação. Assim em uma substituição não determinística a especificação define
-apenas o conjunto sobre o qual deve ser feita a escolha abstraindo assim
-informações de como tal escolha deve ser realizada. Em outras palavras, em uma
-substituição não determinística existem o conjunto de estado finais possíveis que
-podem ser alcançados a cada execução da substituição.
+Substituições não determinísticas são substituições que introduzem escolhas
+aleatórias no corpo das operações, levando a operação a um conjunto de estados
+finais diferentes a cada execução da operação. Assim em uma substituição não
+determinística a especificação define apenas o conjunto sobre o qual deve ser
+feita a escolha, abstraindo assim informações de como tal escolha deve ser
+realizada. Em outras palavras, em uma substituição não determinística existe um
+conjunto de estado finais possíveis que podem ser alcançados a cada execução da
+substituição.
 
 Uma substituição não determinística definida na AMN é a substituição $\ANY$.
 Essa substituição possui o seguinte formato:
@@ -1242,24 +1352,24 @@ Através da definição acima percebe-se que a substituição $\ANY$ é formada por
 três elementos:
 
 \begin{description}
-\item[$\mathit{x}$]trata-se de uma lista de variável que será utilizada no
-corpo da substituição e para as quais serão escolhidos valores abstratos
-delimitados pelo o predicado $\mathit{Q}$.
-\item[$\mathit{Q}$] são predicados que delimitam o conjunto de opções para as
+\item[$\mathit{x}$] é uma lista de variáveis que serão utilizadas no
+corpo da substituição. Para essa variáveis serão atribuidos
+valores abstratos delimitados pelo o predicado $\mathit{Q}$;
+\item[$\mathit{Q}$] são os predicados que delimitam o conjunto de opções para as
 variáveis $\mathit{x}$. Nessa parte as variáveis $\mathit{x}$ devem
-obrigatoriamente serem tipificadas.
-\item[$\mathit{T}$] é denominado corpo da substituição. Nele são colocados
-atribuições que utilizam-se das variáveis $\mathit{x}$ para atualizar estados
-ou atribuir valores para os parâmetros de saída de uma operação
+obrigatoriamente serem tipificadas; e
+\item[$\mathit{T}$] é uma substituição que utilizam-se das variáveis
+$\mathit{x}$ para atualizar estados ou atribuir valores para os parâmetros de
+saída da operação.
 \end{description}
 
 Um exemplo da substituição $\ANY$ pode ser visto na operação da
 figura~\ref{fig:random_create}. Nela uma tarefa é aleatoriamente adicionada na
-máquina $\mathit{Kernel}$. Primeiramente a variável $\mathit{task}$ é criada para
-armazenar um valor aleatório. Em seguida, o tipo e a restrição sobre
+máquina $\mathit{Kernel}$. Para isso, primeiramente a variável $\mathit{task}$ é
+criada para armazenar um valor aleatório. Em seguida, o tipo e a restrição sobre
 $\mathit{task}$ é definida, conjunto da escolha aleatória. Por último, a variável
 $\mathit{task}$ é adicionada ao conjunto $\mathit{tasks}$. Assim um comportamento
-não determinístico é atribuído a operação, pois para cada execução da operação a
+não determinístico é atribuído à operação, pois para cada execução da operação a
 variável $\mathit{task}$ pode assumir um valor aleatório.
  
 
@@ -1278,7 +1388,7 @@ $$
 \quad\quad \mathit{task}\in \mathit{TASK} \land\\
 \quad\quad \mathit{task} \not\in \mathit{tasks}\\
 \quad \THEN\\
-\quad\quad \mathit{tasks}:=\mathit(tasks)\cap \mathit{task}\\
+\quad\quad \mathit{tasks}:=\{\mathit{tasks}\}\cap \mathit{task}\\
 \quad \END\\
 
 
@@ -1294,42 +1404,44 @@ $\mathit{Kernel}$}
 
 Uma definição para a substituição $\ANY$ seria: 
 
-$$\forall \mathit{x}.(\mathit{Q} \Rightarrow [\mathit{T}]\mathit{P})$$ 
+$$\ANY\quad\mathit{x}\quad\WHERE
+\quad\mathit{Q}\quad\THEN\quad\mathit{T}\quad\END \Rightarrow \forall
+\mathit{x}.(\mathit{Q} \Rightarrow [\mathit{T}]\mathit{P})$$
 
 Indicando que para todo valor que for escolhido para o conjunto de variável
-$\mathit{x}$ as substituições $\mathit{T}$ devem garantir o predicado
-$\mathit{P}$.
+$\mathit{x}$ que satisfaça $\mathit{Q}$ as substituições $\mathit{T}$ devem
+aplicadas ao predicado $\mathit{P}$.
 
 \section{Obrigação de Prova}
 
-Após a criação de uma máquina abstrata utilizando o método B ela deve ser
+Após a criação de uma máquina abstrata utilizando o método B, essa deve ser
 avaliada estaticamente para saber se a mesma é coerente e passível de
 implementação. Para realizar tal avaliação o método B dispõe de um conjunto de
-obrigações de prova, expressões lógica, geradas a partir de uma especificação em
-B.
+obrigações de prova que são expressões lógica geradas a partir de uma
+especificação em B.
 
-Resumidamente, a análise estática de uma máquina abstrata, através das
-obrigações de prova, avalia primeiramente se a máquina possui estados válidos, ou
-seja, se pelo menos uma combinação de estados é alcançada pela máquina. Caso a
-máquina possua estados válidos, é avaliada se estes são alcançados ao final de
-cada operações e na inicialização da máquina. Com isso as principais obrigações
-de prova gerada em uma máquina abstrata são: Consistência do invariante,
-Obrigação de prova da inicialização e Obrigação de prova das operações. A seguir
-tem-se em maior detalhe cada uma dessa obrigações de prova e como elas são
-geradas.
+Resumidamente, a análise estática de uma máquina abstrata, através das obrigações
+de prova, avalia primeiramente se a máquina possui estados válidos, ou seja, se
+pelo menos uma combinação do estados é alcançada pela máquina. Caso a máquina
+possua estados válidos, é avaliado se estes são alcançados ao final de cada
+operações e na inicialização da máquina. Com isso, as principais obrigações de
+prova gerada em uma máquina abstrata são: Consistência do invariante, Obrigação
+de prova da inicialização e Obrigação de prova das operações. A seguir tem-se em
+maior detalhes cada uma dessas obrigações de prova e como elas são geradas.
 
 \subsection{Consistência do Invariante}
 
 Nessa obrigação de prova é analisado se o invariante da máquina possui pelo menos
-uma combinação em que todos os estados são válidos, ou seja, possui pelo menos um
-estado válido. Assim essa obrigação de prova é definida da seguinte maneira :
+uma combinação na qual todas variáveis tem valores válidos, ou seja, a máquina
+possui pelo menos um estado válido. Assim essa obrigação de prova é definida da
+seguinte maneira :
  
 $$\exists\mathit{v}.\mathit{I}$$
 
 Onde $\mathit{v}$ indica o vetor de todos as variáveis da máquina e $\mathit{I}$
-representa o Invariante da máquina. Com isso, a definição acima pode ser
-entendida como: Deve existir pelo menos um valor para o vetor de variáveis
-$\mathit{v}$ que satisfaça o invariante $\mathit{I}$
+representa o invariante da máquina. Com isso, a definição acima pode ser
+entendida como: deve existir pelo menos um valor para o vetor de variáveis
+$\mathit{v}$ que satisfaça o invariante $\mathit{I}$.
 
 Um exemplo da aplicação desse obrigação de prova na máquina da
 figura~\ref{fig:maquina_kernel} seria: 
@@ -1337,15 +1449,16 @@ figura~\ref{fig:maquina_kernel} seria:
 $$\exists\mathit{tasks}.(\mathit{tasks} \in \mathit{TASK} \cap
 \card(\mathit{tasks})\leq 10)$$
 
-O que pode ser provador como verdadeiro para $\mathit{tasks} = \emptyset $
+O que pode ser provado como verdadeiro para $\mathit{tasks} = \emptyset $.
 
 
 \subsection{Obrigação de prova da inicialização}
 
-Outra obrigação de prova necessária para uma máquina abstrata é saber se seu
-estado inicial satisfaz o invariante. Isso significa, verificar se o estado
-inicial da máquina é um estado válido. Assim, essa obrigação de prova é definida
-da seguinte maneira : 
+Outra obrigação de prova necessária na analise estática da máquina abstrata é a
+obrigação de prova da inicialização. Nela analisa-se se os estados iniciais da
+máquina satisfazem seu invariante. Isso significa, verificar se o estados
+iniciais da máquina são estado válido. Assim, essa obrigação de prova é definida
+da seguinte maneira :
 
 $$[\mathit{T}]\mathit{I}$$
 
@@ -1358,13 +1471,14 @@ $$[\mathit{task}:= \emptyset] (\mathit{tasks} \in \mathit{TASK} \cap
 \card(\mathit{tasks})\leq 10) \quad \Rightarrow\quad \emptyset \in \mathit{TASK}
 \cap \card(\emptyset)\leq 10$$
 
-O que pode ser facilmente deduzido como uma verdade.
+O que pode ser facilmente provado como válido.
 
 \subsection{Obrigação de prova das Operações}
 
 Na obrigação de prova das operações deve ser analisado se, quando satisfeita a
-sua pré-condição, a execução da operação levará a máquina a um estado válido.
-Assim a definição dessa obrigação de prova pode ser vista da seguinte maneira:
+sua pré-condição, a execução da operação, apartir de um estado válido, levará a
+máquina a um estado válido. Assim a definição dessa obrigação de prova pode ser
+vista da seguinte maneira:
 
 $$\mathit{I} \land \mathit{P} \Rightarrow [\mathit{S}]I$$
 
@@ -1374,12 +1488,11 @@ substituições realizadas no corpo da operação. Assim, uma explicação mais precis
 dessa definição seria: quando a máquina estiver em um estado válido e a
 pré-condição da operação for satisfeita, a execução da operação deve manter a
 máquina em um estado válido. Nota-se assim que esta obrigação de prova não
-torna-se necessária as operações que não alteram o estado da máquina, chamada de
-operações de consulta, como a da figura~\ref{fig:query_task} onde apenas o
-valor da parâmetro de retorno é alterado, pois nelas nenhum estado da máquina
-é alterado.
+é necessária nas operações que não alteram o estado da máquina, chamadas de
+operações de consulta, como a da figura~\ref{fig:query_task}. Pois nessas
+operações apenas o valor do parâmetro de retorno é alterado.
 
-Um exemplo de uma obrigação de prova da operação $\mathit{add_task}$ da máquina
+Um exemplo de uma obrigação de prova da operação $\mathit{add\_task}$ da máquina
 da figura~\ref{fig:task_states} pode ser visto a seguir:
 
 $$
@@ -1398,11 +1511,11 @@ $$
 
 \section{Refinamento}
 
-A linguagem abstrata demonstratada até agora é usada principalmente para criar
+A linguagem abstrata demonstrada até agora é usada principalmente para criar
 uma modelagem funcional de sistemas e componentes. Nela o principal objetivo é
 descrever o comportamento do sistema sem se preocupar com detalhes de como tal
 comportamento será implementado ou de como os dados serão manipuladas pelo
-computador. Entretanto, para realizar uma modelagem mais concrete e passível de
+computador. Entretanto, para realizar uma modelagem mais concreta e passível de
 implementação é necessário que notações matemáticas abstratas utilizadas na
 modelagem do sistema, como conjuntos e substituições não determinística, sejam
 descritas de forma mais concreta.
@@ -1410,52 +1523,52 @@ descritas de forma mais concreta.
 Através da técnica de refinamento o método B possibilita um desenvolvimento
 gradativo do sistema. Nele um sistema é especificado em estágios que vão da
 modelagem abstrata até um nível algoritmo denominada de implementação. Entre esse
-níveis de abstração existem um modelos intermediário chamados de refinamentos,
+níveis de abstração existem modelos intermediário chamados de refinamentos,
 que combina especificações de construção e detalhes de implementação.
 
 Mais precisamente, refinamentos são decisões de projeto nas quais estruturas
 abstratas são detalhadas em um nível mais concreto. Com isso, um refinamento deve
-obrigatoriamente está ligado a um modelo abstrato anterior e possui um
+obrigatoriamente estar ligado a um modelo abstrato anterior e possuir seu
 comportamento delimitado pelo o modelo a qual está relacionado. Para garantir
-que essa relação entre módulo seja feita de forma coerente existem mecanismo de
+que essa relação entre módulo seja feita de forma coerente, existem mecanismo de
 análise estática denominados obrigações de prova do refinamento, o qual será
 detalhado na seção~\ref{subsec:obrigacao_de_prova_refinamento}.
 
 A construção de um refinamento é muito parecida com a construção de uma máquina
 abstrata. Ele, assim como a máquina abstrata, é dividido em seções onde são
-especificadas as informações do sistema, possuindo basicamente as mesma seção de
-uma máquina abstrata. A diferença de um refinamento para os demais módulos está
-na seção $\REFINEMENT$ e $\REFINES$ na seção, onde são colocados respectivamente
-o nome do refinamento e o módulo que será refinado. 
+especificadas as informações do sistema. Um refinamento possuindo basicamente as
+mesma seção de uma máquina abstrata, a diferença está na seção,  $\REFINEMENT$ e
+$\REFINES$, onde são colocados respectivamente o nome do refinamento e o módulo
+que será refinado.
 
- Como ocorreu na seção da máquina abstrata \ref{s}, para uma melhor entendimento
- e analogia à construção de uma máquina abstrata, a especificação de um
- refinamento basicamente em duas parte principais especificação do refinamento
- dos estados e especificação do refinamento das operações. Em seguida tem-se
- o delineamento dessas duas partes principais.
+ Como ocorreu na seção da máquina abstrata \ref{s}, para um melhor entendimento,
+ a especificação de um refinamento será dividida basicamente em duas parte
+ principais: refinamento do estado da máquina abstrata e refinamento das
+ operações da máquina abstrata. Em seguida tem-se o delineamento dessas duas
+ partes principais.
 
 \subsection{Refinamento do Estado}
 
 No refinamento de dados, como é reconhecido o refinamento do estado, tem-se o
 objetivo de especificar o estado de uma máquina em uma forma mais concreta, ou
-seja mais próxima a utilizada pelo computador. Para isso estruturas abstratas
+seja, mais próxima à utilizada pelo computador. Para isso, estruturas abstratas
 como conjuntos e relações são substituídas por mecanismo mais implementáveis
 como vetores e sequências.
 
 Como foi dito anteriormente, um refinamento necessita estar relacionado com um
 nível abstrato ligeiramente acima dele. No refinamento de dados essa relação é
-feita através de um mecanismo denominado \textit{relação de refinamento}.
-Assim, a \textit{relação de refinamento} nada mais é do que conjunções lógicas
-que ligam o estado do refinamento ao estado do módulo refinado por ele.
+feita através de um mecanismo denominado \textit{relação de refinamento}. Assim,
+a \textit{relação de refinamento} nada mais é do que conjunções lógicas que ligam
+o estado do refinamento ao estado do módulo refinado por ele.
 
 Um exemplo de refinamento de dados pode ser visto na
 figura~\ref{fig:refinamento_kernelR}. Nela é feito o refinamento da máquina
-$\mathit{Kernel}$ (figura~\ref{fig:maquina_kernel}), qual possui o estado
-$\mathit{task}$ especificado como sendo um conjunto de tarefa. Entretanto, conjunto
-são representações abstrata de dados. Assim no refinamento $\mathit{KernelR}$ o
-estado $\mathit{task}$ é refinado por $\mathit{taskR}$, que trata-se de um
+$\mathit{Kernel}$ (figura~\ref{fig:maquina_kernel}),a qual possui o estado
+$\mathit{task}$ especificado como sendo um conjunto de tarefas. Entretanto,
+conjuntos são representações abstratas de dados. Assim no refinamento
+$\mathit{KernelR}$ o estado $\mathit{task}$ é refinado por $\mathit{taskR}$, uma
 sequência de tarefas, estrutura mais concreta que um conjunto. A relação de
-refinamento entre os dois estado é feita através da igualdade
+refinamento entre os dois estados é feita através da igualdade
 $\mathbf{ran}(\mathit{tasks\_r})=\mathit{tasks}$.
 
 
@@ -1510,60 +1623,68 @@ $$
 
 Após feito o refinamento do estado da máquina é necessário agora especificar o
 refinamento das suas operações. O refinamento das operações de uma máquina deve
-garantir que está possua os mesmo comportamentos que suas operações abstratas,
-podem até fazer menos ações que as operações refinadas, sendo proibido apenas as
-ações adicionais.
+garantir que está possua os mesmo comportamentos que suas operações abstratas.
 
-As operações de um refinamento devem possuir a mesma assinaturas das operações do
-módulo relacionado à ele, mesmo nomes e parâmetros de entrada e saída.
-Entretanto, nas operações de um refinamento não é necessário a declaração da pré
-condição ($\PRE$), uma vez que essa foi definida em um nível mais abstrato e são
-suficientes para garantir que o tipo do parâmetro de entrada permaneça o mesmo e
-que o invariante da máquina seja mantido quando a operação for executada.
+As operações de um refinamento devem possuir a mesma assinatura das operações do
+módulo relacionado à ele, ou seja, ter os mesmo nomes e parâmetros de entrada e
+saída. Entretanto, nas operações de um refinamento não é necessário a declaração
+da pré condição ($\PRE$), uma vez que essa foi definida em um nível mais abstrato
+e é suficiente para garantir que o tipo do parâmetro de entrada permaneça o
+mesmo.
 
 Um exemplo do refinamento de uma operação pode ser visto na operação
 $\mathit{add\_task}$ do refinamento $\mathit{KernelR}$
-(figura~\ref{fig:refinamento_kernelR}). Nela percebe-se a ausência da pré
-condição e que a assinatura da operação permanece a mesma. A parte alterada foi
-apenas o corpo da operação que foi adaptada para trabalhar com o estado
+(figura~\ref{fig:refinamento_kernelR}). Nela percebe-se a ausência da
+pré-condição e que a assinatura da operação permanece a mesma. A parte alterada
+foi apenas o corpo da operação que foi adaptada para trabalhar com o estado
 $\mathit{taskR}$.
 
 
 \subsection{Obrigação de Prova do refinamento}
 \label{subsec:obrigacao_de_prova_refinamento}
-A analise estática para saber se um refinamento e consistente com o nível
+A analise estática para saber se um refinamento é consistente com o nível
 abstrato acima dele é feita através de obrigações de prova e pode ser dividida em
 duas partes, obrigação de prova da inicialização e obrigação de prova das
 operações. Entretanto, na obrigação de prova das operações são possíveis dois
-tratamento diferentes, obrigações de prova para as operações sem parâmetro de
-retorno e a obrigação de prova para as operações com parâmetro de retorno. A
+tratamentos diferentes, obrigações de prova para as operações sem parâmetros de
+retorno e a obrigação de prova para as operações com parâmetros de retorno. A
 seguir é demonstrada como é realizada cadas umas dessas obrigações de prova.
 
 \subsubsection{Obrigação de Prova da Inicialização}
 
-Em um refinamento, a ligação entre os estados da máquina abstrata e o refinamento
-é feito através da \textit{relação de refinamento} a qual será denominada de
-$\mathit{J}$. Assim necessariamente a inicialização da máquina abstrata deve
-possuir algum estado que satisfaça essa ligação, ou, melhor dizendo, $\mathit{J}$
-deve possuir algum estado especificado pela inicialização de máquina abstrata,
-denominada $\mathit{T}$. Isso gera a seguinte asserção:
+Em geral a inicialiazação da máquina abstrata $\mathit{T}$ e a inicialização do
+refinamento $\mathit{T1}$ possuem um conjunto de execuções possíveis que levam a
+um conjunto de diferentes estados. Assim em um refinamento é necessário que cada
+execução de $\mathit{T1}$ possua uma execução correspondente em $\mathit{T}$. Em
+outras palavras, todo estado encontrado em $\mathit{T1}$ deve possuir, via
+\textit{relação de refinamento} $\mathit{J}$, um estado gerado por $\mathit{T}$.
 
-$$ \neg[\mathit{T}] \neg \mathit{J} $$ 
+A \textit{relação de refinamento} $\mathit{J}$ é um predicado entre
+variáveis abstratas e variáveis de refinamento. Com isso $\mathit{T}$ deve
+possuir pelo menos uma transição que satisfaça esse predicado, ou seja, nem
+toda transição de $\mathit{T}$ levará $\mathit{J}$ a falsidade. Essa afirmativa
+pode ser traduzida na expressação abaixo:
 
-Na expressão acima tem-se que  $\mathit{T}$ deve possuir algum estado válido em
-$\mathit{J}$, ou que, $\mathit{J}$ possui algum estado que satisfaça a
-inicialização $\mathit{T}$.
+$$ \neg[\mathit{T}] \neg \mathit{J} $$
 
-Além disso é necessário também que a inicialização do refinamento denominado de
-$\mathit{T1}$ esteja liga a esse conjunto de estados válidos definidos por
-$\mathit{J}$ e $\mathit{T}$. Essa ligação ocorre da seguinte forma: todo estado
-gerado na inicialização de $\mathit{T1}$ deve possuir um correspondente válido
-de $\mathit{T}$.O que gera a seguinte definição:
+O predicado $\neg \mathit{J}$ indica que $\mathit{J}$ é falso e o predicato
+$[\mathit{T}] \neg \mathit{J}$ representa que todo transformação de $\mathit{T}$
+levará $\mathit{J}$ a um estado falso. Assim a negação dessa afirmação
+$\neg[\mathit{T}] \neg \mathit{J}$ indica quem existem uma transição de
+$\mathit{T}$ que não levará $\mathit{J}$ à falsidade, ou seja, nem toda transição
+de $\mathit{T}$ levará $\mathit{J}$ a falsidade.
+
+Assim para encerrar a obrigação de prova da inicialização do refinamento é
+necessário que para toda transformação de $\mathit{T1}$ o predicado
+$\neg[\mathit{T}] \neg \mathit{J}$ seja estabelecido. Essa afirmação pode ser
+traduzida na expressão abaixo, a qual representa a obrigação de prova do
+refinamento
 
 $$ [\mathit{T1}]\neg [\mathit{T}] \neg \mathit{J} $$
 
-Assim a obrigação de prova entre as máquina $\mathit{Kernel}$ e a máquina
-$\mathit{KernelR}$ fica como demonstra a asserção abaixo:
+Um exemplo de uma obrigação de prova da inicialização do refinamento pode ser
+visto entre as máquina $\mathit{Kernel}$ e a máquina $\mathit{KernelR}$. Nela a
+inicialização dos estados das duas máquina gera a seguinte obrigação de prova:
 
 $$
 [\mathit{tasks\_r}:=[]]\neg[\mathit{tasks}:=\emptyset]\neg(\mathbf{ran}(\mathit{tasks\_r})=\mathit{tasks})
@@ -1572,29 +1693,28 @@ $$
 \subsubsection{Obrigação de prova da operação sem parâmetro de retorno}
 Geralmente uma operação é definida como $\PRE \mathit{P} \THEN \mathit{S} \END$,
 sendo o seu refinamento $\PRE \mathit{P1} \THEN \mathit{S1} \END$, onde na
-maioria da vezes $\mathit{P1}$ é abstraído. Com isso, do mesmo modo que na
-inicialização, tem-se que os estado gerados em $\mathit{S1}$ devem estar
-relacionado com alguma execução $\mathit{S}$, o que é definido na expressão
+maioria da vezes $\mathit{P1}$ é verdadeiro. Com isso, do mesmo modo que na
+inicialização, tem-se que as trasições geradas por $\mathit{S1}$ devem estar
+relacionada com alguma transição de $\mathit{S}$, o que é definido pela expressão
 abaixo:
  
-$$\mathit{S1} \neg \mathit{S} \neg \mathit{J}$$
+$$[\mathit{S1}] \neg [\mathit{S}] \neg \mathit{J}$$
 
 Entretanto, diferente da inicialização, a execução de uma operação deve levar em
-consideração o estado da máquina anterior à sua execução. Com isso o estado da
-máquina abstrata junto com o seu refinamento devem ser um estado válido. Uma
-relevante ligação entre esse estados e o invariante $\mathit{I}$ e a sua relação
-de refinamento $\mathit{J}$. Além disso, para a correta execução da operação a pré
-condição da mesma deve ser estabelecido. Assim, unido que uma operação só pode
-ser executada corretamente quando houver uma ligação válida entre os estado da
-máquina e a sua pré condição for estabelecida, a obrigação de prova de uma operação é
-feita da seguinte forma:
+consideração o estado da máquina anterior à sua execução. Assim, o estado da
+máquina abstrata junto com o estado do seu refinamento devem ser estados válidos.
+Uma relevante ligação entre esse estados e o invariante $\mathit{I}$ é a sua
+relação de refinamento $\mathit{J}$. Além disso, para a correta execução da
+operação a pré-condição da mesma deve ser estabelecida. Assim, levando em
+consideração que uma operação só pode ser executada corretamente quando a máquina
+estiver em um estado válido e a sua pré-condição for estabelecida, a obrigação de
+prova de uma operação é feita da seguinte forma:
 
 $$\mathit{I} \land \mathit{J} \land \mathit{P} \Rightarrow \mathit{S1} \neg
 \mathit{S} \neg \mathit{J}$$
 
-Por exemplo, a obrigação de prova do refinamento da operação $\mathit{add_task}$
-da máquina $\mathit{Kernel}$ é estabelecida como de acordo com a preposição
-abaixo:
+Por exemplo, a obrigação de prova do refinamento da operação $\mathit{add\_task}$
+da máquina $\mathit{Kernel}$ é :
 
 
 $$
@@ -1614,28 +1734,29 @@ $$
 
 \subsubsection{Obrigação de prova da operação com parâmetro de saída}
 
-Devido uma obrigação do refinamento das operações, a qual obriga que cada saída
-possível para o refinamento de uma operação deve está ligada a uma saída da
-operação especificada, as operações com parâmetro de saída necessitam de uma
-atenção especial . Assim denominando $\mathit{out'}$ como sendo os parâmetros de
-saída do refinamento e $\mathit{out}$ os parâmetros de saída da especificação
-tem-se que cada valor de $\mathit{out'}$ deve possuir um correspondente em
-$\mathit{out}$. Em outra palavra, cada execução de $\mathit{S1}$ deve encontrar
-uma execução $\mathit{S}$, na qual $\mathit{out'}$ produzido por $\mathit{S1}$
-seja igual ao $\mathit{out}$ produzido por $\mathit{S}$.
+No refinamento de uma operação com saídas, cada saída possível para o refinamento
+de uma operação deve estar ligada a uma saída da operação especificada. Assim
+denominando $\mathit{out'}$ como os parâmetros de saída do refinamento e
+$\mathit{out}$ como os parâmetros de saída da especificação tem-se que cada
+valor de $\mathit{out'}$ deve possuir um correspondente em $\mathit{out}$. Em outra
+palavra, cada execução de $\mathit{S1}$ deve encontrar uma execução $\mathit{S}$,
+na qual $\mathit{out'}$ produzido por $\mathit{S1}$ seja igual ao $\mathit{out}$
+produzido por $\mathit{S}$.
 
-Além da ligação entre o parâmetros de saída, no refinamento de uma operação com
+Além da ligação entre os parâmetros de saída, no refinamento de uma operação com
 retorno, deve-se obedecer todas as restrições impostas para o refinamento das
-operações sem parâmetro de saída, ficando da seguinte maneira a obrigação de
-prova das operações com retorno estabelecida da seguinte maneira:
+operações sem parâmetro de saída, ficando da seguinte maneira a expressão da
+obrigação de prova para as operações com retorno:
 
 $$\mathit{I} \land \mathit{J} \land \mathit{P} \Rightarrow
-\mathit{S1}[\mathit{out'}/\mathit{out}] \neg \mathit{S} \neg \mathit{J}$$
+\mathit{S1}[\mathit{out'}/\mathit{out}] \neg \mathit{S} \neg (\mathit{J} \land
+\mathit{out'} = \mathit{out})$$
 
-Nela $[\mathit{out'}\mathit{out}]$ significa que na atribuições de $\mathit{S1}$
-os valores de $\mathit{out}$ devem ser substituídos por $\mathit{out'}$ e manter
-verdadeira a preposição, garantindo que cada produção de $\mathit{out}$ de
-$\mathit{S1}$ tenha uma correspondente no conjunto $\mathit{out}$.
+Nela $[\mathit{out'} / \mathit{out}]$ significa que na atribuições de
+$\mathit{S1}$ os valores de $\mathit{out}$ devem ser substituídos por
+$\mathit{out'}$ e manter verdadeira a preposição, garantindo que cada produção de
+$\mathit{out}$ de $\mathit{S1}$ tenha uma correspondente no conjunto
+$\mathit{out}$.
 
 
 
@@ -1686,5 +1807,5 @@ $\mathit{S1}$ tenha uma correspondente no conjunto $\mathit{out}$.
 
 \anexo
 
-\end{document}
 
+\end{document}
