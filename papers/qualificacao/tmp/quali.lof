@@ -1,15 +1,16 @@
 \select@language {brazil}
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Camada abstrata proporcionada pelo FreeRTOS \cite {Kalinsky03}}}{8}
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Diagrama de estados de uma tarefa no FreeRTOS \cite {Barry09}}}{10}
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Grafo de estados de uma co-rotina}}{11}
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Funcionamento de um escalonador preemptivo baseado na prioridade \cite {Li03}}}{12}
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Funcionamento de uma fila de mensagens}}{16}
-\contentsline {figure}{\numberline {2.6}{\ignorespaces Estrutura da rotina de uma tarefa}}{20}
-\contentsline {figure}{\numberline {2.7}{\ignorespaces Aplica\c c\~ao formada por uma tarefa c\IeC {\'\i }clica}}{21}
-\contentsline {figure}{\numberline {2.8}{\ignorespaces Aplica\c c\~ao que utiliza uma fila de mensagens}}{22}
-\contentsline {figure}{\numberline {2.9}{\ignorespaces Aplica\c c\~ao que demonstra a utiliza\c c\~ao de um sem\'aforo}}{24}
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Etapas do desenvolvimento de sistema atrav\'es do m\'etodo B \cite {dantas08}}}{27}
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Maquina abstrata de tarefas}}{28}
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Opera\c c\~ao que consulta se uma tarefa pertence a m\'aquina $\mathit {Kernel}$}}{30}
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Opera\c c\~ao que cria uma tarefa aleat\'oria na m\'aquina $\mathit {Kernel}$}}{33}
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Refinamento da maquina abstrata de $\mathit {Kernel}$}}{37}
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Esbol\c co da arquitetura da especifica\c c\~ao}}{9}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Camada abstrata proporcionada pelo FreeRTOS \cite {Kalinsky03}}}{11}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Diagrama de estados de uma tarefa no FreeRTOS \cite {Barry09}}}{13}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Grafo de estados de uma co-rotina}}{14}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Funcionamento de um escalonador preemptivo baseado na prioridade \cite {Li03}}}{15}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Funcionamento de uma fila de mensagens}}{19}
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Estrutura da rotina de uma tarefa}}{23}
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Aplica\c c\~ao formada por uma tarefa c\IeC {\'\i }clica}}{24}
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Aplica\c c\~ao que utiliza uma fila de mensagens}}{25}
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Aplica\c c\~ao que demonstra a utiliza\c c\~ao de um sem\'aforo}}{27}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Etapas do desenvolvimento de sistema atrav\'es do m\'etodo B \cite {dantas08}}}{30}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Maquina abstrata de tarefas}}{31}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Opera\c c\~ao que consulta se uma tarefa pertence a m\'aquina $\mathit {Kernel}$}}{33}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Opera\c c\~ao que cria uma tarefa aleat\'oria na m\'aquina $\mathit {Kernel}$}}{36}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Refinamento da maquina abstrata de $\mathit {Kernel}$}}{40}

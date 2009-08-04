@@ -80,81 +80,204 @@ Aplicada \par Programa de Pós-graduação em Sistemas e Computação}
 
 \chapter{Introdução\label{cap:introducao}}
 
-A área da computação é uma área relativamente jovem que ainda necessita de
-esforços para torna-se matura e confiável como as demais áreas da ciência. Assim
-para um melhor planejamento da evolução da computação e para agrupar esforços em
-objetivos comuns, vários pesquisadores procuraram identificar alguns dos
-principais desafios que a sociedade gostaria de ver desenvolvidos a curto e médio
-prazo.
+A Ciência da Computação é uma área relativamente jovem mas com grande impacto na
+sociedade atual. Através dela é possível acelerar o desenvolvimento e crescimento
+das demais ciências. A sua importância é tal que em \cite{USReport} ela chegou a
+ser citada como um dos pilares da ciência, sendo considerada ainda como um fator
+crucial para a economia, tecnológico e social de um pais.
 
-Um pesquisador bastante conhecido pela computação, mais especificamente na
-disciplina de métodos formais, responsável por definir necessidades através de
-desafios, é o britânico Jim Woodcock. No âmbito nacional existe a Sociedade
-Brasileira de Computação (SBC) que também está preocupada em definir diretrizes
-para a área em forma de desafio. Assim, um desafio comum entre as duas partes
-(SBC e Jim), lançado recentemente por Jim, é o de especificar formalmente o
-Sistema Operacional de Tempo Real FreeRTOS.
+Devido a essa grande importância da computação atualmente pesquisadores de todo
+mundo tem busca definir diretrizes a serem seguindas ao longo dos próximos anos.
+Esse movimento tem como objetivo reunir esforços em torno de um problema comum
+que terá um grande contribuição para a humanidade. Geralmente tais problemas são
+intitulados como desafios e serem vencidos na computação.
 
-Sistemas de tempo real são sistema que necessitam responder, em tempos bem
-definidos, aos estímulos causados por eventos externos. Esse tipo de sistema
-está presente em quase todo o cotidiano da sociedade atual e tem sido utilizado
-principalmente em ambientes críticos como o controle de transportes (aeronaves,
-trens e automóveis), monitoramento de aparelhos hospitalares e controle da
-linha de produção de fábricas.
+Seguindo esse contexto a Sociedade Brasileira de Computação (SBC), elaborou um
+relatório contento os grandes desafios da computação no Brasil \cite{GDSBC}. Um
+dos desafios identificados nesse documento foi o \textit{desenvolvimento
+tecnológico de qualidade: sistemas disponíveis, corretos, seguros, escaláveis,
+persistentes e ubíquos}, no qual encontra-se as vertentes de construção de
+software fededignos. Tal preocupação está destinada principalmente a softwares
+críticos, os quais uma falha pode ter consequências catastróficas, como os
+controles de aeronaves, trens e aparelhos médicos.
 
-O FreeRTOS é um software que tem o objetivo de facilitar o desenvolvimento dos
-sistemas de tempo real. Ele, através de funcionalidades disponibilizadas na forma
-de bibliotecas, abstrai do desenvolvedor os detalhes do hardware no qual o
-sistema será utilizado. Uma das principais característica desse software está na
-sua simplicidade e portabilidade, pois o seu código, feito em \textit{C} com
-partes em assembler, possui cerca 2.200 linhas de código e é oficialmente
-portável para dezessete arquiteturas diferentes de mono-processadores.
+Uma das abordagem usadas para a construção de sistemas fidedignos tem sido os
+métodos formais \cite{FM}. Eles tem sido utilizados na industria para a
+construção de pequenas mas significantes aplicações \cite{Jim09}. Entretanto a
+comunidade de métodos formais também tem seus desafios e entre eles encontra-se o
+desafio do ``software verificado'' \cite{}.
 
-A especificação formal de um sistema é uma metodologia de especificação,
-construção e verificação de sistemas capaz de deixa-los mais confiável e
-fidedigno. Isso é feito utilizando-se conceitos matemáticos sólidos como a teoria
-do conjunto e a lógica de primeira ordem. Com isso, uma especificação formal do
-FreeRTOS tornaria mais fidedigno não só próprio sistema operacional mas também os
-sistemas que utilizam-se dele para realizar suas tarefas.
+O software verificado é um conjunto de teorias, feramentas e experiências que
+podem ser usada para verificação de software garantindo o comportamento fidedigno
+para o sistema analisado, visando a criação de uma verificador de softwares.
+Outro atividades associada a este desafio é criação de estudo de casos utilizados
+para comparar deferentes abordagens identificando seus pontos fracos e como essas
+podem ser melhoradas. Entre os estudos de caso está a especificação do sistema
+operacional de tempo real FreeRTOS.
 
-Nesse contexto o presente trabalho pretende, através de uma especificação formal
-do FreeRTOS, resolver os desafios proposto por Jim e pela SBC. O formalismo
-utilizado na resolução desse problema será o método B, que trata-se de uma
-metodologia de construção de sistemas por técnicas de refinamentos. Nessa técnica
-um sistema concreto é gerado a partir de uma especificação abstrata do mesmo e
-cada etapa de abstração do desenvolvimento é passível de uma verificação
-estática para garantir a corretude do sistema.
+O FreeRTOS torna-se um interesante estudo de caso devido a sua larga utilização
+possuindo o seu repositório uma taxa de cerca 5000 downloads por mês. Além o seu
+núcleo é acessível (possui código fonte aberto), simples, portável (supota 17
+arquiteturas diferente) e pequeno. Com isso a especificação de tal sistema seria
+uma grande contribução para os desafios citado anteriormente e teria um grande
+impacto social e científico.
 
-O plano desenvolvido para a resolução desse desafio foi divido em três partes
-principais. Inicialmente tem-se o estudo do FreeRTOS para descobrir suas
-características, estruturas e comportamentos. Depois disso, uma especificação
-abstrata do mesmo é desenvolvida com a finalidade de especificar os seus
-comportamentos e estruturas mais relevantes. Em seguida, na terceira parte, essa
-especificação abstrata é refinada de acordo com decisões de projetos para que
-determinadas estruturas e funcionalidades do sistema torne-se mais concreta e
-passível de verificação.
+Entre as possíveis abordagens para a especificação do FreeRTOS está o método B
+\cite{abrial96}\cite{schneider06}. O método B é um framework para especificação e
+verificação de sistemas. Através dele é possível refinar-se especificação até um
+nível algoritmo passível de transformação para as linguagens de programação
+imperativas. Ele possui como suporte um pacote de ferramentas que apoiam todos
+o seus estágios de desenvolvimento o que tornou essa abordagem um forte
+candidata para a especificação do FreeRTOS. 
 
-Atualmente a primeira e a segunda parte do trabalho estão bem desenvolvidos. Como
-fruto desse trabalho inicial tem-se uma especificação abstrata de algumas das
-principais funcionalidades do sistema restando apenas a especificação das demais
-funcionalidades e o refinamento em um nível concreto da especificação do sistema.
+\section{Objetivo}
+O objetivo desse trabalho é através da especificação do FreeRTOS utilizando o
+método B contribuir para o desafios do software verificado e da construção de
+software fidedigno. A especificação desenvolvida terá um nível de abstração
+próximo ao algoritimo sendo a mesma capaz de analisar propriedades estáticas do
+FreeRTOS e validar algumas de suas principais funcionalidades.
+
+\section{Metodologia}
+
+O desenvolvido do presente trabalho pode ser sucitamente resulmida pelos itens
+abaixo os quais serão comentados nos paragrafos a seguir:
+\begin{itemize}
+  \item Estudo do método B;
+  \item Levantamento bibliográfico sobre FreeRTOS;
+  \item Estudo da código fonte do FreeRTOS;
+  \item Elaboração de um plano para a modelagem funcional do FreeRTOS;
+  \item Elaboração de da modelagem funcional do FreeRTOS
+  \item Refinamento da modelagem desenvolvida no item anterior;
+  \item Acrescentar demais abstrações de hardware a modelagem funcinal;
+  \item Refinamento completo da modelagem
+\end{itemize}
+
+A elaboração desse trabalho iniciou-se com o estudo do método B. Esse estudo
+ocorreu principalmente através do desenvolvimento de uma especificação do
+microcontrolador 8051( melhor detalhada em \cite{ermac}) e com colaborações para
+o projeto Compilador Verificável \cite{CompVerif} o qual gerou as seguintes
+publicações \cite{sbmf08} e \cite{semish08}.
+
+Em um projetos a especificação é uma etapa inicial que server para modelar e
+validar requisitos do sistema. No presente trabalho, os requisitos do sistema já
+foram definidos e suas funcionalidades implementadas. Assim, para criar-se uma
+modelagem que valide o seu correto funcionamento é necessário fazer uma
+engenharia reversa para a especificação desejada, nesta caso para o método B. No
+presente trabalho, tal engenharia iniciou-se com do estudo detalhado do sistema
+em questão. Esse estudo pode foi divido em duas parte principais: o levantamento
+bibliográfico sobre o sistema e analise do código fonte do mesmo.
+
+No levantamento bibliográfico a documento disponível sobre o sistema foi
+examinada. Assim, os principais requisitos, funcionalidade e características e do
+sistema poderam ser identificados e classificadas de acordo com sua importâncias.
+Servindo esse trabalho como base para a analise do código fonte e elaboração de
+plano para uma modelagem funcional do sistema.
+
+Durante a análise do código fonte foi possível identificar a arquitetura do
+sistema e como suas principais abstrações de hardware e funcionalidades são
+implementados. Nessa análise percebeu-se que muita vezes o sistema possui
+detalhes a nível de assemble, o que segundo Dantas em \cite{} também pode ser
+tratado utilizando o método B.
+
+Através da análise do FreeRTOS descobriu-se que apesar dele ser um sistema
+simples e pequeno a sua modelagem é um trabalho que leva muito tempo e esforços.
+Assim, como primeiro passo para iniciar-se a especificação do sistema foi
+desenvolvida um modelo funcinal inicial. Entretanto, para uma melhor elaboração
+e proveito desse modelo, antes da sua elaboração foi desenvolvido um plano para
+identificar quais ``elementos'' e funcionalidades devem fazer parte dessa modelagem
+funcional inicial.
+
+Nesse plano foi decidido que para essa modelagem inicial, devido as suas
+importâncais, apenas os elementos tarefas e fila de mensagens serão
+especificados, sendo os demais elementos principais (semáforo, co-rotina e mutex)
+tratados nas próximas etapas da especificação. Após definidos os abstrações de
+hardware o plano foi divido em módulos incrementais, os quais eram compostos
+por funcionalidades de cada abstração.
+
+Na modelagem funcional resultante do plano descrito anteriormente, utilizando o
+mecanismo composicional do método B, foi possível definir um esboço da
+arquitetura da especificação. Nessa modelagem o sistema foi divido inicialmente
+em sete módulos: \textit{Config}, \textit{Type}, \textit{Task},
+\textit{Scheduler}, \textit{Queue}, \textit{FreeRTOSBasic}, \textit{FreeRTOS}.
+Resulmidamente esses módulos foram planejados de acordo com a
+figura~\ref{fig:arquitetura}. Nela basicamente os módulo mais abaixo fornecem
+operações e implementam elementos para os módulos superiores realizarem suas
+operações, sendo o módulo \textit{FreeRTOS} responsável por especificar as
+funcionalidades do sistema, maiores detalhes sobre essa modelagem funcional
+podem ser encontrados em \cite{}.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.6]{../fig/class_diagram.jpg}
+\caption{Esbolço da arquitetura da especificação}
+\label{fig:arquitetura}
+\end{figure}
+
+Entretanto, por tratar-se de um modelo funcional, a modelagem acima abstraiu
+muitas características importantes do FreeRTOS, entre elas a característica de
+prioridade de uma tarefa. Para adicionar tal característica e demonostrar como
+sera feito o processo amadurecimento da especificação, foi feito um refinamento
+do modelo funcional anterior. Esse trabalho foi feito da criação do módulo de
+refinamento \textit{Task\_r} o qual refina o módulo \textit{Task}, reponsável
+por implementar a abstração de hardware \textit{tarefa}.
+
+Ao total essa especificação inicial desenvolvida possui 1974 linhas as quais
+geram 538 obrigações de prova \ref{}. Entre essas obrigrações de prova, somente
+49 necessitaram da interação humana para sua resolução, sendo as demais
+provadas automaticamente pela ferramenta adotada pelo projeto. Como fruto dessa
+primeira etapa desse trabalho foi publicado o seguinte trabalho \cite{}.
+
+Dando continuidade a metodologia do trabalho as próximas etapas são: agregar os
+demais elementos e suas funcionalidades abstraídos da modelagem inicial; refinar
+a modelagem para implementar as demais características do FreeRTOS; implementação
+dos demais elementos não básicos; e refinamento do modelo.
+
+Na adição dos demais elementos básicos ao modelo a abstração mutex e suas
+funcionalidade serão adcionadas ao modelo funcional. O semáforo, outro elemento
+do sistema, foi considerado como não básico pois a sua implementação e feita em
+cima do elemento fila de mensagens e as co-rotinas não entrarão no escopo desse
+trabalho.
+
+Após a implementação do mutex será especificada a característica de tamanho da
+fila. Essa etapa sera feita atravé de uma refinamento da modelagem que ira
+tratar os não determinismo presente no módulo \textit{Queue}, responsável por
+especificar o elemento fila de mensagens. 
+
+Com a especificação da caracterítica de tamanho da fila a especificação atingirá
+um nível razoavelmente maduro, restando agora apenas que os demais que elementos
+sejam especificados e a modelagem torne-se mais concreta. Isso ocorrerá
+seguindo o padrão das etapas anteriores, adicionando novos elementos a
+especificação e refinando a mesma para tratar as demais características do
+sistema.
+
+Ao final do trabalho pretende-se atingir uma modelagem concentra na qual
+funcionalidade do sistema possam ser testadas e validadas. Além disso a
+especificação aqui desenvolvida servirá como material de apoio ao FreeRTOS
+possuindo uma especificação do sistema utilizando o ponto de vista formal.
+
+
+
+%Aqui eu posso dar o quantitativo das obrigações de prova?
+%também acho que o leitor ainda não tem esse nível de conhecimento para
+%entender o que é obrigação de prova
+Para amadurecer a modelagem anterior um nível de refinamento foi realizado. Nesse
+refinamento foi acrescentada ao modelo inicial a característica de prioridade de
+uma tarefa. Isso gerou uma especificação inicial do FreeRTOS ( disponível em
+\cite{}, considerada como primeiro passo para a modelagem final do sistemas, com
+o total total de oito módulos e aproximadamente 2000 linhas de código.
+
+Dando continuidade a esse trabalho demais refinamentos serão realizados 
+
+
+
+
+
+
 
 %Falar dos grandes desafios (SBC) e do desafio do compilador ``Verifiging
 %compile'', ``Verified Software repository'' desafio de Jim Woodcock
 
-\section{Objetivos}
-Falar do objetivo da dissertação e não só da qualificação. Itens a serem
-discutidos:
 
-\begin{itemize}
-  \item Abrangência da especificação
-  \item Profundidade em aspectos pelo menos da construção do software
-  \item Se necessário tem a possibilidade de estessão até o nível de assemblagem
-		devido aos códigos em assembler que compõem o FreeRTOS.
-\end{itemize}
-
-\section{Metodologia}
-Metodologia da dissertação, no contexto do que já foi feito
 
 
 

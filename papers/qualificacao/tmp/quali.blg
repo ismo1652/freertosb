@@ -3,6 +3,14 @@ The top-level auxiliary file: quali.aux
 The style file: abnt-alf.bst
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Database file #1: quali.bib
+Warning--I didn't find a database entry for "USReport"
+Warning--I didn't find a database entry for "GDSBC"
+Warning--I didn't find a database entry for "FM"
+Warning--I didn't find a database entry for "Jim09"
+Warning--I didn't find a database entry for "ermac"
+Warning--I didn't find a database entry for "CompVerif"
+Warning--I didn't find a database entry for "sbmf08"
+Warning--I didn't find a database entry for "semish08"
 Warning--I didn't find a database entry for "clearsy"
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 +---------------------------------------------------------+
@@ -11,45 +19,45 @@ Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 | Em caso de duvidas ou problemas com este estilo procure |
 | http://abntex.codigolivre.org.br                        |
 +---------------------------------------------------------+
-You've used 7 entries,
+You've used 8 entries,
             6522 wiz_defined-function locations,
-            1199 strings with 10107 characters,
-and the built_in function-call counts, 5131 in all, are:
-= -- 482
-> -- 148
+            1217 strings with 10250 characters,
+and the built_in function-call counts, 5746 in all, are:
+= -- 525
+> -- 163
 < -- 0
-+ -- 97
-- -- 47
-* -- 319
-:= -- 786
-add.period$ -- 23
-call.type$ -- 7
-change.case$ -- 55
-chr.to.int$ -- 7
-cite$ -- 7
-duplicate$ -- 224
-empty$ -- 409
-format.name$ -- 223
-if$ -- 1206
++ -- 103
+- -- 52
+* -- 355
+:= -- 873
+add.period$ -- 26
+call.type$ -- 8
+change.case$ -- 61
+chr.to.int$ -- 8
+cite$ -- 8
+duplicate$ -- 260
+empty$ -- 470
+format.name$ -- 246
+if$ -- 1354
 int.to.chr$ -- 0
 int.to.str$ -- 0
-missing$ -- 120
-newline$ -- 39
-num.names$ -- 35
-pop$ -- 169
+missing$ -- 139
+newline$ -- 43
+num.names$ -- 40
+pop$ -- 193
 preamble$ -- 1
-purify$ -- 24
+purify$ -- 27
 quote$ -- 0
-skip$ -- 300
+skip$ -- 336
 stack$ -- 1
-substring$ -- 163
-swap$ -- 87
+substring$ -- 181
+swap$ -- 101
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 1
 warning$ -- 0
-while$ -- 44
+while$ -- 50
 width$ -- 0
-write$ -- 107
-(There was 1 warning)
+write$ -- 121
+(There were 9 warnings)
