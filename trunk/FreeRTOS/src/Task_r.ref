@@ -382,6 +382,74 @@ OPERATIONS
         END
     END;
     
+    
+    t_incrementTick (tick) = 
+    PRE
+        active = TRUE &
+        tick : TICK
+    THEN
+        ANY
+            unblocked
+        WHERE
+            unblocked : FIN(TASK) &
+            unblocked <: blocked
+        THEN
+            IF unblocked /= {} THEN
+                IF t_priority(running) <= max(t_priority[unblocked])  THEN
+                    ANY
+                        task
+                    WHERE
+                        task : TASK &
+                        task : schedule_p(unblocked,t_priority)
+                    THEN
+                        running := task ||
+                        ready := ready\/{running}\/(unblocked-{task})
+                    END
+                    
+                ELSIF ready/={} THEN
+                    IF max(t_priority[ready]) =t_priority(running) THEN
+                        ANY
+							task
+						WHERE
+							task:TASK & 
+							task:schedule_p(ready,t_priority)&
+							task/=idle&
+							task/=running
+						THEN
+						    running:=task||
+							ready := (ready -{task})\/{running}\/unblocked 
+						END
+                    ELSE
+						ready := ready \/ unblocked
+					END	    		
+				ELSE
+				    ready := ready \/ unblocked
+                END||
+                blocked := blocked - unblocked
+            ELSIF ready/={} THEN
+               	IF max(t_priority[ready]) =t_priority(running) THEN
+					ANY
+						task
+					WHERE
+						task:TASK & 
+						task:schedule_p(ready, t_priority)&
+						task/=idle&
+						task/=running
+					THEN
+						running:=task||
+						ready := (ready -{task})\/{running} 
+					END
+				ELSE
+					skip
+				END
+			ELSE	    
+			    skip
+            END
+        END
+    END;
+    
+    
+    
     /**
     \brief	Remove From Block List
     

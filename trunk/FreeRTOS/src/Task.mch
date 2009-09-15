@@ -368,8 +368,7 @@ OPERATIONS
     \brief	Resume All
     
     \do	
-    Method used for resume the scheduler. It increment the tick with missed ticks and verify the list of 
-    blocked tasks to unblock the tasks with expired timers.
+    Method used for verify the list of blocked tasks to unblock the tasks with expired timers.
     **/
     t_resumeAll (tick) = 
     PRE
@@ -429,10 +428,86 @@ OPERATIONS
         blocked := blocked - {task}
     END
     ;
-/*
-SG->DD
-Adicionei mais essa operação
-*/
+	
+/**
+	/brief
+		States changes in tick increment
+	/do
+		This method concerns with the states change in tick increment occur.
+
+**/
+
+t_incrementTick(tick) =
+PRE
+    active=TRUE &
+    tick : TICK
+THEN
+	ANY
+		unblocked
+	WHERE
+		unblocked : FIN(TASK) &
+		unblocked <: blocked
+	THEN
+		IF unblocked /= {} THEN
+			CHOICE
+				ANY
+					task
+				WHERE
+					task : TASK &
+					task : tasks &
+					task : unblocked 
+				THEN
+					running := task ||
+					ready := ready \/ {running} \/ (unblocked - {task})
+				END
+			OR
+			    ANY
+					task
+				WHERE
+					task:ready & 
+					task/=running &
+					task/=idle
+				THEN
+				    running:=task||
+					ready := (ready -{task}) \/ {running} \/ unblocked
+					
+				END   
+			OR  
+				ready := ready \/ unblocked
+			END ||
+			blocked := blocked - unblocked
+		ELSE
+			CHOICE
+				ANY
+					task
+				WHERE
+					task:ready & 
+					task/=running &
+					task/=idle
+				THEN
+				    running:=task||
+					ready := (ready -{task}) \/ {running} 
+					
+				END        
+			OR
+				skip
+			END
+		END
+	END    
+END
+;
+	    
+    
+/**
+    \brief	Set the Priority Task
+    
+    \do
+    This method set the priotity of the gived task
+    
+    \paramenters
+    task - The task that will set the priority
+    priority - The new priority of the task
+**/
     t_setPriority(task,priority)=
     PRE
        
@@ -469,3 +544,7 @@ Adicionei mais essa operação
         END
     END
 END
+
+
+
+

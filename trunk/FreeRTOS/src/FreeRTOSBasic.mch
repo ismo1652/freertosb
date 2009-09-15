@@ -534,11 +534,12 @@ uma coisa mais complicada
         scheduler /= taskSCHEDULER_NOT_STARTED
     THEN
         IF scheduler = taskSCHEDULER_RUNNING THEN 
-            tickCount := TICK_INCREMENT(tickCount, 1)
+            tickCount := TICK_INCREMENT(tickCount, 1)||
+        	t_incrementTick(TICK_INCREMENT(tickCount, 1))
+        	
         ELSE 
             tickMissed := TICK_INCREMENT(tickCount, 1)
-        END ||
-        t_resumeAll (TICK_INCREMENT(tickCount, 1)) 
+        END 
     END;
 
 /*
