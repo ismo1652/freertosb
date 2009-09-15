@@ -200,7 +200,7 @@ END
 THEORY ListSubstitutionX IS
   Expanded_List_Substitution(Machine(FreeRTOSBasic),vTaskPrioritySet)==(pxTask: tasks & uxNewPriority: PRIORITY & active = TRUE & pxTask/=idle | pxTask: ready ==> (skip [] running,ready:=pxTask,(ready\/{running})-{pxTask}) [] not(pxTask: ready) ==> (pxTask = running ==> (skip [] @task.(task: TASK & task: tasks & task: ready ==> running,ready:=task,(ready\/{running})-{task})) [] not(pxTask = running) ==> skip));
   Expanded_List_Substitution(Machine(FreeRTOSBasic),vQueueDelete)==(pxQueue: queues | queues,queue_items,queue_receiving,queue_sending:=queues-{pxQueue},{pxQueue}<<|queue_items,{pxQueue}<<|queue_receiving,{pxQueue}<<|queue_sending);
-  Expanded_List_Substitution(Machine(FreeRTOSBasic),incrementTick)==(scheduler/=taskSCHEDULER_NOT_STARTED & active = TRUE & TICK_INCREMENT(tickCount,1): TICK | scheduler = taskSCHEDULER_RUNNING ==> tickCount:=TICK_INCREMENT(tickCount,1) [] not(scheduler = taskSCHEDULER_RUNNING) ==> tickMissed:=TICK_INCREMENT(tickCount,1) || @unblocked.(unblocked: FIN(TASK) & unblocked <: blocked ==> (unblocked/={} ==> (@task.(task: TASK & task: tasks & task: unblocked ==> running,ready:=task,ready\/{running}\/unblocked-{task}) [] ready:=ready\/unblocked || blocked:=blocked-unblocked) [] not(unblocked/={}) ==> skip)));
+  Expanded_List_Substitution(Machine(FreeRTOSBasic),incrementTick)==(scheduler/=taskSCHEDULER_NOT_STARTED | scheduler = taskSCHEDULER_RUNNING ==> (active = TRUE & TICK_INCREMENT(tickCount,1): TICK | tickCount:=TICK_INCREMENT(tickCount,1) || @unblocked.(unblocked: FIN(TASK) & unblocked <: blocked ==> (unblocked/={} ==> (@task.(task: TASK & task: tasks & task: unblocked ==> running,ready:=task,ready\/{running}\/unblocked-{task}) [] ready:=ready\/unblocked [] @task.(task: ready & task/=running & task/=idle ==> ready,running:=ready-{task}\/{running}\/unblocked,task) || blocked:=blocked-unblocked) [] not(unblocked/={}) ==> (@task.(task: ready & task/=running & task/=idle ==> ready,running:=ready-{task}\/{running},task) [] skip)))) [] not(scheduler = taskSCHEDULER_RUNNING) ==> tickMissed:=TICK_INCREMENT(tickCount,1));
   Expanded_List_Substitution(Machine(FreeRTOSBasic),xTaskResumeAll)==(scheduler = taskSCHEDULER_SUSPENDED & scheduler = taskSCHEDULER_SUSPENDED & active = TRUE & TICK_INCREMENT(tickCount,tickMissed): TICK | scheduler:=taskSCHEDULER_RUNNING || @unblocked.(unblocked: FIN(TASK) & unblocked <: blocked ==> (unblocked/={} ==> (@task.(task: TASK & task: tasks & task: unblocked ==> running,ready:=task,ready\/{running}\/unblocked-{task}) [] ready:=ready\/unblocked || blocked:=blocked-unblocked) [] not(unblocked/={}) ==> skip)) || tickCount:=TICK_INCREMENT(tickCount,tickMissed) [] skip);
   Expanded_List_Substitution(Machine(FreeRTOSBasic),vTaskSuspendAll)==(scheduler = taskSCHEDULER_RUNNING | scheduler:=taskSCHEDULER_SUSPENDED);
   Expanded_List_Substitution(Machine(FreeRTOSBasic),vTaskEndScheduler)==(scheduler = taskSCHEDULER_RUNNING & scheduler = taskSCHEDULER_RUNNING & active = TRUE | scheduler:=taskSCHEDULER_NOT_STARTED || active,tasks,blocked,suspended,ready:=FALSE,{},{},{},{});
@@ -237,7 +237,7 @@ THEORY ListSubstitutionX IS
   List_Substitution(Machine(FreeRTOSBasic),vTaskEndScheduler)==(stopScheduler || t_endScheduler);
   List_Substitution(Machine(FreeRTOSBasic),vTaskSuspendAll)==(suspendScheduler);
   List_Substitution(Machine(FreeRTOSBasic),xTaskResumeAll)==(CHOICE resumeScheduler || t_resumeAll(TICK_INCREMENT(tickCount,tickMissed)) || tickCount:=TICK_INCREMENT(tickCount,tickMissed) OR skip END);
-  List_Substitution(Machine(FreeRTOSBasic),incrementTick)==(IF scheduler = taskSCHEDULER_RUNNING THEN tickCount:=TICK_INCREMENT(tickCount,1) ELSE tickMissed:=TICK_INCREMENT(tickCount,1) END || t_resumeAll(TICK_INCREMENT(tickCount,1)));
+  List_Substitution(Machine(FreeRTOSBasic),incrementTick)==(IF scheduler = taskSCHEDULER_RUNNING THEN tickCount:=TICK_INCREMENT(tickCount,1) || t_incrementTick(TICK_INCREMENT(tickCount,1)) ELSE tickMissed:=TICK_INCREMENT(tickCount,1) END);
   List_Substitution(Machine(FreeRTOSBasic),vQueueDelete)==(queueDelete(pxQueue));
   List_Substitution(Machine(FreeRTOSBasic),vTaskPrioritySet)==(t_setPriority(pxTask,uxNewPriority))
 END
@@ -335,7 +335,7 @@ THEORY ListOfIdsX IS
   List_Of_VisibleCst_Ids(Machine(Types)) == (BIT,QUEUE_NULL,ITEM_NULL,REMOVE_EVENT,PRIORITY,TICK,TICK_INCREMENT,MAX_DELAY,NULL_PARAMETER);
   List_Of_VisibleVar_Ids(Machine(Types)) == (? | ?);
   List_Of_Ids_SeenBNU(Machine(Types)) == (?: ?);
-  List_Of_Ids(Machine(Task)) == (? | ? | idle,running,suspended,ready,blocked,tasks,active | ? | t_create,t_delete,t_suspend,t_resume,t_getPriority,t_getCurrent,t_getNumberOfTasks,t_delayTask,t_startScheduler,t_endScheduler,t_resumeAll,t_unblock,t_setPriority | ? | seen(Machine(FreeRTOSConfig)),seen(Machine(Types)) | ? | Task);
+  List_Of_Ids(Machine(Task)) == (? | ? | idle,running,suspended,ready,blocked,tasks,active | ? | t_create,t_delete,t_suspend,t_resume,t_getPriority,t_getCurrent,t_getNumberOfTasks,t_delayTask,t_startScheduler,t_endScheduler,t_resumeAll,t_unblock,t_incrementTick,t_setPriority | ? | seen(Machine(FreeRTOSConfig)),seen(Machine(Types)) | ? | Task);
   List_Of_HiddenCst_Ids(Machine(Task)) == (? | ?);
   List_Of_VisibleCst_Ids(Machine(Task)) == (?);
   List_Of_VisibleVar_Ids(Machine(Task)) == (? | ?);
@@ -369,6 +369,6 @@ THEORY TCIntRdX IS
   abstract_constants_visible_in_values == KO;
   event_b_project == KO;
   event_b_deadlockfreeness == KO;
-  variant_clause_mandatory == KO
+  variant_clause_mandatory == OK
 END
 )

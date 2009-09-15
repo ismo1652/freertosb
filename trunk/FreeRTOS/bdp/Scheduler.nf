@@ -63,7 +63,7 @@ END
 THEORY ListAssertionsX IS
   Expanded_List_Assertions(Machine(Scheduler))==(btrue);
   Abstract_List_Assertions(Machine(Scheduler))==(btrue);
-  Context_List_Assertions(Machine(Scheduler))==(ERROR_DEFINITION <: INTEGER & BIT <: NATURAL);
+  Context_List_Assertions(Machine(Scheduler))==(BIT <: NATURAL);
   List_Assertions(Machine(Scheduler))==(btrue)
 END
 &
@@ -145,17 +145,19 @@ THEORY ListConstantsX IS
 END
 &
 THEORY ListSetsX IS
-  Set_Definition(Machine(Scheduler),SCHEDULER_STATE)==({taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED});
-  Context_List_Enumerated(Machine(Scheduler))==(SCHEDULER_STATE);
-  Context_List_Defered(Machine(Scheduler))==(NAME,PARAMETER,TASK,STACK,TASK_CODE);
-  Context_List_Sets(Machine(Scheduler))==(NAME,PARAMETER,TASK,STACK,TASK_CODE,SCHEDULER_STATE);
+  Set_Definition(Machine(Scheduler),ERROR_DEFINITION)==({errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,errQUEUE_EMPTY,errQUEUE_FULL,pdPASS,pdFAIL,pdTRUE,pdFALSE});
+  Context_List_Enumerated(Machine(Scheduler))==(SCHEDULER_STATE,COPY_POSITION,ERROR_DEFINITION);
+  Context_List_Defered(Machine(Scheduler))==(NAME,PARAMETER,TASK,STACK,TASK_CODE,ITEM,QUEUE);
+  Context_List_Sets(Machine(Scheduler))==(NAME,PARAMETER,SCHEDULER_STATE,TASK,STACK,TASK_CODE,ITEM,COPY_POSITION,QUEUE,ERROR_DEFINITION);
   List_Valuable_Sets(Machine(Scheduler))==(?);
   Inherited_List_Enumerated(Machine(Scheduler))==(?);
   Inherited_List_Defered(Machine(Scheduler))==(?);
   Inherited_List_Sets(Machine(Scheduler))==(?);
   List_Enumerated(Machine(Scheduler))==(?);
   List_Defered(Machine(Scheduler))==(?);
-  List_Sets(Machine(Scheduler))==(?)
+  List_Sets(Machine(Scheduler))==(?);
+  Set_Definition(Machine(Scheduler),COPY_POSITION)==({queueSEND_TO_BACK,queueSEND_TO_FRONT});
+  Set_Definition(Machine(Scheduler),SCHEDULER_STATE)==({taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED})
 END
 &
 THEORY ListHiddenConstantsX IS
@@ -167,7 +169,7 @@ END
 &
 THEORY ListPropertiesX IS
   Abstract_List_Properties(Machine(Scheduler))==(btrue);
-  Context_List_Properties(Machine(Scheduler))==(BIT = 0..1 & pdTRUE: BIT & pdTRUE = 1 & pdFALSE: BIT & pdFALSE = 0 & pdPASS: BIT & pdPASS = 1 & pdFAIL: BIT & pdFAIL = 0 & errQUEUE_EMPTY: BIT & errQUEUE_EMPTY = 0 & errQUEUE_FULL: BIT & errQUEUE_FULL = 0 & ERROR_DEFINITION = -5.. -1 & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY: ERROR_DEFINITION & errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY = -1 & errNO_TASK_TO_RUN: ERROR_DEFINITION & errNO_TASK_TO_RUN = -2 & errQUEUE_BLOCKED: ERROR_DEFINITION & errQUEUE_BLOCKED = -4 & errQUEUE_YIELD: ERROR_DEFINITION & errQUEUE_YIELD = -5 & MAX_DELAY: 0..MAXINT & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TICK_INCREMENT: TICK*TICK --> TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & SCHEDULER_STATE: FIN(INTEGER) & not(SCHEDULER_STATE = {}));
+  Context_List_Properties(Machine(Scheduler))==(BIT = 0..1 & MAX_DELAY: 0..MAXINT & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TICK_INCREMENT: TICK*TICK --> TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & QUEUE_NULL: QUEUE & ITEM_NULL: ITEM & REMOVE_EVENT: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) & REMOVE_EVENT = %(task,queues,pending).(task: TASK & queues: POW(QUEUE) & pending: QUEUE +-> POW(TASK) | %queue.(queue: queues & queue: dom(pending) | pending(queue)-{task})) & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & ITEM: FIN(INTEGER) & not(ITEM = {}) & QUEUE: FIN(INTEGER) & not(QUEUE = {}) & SCHEDULER_STATE: FIN(INTEGER) & not(SCHEDULER_STATE = {}) & COPY_POSITION: FIN(INTEGER) & not(COPY_POSITION = {}) & ERROR_DEFINITION: FIN(INTEGER) & not(ERROR_DEFINITION = {}));
   Inherited_List_Properties(Machine(Scheduler))==(btrue);
   List_Properties(Machine(Scheduler))==(btrue)
 END
@@ -198,9 +200,9 @@ THEORY ListOfIdsX IS
   List_Of_VisibleCst_Ids(Machine(Scheduler)) == (?);
   List_Of_VisibleVar_Ids(Machine(Scheduler)) == (? | ?);
   List_Of_Ids_SeenBNU(Machine(Scheduler)) == (?: ?);
-  List_Of_Ids(Machine(Types)) == (PRIORITY,TICK,TICK_INCREMENT,BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER,NAME,PARAMETER,TASK,STACK,TASK_CODE,SCHEDULER_STATE,taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED | ? | ? | ? | ? | ? | ? | ? | Types);
+  List_Of_Ids(Machine(Types)) == (BIT,QUEUE_NULL,ITEM_NULL,REMOVE_EVENT,PRIORITY,TICK,TICK_INCREMENT,MAX_DELAY,NULL_PARAMETER,NAME,PARAMETER,SCHEDULER_STATE,TASK,STACK,TASK_CODE,ITEM,COPY_POSITION,QUEUE,ERROR_DEFINITION,taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED,queueSEND_TO_BACK,queueSEND_TO_FRONT,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,errQUEUE_EMPTY,errQUEUE_FULL,pdPASS,pdFAIL,pdTRUE,pdFALSE | ? | ? | ? | ? | ? | ? | ? | Types);
   List_Of_HiddenCst_Ids(Machine(Types)) == (? | ?);
-  List_Of_VisibleCst_Ids(Machine(Types)) == (PRIORITY,TICK,TICK_INCREMENT,BIT,pdTRUE,pdFALSE,pdPASS,pdFAIL,errQUEUE_EMPTY,errQUEUE_FULL,ERROR_DEFINITION,errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,MAX_DELAY,NULL_PARAMETER);
+  List_Of_VisibleCst_Ids(Machine(Types)) == (BIT,QUEUE_NULL,ITEM_NULL,REMOVE_EVENT,PRIORITY,TICK,TICK_INCREMENT,MAX_DELAY,NULL_PARAMETER);
   List_Of_VisibleVar_Ids(Machine(Types)) == (? | ?);
   List_Of_Ids_SeenBNU(Machine(Types)) == (?: ?)
 END
@@ -222,6 +224,6 @@ THEORY TCIntRdX IS
   abstract_constants_visible_in_values == KO;
   event_b_project == KO;
   event_b_deadlockfreeness == KO;
-  variant_clause_mandatory == KO
+  variant_clause_mandatory == OK
 END
 )

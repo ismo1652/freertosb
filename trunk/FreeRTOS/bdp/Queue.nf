@@ -237,6 +237,6 @@ THEORY TCIntRdX IS
   abstract_constants_visible_in_values == KO;
   event_b_project == KO;
   event_b_deadlockfreeness == KO;
-  variant_clause_mandatory == KO
+  variant_clause_mandatory == OK
 END
 )
