@@ -1,0 +1,118 @@
+/* Queue_r
+ * Author: Antonino
+ * Creation date: ter mai 26 2009
+ */
+REFINEMENT
+   Queue_r
+REFINES
+   Queue
+
+SEES
+   Types
+
+ABSTRACT_VARIABLES
+    queues,
+    queue_receiving,
+    queue_sending,
+    queue_size,
+    queue_items_r
+   
+INVARIANT
+    queue_size : QUEUE +-> NAT &
+    queue_items_r : QUEUE +-> iseq(ITEM) &
+    dom(queue_items_r) = dom(queue_items ) &
+	dom(queue_size) = queues &
+    !queue.(queue:queues => ran(queue_items_r(queue)) = queue_items(queue))
+
+INITIALISATION
+    queues := {} ||
+    queue_receiving := {} ||
+    queue_sending := {} ||
+    queue_size := {} ||
+    queue_items_r:= {}
+
+OPERATIONS
+    
+    xQueueHandle <-- xQueueCreate(uxQueueLength, uxItemSize) =
+	BEGIN
+    	CHOICE
+			ANY
+			    queue 
+			WHERE
+			    queue : QUEUE & 
+			    queue /: queues
+			THEN	
+			    queues := queues \/ {queue}||
+			    queue_size := queue_size \/ { queue |-> uxQueueLength } ||
+		    	queue_items_r := queue_items_r \/ { queue |->  [] } ||
+		    	queue_receiving := queue_receiving \/ {queue |-> {}} ||
+		    	queue_sending := queue_sending \/ {queue |-> {}}||
+		    	xQueueHandle := queue
+			END		    
+     	OR
+        	xQueueHandle:=QUEUE_NULL
+     	END
+   	END; 
+   
+    queueDelete(queue) =
+	BEGIN
+	    queues := queues - {queue}||
+	    queue_size := {queue} <<| queue_size ||
+	    queue_items_r := {queue} <<| queue_items_r ||
+		queue_receiving := {queue} <<| queue_receiving ||
+		queue_sending := {queue} <<| queue_sending
+   	END;
+   
+    sendItem(pxQueue, pxItem, task, copy_position) =
+    BEGIN IF pxItem /: ran(queue_items_r(pxQueue) ) THEN
+           IF copy_position = queueSEND_TO_BACK THEN
+               queue_items_r(pxQueue) := queue_items_r(pxQueue) <- pxItem
+           ELSE
+               queue_items_r(pxQueue) := pxItem -> queue_items_r(pxQueue) 
+           END
+       END ||
+       queue_receiving(pxQueue) := queue_receiving(pxQueue) - {task}
+	END;
+  
+	insertTaskWaitingToSend(pxQueue, pxTask) =
+	BEGIN
+    	queue_sending(pxQueue) := queue_sending(pxQueue) \/ {pxTask}
+	END;
+	
+	insertTaskWaitingToRecived(pxQueue, pxTask) =
+	BEGIN
+    	queue_receiving(pxQueue) := queue_receiving(pxQueue) \/ {pxTask}
+	END;
+   
+    xItem <-- receivedItem(pxQueue, justPeeking, task) =
+    BEGIN
+        xItem := first(queue_items_r(pxQueue)) ||
+        IF justPeeking = FALSE THEN 
+            queue_items_r(pxQueue) := tail(queue_items_r(pxQueue) ) ||
+            queue_sending(pxQueue) := queue_sending(pxQueue) - {task}
+        END
+	END;
+	
+	removeFromEventListQueue(task) =
+	BEGIN
+	    ANY
+	        receiving, sending  
+    	WHERE
+        	receiving = REMOVE_EVENT(task, queues, queue_receiving) &
+        	sending = REMOVE_EVENT(task, queues, queue_sending)
+		THEN
+       		queue_receiving := queue_receiving <+ receiving ||
+       		queue_sending := queue_sending <+ sending
+    	END
+ 	END;
+ 
+ 	full <-- queue_is_full(pxQueue) =
+ 	BEGIN
+ 	    IF queue_size(pxQueue) = size( queue_items_r(pxQueue) ) THEN
+ 	        full := TRUE
+ 	    ELSE
+ 	        full := FALSE
+ 	    END
+	END
+
+END
