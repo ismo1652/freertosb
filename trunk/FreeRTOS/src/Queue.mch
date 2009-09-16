@@ -245,4 +245,15 @@ OPERATIONS
        		queue_sending := queue_sending <+ sending
     	END
 	END
+;
+full <-- queue_is_full(pxQueue) =
+ 	PRE
+ 	    pxQueue: queues
+ 	THEN
+ 		CHOICE
+ 	    	full := TRUE
+ 		OR
+ 	        full := FALSE
+ 	    END
+	END
 END
