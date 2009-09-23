@@ -1,0 +1,304 @@
+/* Task_rr
+ * Author: stepgalvao
+ * Creation date: Mon Sep 21 2009
+ */
+REFINEMENT
+   Task_rr
+REFINES
+   Task_r
+
+SEES
+   FreeRTOSConfig ,
+   Types
+
+ABSTRACT_VARIABLES
+   active ,
+   tasks ,
+   blocked ,
+   running ,
+   ready ,
+   suspended ,
+   idle ,
+   t_priority,
+   t_scheduler
+   
+INVARIANT
+   t_scheduler: TASK +-> NATURAL &
+   ready<:dom(t_scheduler) &
+   dom(t_scheduler) <: tasks
+  
+INITIALISATION
+   active := FALSE ||
+   tasks := {} ||
+   running :: TASK ||
+   idle :: TASK ||
+   t_priority := {} ||
+   t_scheduler :={} ||
+   blocked,ready,suspended := {},{},{}
+   
+CONSTANTS
+    put_ready
+    
+PROPERTIES
+    put_ready : TASK*POW(TASK)*(TASK +-> NATURAL) --> POW(TASK)*(TASK +-> NATURAL) &
+	put_ready = %(ttask,tready,tt_scheduler).(ttask:TASK & tready:POW(TASK) & tt_scheduler:(TASK +-> NATURAL) & ttask/:tready 
+	    			|(tready\/{ttask}),(tt_scheduler\/{ttask|->0}))
+	
+OPERATIONS
+    result <-- t_create (priority) =
+    BEGIN	
+        ANY
+            task
+        WHERE
+            task : TASK &
+            task /: tasks
+        THEN     	    
+            tasks := {task} \/ tasks ||
+            t_priority:= t_priority \/{task|->priority}||
+            ready:=ready \/ {task}||
+            t_scheduler:=t_scheduler\/{task|->0} ||
+            result := task
+        END                  
+    END
+    ;
+    
+    t_delete (atask)=
+    PRE
+        atask : TASK &
+        atask : tasks &
+        atask /= idle
+    THEN
+        tasks := tasks - { atask } || 	
+        t_priority:= { atask } <<| t_priority ||
+		t_scheduler:= { atask } <<| t_scheduler ||
+
+        IF atask = running	THEN
+            ANY
+                task
+            WHERE 
+                task : TASK & task : schedule_p (ready, t_priority)
+            THEN
+                running := task ||
+                ready := ready - { task }
+            END		
+        ELSIF atask : ready  THEN
+            ready := ready - { atask }
+        ELSIF atask : blocked  THEN
+            blocked := blocked - { atask }
+        ELSIF atask : suspended THEN
+            suspended := suspended - { atask }
+        END
+    END
+    ;
+    
+	t_resume (atask) =
+    BEGIN   
+        IF t_priority(atask) > t_priority(running) THEN
+            ready := ready \/ { running } ||
+            t_scheduler:=t_scheduler<+{running|->0}||
+            running := atask
+        ELSIF t_priority(atask) = t_priority(running) THEN
+            CHOICE
+	            ready := ready \/ { running } ||
+	            t_scheduler:=t_scheduler<+{running|->0}||
+    	        running := atask
+    	    OR
+    	        ready := ready \/ { atask }||
+    	        t_scheduler:=t_scheduler<+{atask|->0}
+    	    END
+        ELSE
+            ready := ready \/ { atask }||
+            t_scheduler:=t_scheduler<+{atask|->0}
+        END ||
+        suspended := suspended - { atask }	
+    END
+    ;
+    
+    t_startScheduler = 
+    BEGIN
+        active := TRUE ||
+        blocked, suspended := {}, {} ||
+        ANY
+            idle_task 
+        WHERE
+            idle_task : TASK & 
+            idle_task /: tasks 
+        THEN
+            tasks := tasks \/ { idle_task } ||
+            t_priority := t_priority \/ { idle_task |-> IDLE_PRIORITY } ||
+            idle := idle_task ||
+            ANY 
+                task
+            WHERE
+                task : TASK &
+                (ready = {} => task = idle_task) &
+                (ready /= {} => task : ready & t_priority(task) = max(t_priority[ready]))
+            THEN
+                running := task ||           	        
+                ready := (ready \/ { idle_task }) - { task }||
+                t_scheduler:=t_scheduler\/{idle_task|->0}
+                
+            END
+        END
+    END
+    ;
+        
+    t_endScheduler =
+    BEGIN
+        active := FALSE ||
+        tasks := {} ||
+        t_priority,t_scheduler:= {},{}||
+        blocked , ready , suspended := {},{},{}
+    END
+    ;
+    
+    t_resumeAll (tick) = 
+    PRE
+        active = TRUE &
+        tick : TICK
+    THEN
+        ANY
+            unblocked
+        WHERE
+            unblocked : FIN(TASK) &
+            unblocked <: blocked
+        THEN
+            IF unblocked /= {} THEN
+                IF t_priority(running) <= max(t_priority[unblocked])  THEN
+                    ANY
+                        task
+                    WHERE
+                        task : TASK &
+                        task : schedule_p(unblocked, t_priority)
+                    THEN
+                        running := task ||
+                        ready := ready \/ {running} \/ (unblocked - {task})||
+                        t_scheduler :=  t_scheduler <+ {running|->0} <+ (unblocked * {0})
+                    END
+                ELSE
+                    ready := ready \/ unblocked||
+                    t_scheduler := t_scheduler<+(unblocked*{0})
+                    
+                END ||
+                blocked := blocked - unblocked
+            END
+        END
+    END;
+    
+    t_incrementTick (tick) = 
+    PRE
+        active = TRUE &
+        tick : TICK
+    THEN
+        ANY
+            unblocked
+        WHERE
+            unblocked : FIN(TASK) &
+            unblocked <: blocked
+        THEN
+            IF unblocked /= {} THEN
+                IF t_priority(running) <= max(t_priority[unblocked])  THEN
+                    ANY
+                        task
+                    WHERE
+                        task : TASK &
+                        task : schedule_p(unblocked,t_priority)
+                    THEN
+                        running := task ||
+                        ready := ready\/{running}\/(unblocked-{task})||
+                        t_scheduler:=t_scheduler <+ {running|->0} <+ (unblocked * {0})
+                    END
+                    
+                ELSIF ready/={} THEN
+                    IF max(t_priority[ready]) =t_priority(running) THEN
+                        ANY
+							task
+						WHERE
+							task:TASK & 
+							task:schedule_p(ready,t_priority)&
+							t_scheduler(task)= min(t_scheduler[ready])&
+							task/=idle&
+							task/=running
+						THEN
+						    running:=task||
+							ready := (ready -{task})\/{running}\/unblocked ||
+							t_scheduler:=t_scheduler <+ {running|->(t_scheduler(running)+1)} <+ (unblocked * {0})
+						END
+                    ELSE
+						ready := ready \/ unblocked||
+						t_scheduler:=t_scheduler<+(unblocked*{0})
+						
+					END	    		
+				ELSE
+				    ready := ready \/ unblocked||
+					t_scheduler:=t_scheduler<+(unblocked*{0})
+                END||
+                blocked := blocked - unblocked
+            ELSIF ready/={} THEN
+               	IF max(t_priority[ready]) =t_priority(running) THEN
+					ANY
+						task
+					WHERE
+						task:TASK & 
+						task:schedule_p(ready, t_priority)&
+						t_scheduler(task)= min(t_scheduler[ready])&
+						task/=idle&
+						task/=running
+					THEN
+						running:=task||
+						ready := (ready -{task})\/{running}||
+						t_scheduler:=t_scheduler <+ {running|->(t_scheduler(running)+1)}
+					END
+				ELSE
+					skip
+				END
+			ELSE	    
+			    skip
+            END
+        END
+    END;
+    
+    
+    t_unblock(task)=
+    PRE
+        active = TRUE &
+        blocked /= {} &
+        task : TASK &
+        task : blocked
+    THEN
+        blocked := blocked - { task } ||
+        IF t_priority(task) >= t_priority(running) THEN
+            running := task ||
+            ready := ready \/ { running }||
+            t_scheduler:=t_scheduler <+ {running|->0}
+        ELSE
+            ready := ready \/ { task }||
+            t_scheduler:=t_scheduler <+ {task|->0}
+        END
+    END
+    ;
+    
+    t_setPriority (task, priority)=
+    BEGIN
+        t_priority(task) := priority ||
+
+        IF task : ready & t_priority(running) <= priority 
+        THEN
+            running := task ||        
+            ready := (ready \/{running})-{task}||
+            t_scheduler:=t_scheduler <+ {running|->0}
+        ELSIF task = running & priority < max(t_priority[ready])  THEN
+            ANY
+                atask
+            WHERE
+                atask : TASK &
+                atask : schedule_p(ready, t_priority)
+            THEN
+                running := atask ||
+                ready := (ready \/ { running }) - { atask }||
+                t_scheduler:=t_scheduler <+ {running|->0}
+            END
+        END
+    END
+
+END
