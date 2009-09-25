@@ -227,7 +227,6 @@ OPERATIONS
                     ELSE
 						ready := ready \/ unblocked||
 						t_scheduler:=t_scheduler<+(unblocked*{0})
-						
 					END	    		
 				ELSE
 				    ready := ready \/ unblocked||
