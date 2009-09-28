@@ -288,9 +288,10 @@ OPERATIONS
             task : TASK &
             task : ready & 
             t_priority(task) = max(t_priority[ready])    	    
-        THEN   		    
+        THEN	    
             running := task ||
             ready := ready - { task } 
+           
         END
     END;
     

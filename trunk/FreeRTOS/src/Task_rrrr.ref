@@ -1,0 +1,106 @@
+/* Task_rrrr
+ * Author: stepgalvao
+ * Creation date: Sun Sep 27 2009
+ */
+REFINEMENT
+   Task_rrrr
+REFINES
+   Task_rrr
+
+SEES
+   FreeRTOSConfig ,
+   Types
+
+ABSTRACT_VARIABLES
+   active ,
+   tasks ,
+   blocked ,
+   running ,
+   ready ,
+   suspended ,
+   idle ,
+   t_priority ,
+   t_scheduler ,
+   t_unblocked,
+   /*
+   Refinement Variables
+   */
+   ready_r,
+   blocked_r,
+   suspended_r
+   
+INVARIANT
+    ready_r : PRIORITY >+> seq(TASK) &
+    blocked_r : seq(TASK) &
+    suspended_r : seq(TASK) &
+    
+    dom(ready_r)<:ran(t_priority)&
+    
+    
+    !(ptask,sready).(ptask: PRIORITY & sready:seq(TASK) & {ptask|->sready}:(PRIORITY >+>> seq(TASK)) & {ptask|->sready}:ready_r => 
+        !(ttask).(ttask:TASK & ttask:ran(sready) => t_priority(ttask) = ptask ))
+    
+    
+    
+    
+    
+
+INITIALISATION
+   active := FALSE ||
+   tasks := {} ||
+   running :: TASK ||
+   idle :: TASK ||
+   t_priority := {} ||
+   t_scheduler := {} ||
+   blocked , ready , suspended := {} ||
+   t_unblocked := {}
+
+OPERATIONS
+	result <-- t_create (priority) =
+    BEGIN	
+        ANY
+            task
+        WHERE
+            task : TASK &
+            task /: tasks
+        THEN     	    
+            tasks := {task} \/ tasks ||
+            t_priority:= t_priority \/{task|->priority}||
+            ready_r(priority):=ready_r(priority)<-task||
+            t_scheduler:=t_scheduler\/{task|->0} ||
+            t_unblocked := t_unblocked \/{task|->0}||
+            result := task
+        END                  
+    END
+    ;
+    
+    t_delete (atask)=
+    PRE
+        atask : TASK &
+        atask : tasks &
+        atask /= idle
+    THEN
+        tasks := tasks - { atask } || 	
+        t_priority:= { atask } <<| t_priority ||
+		t_scheduler:= { atask } <<| t_scheduler ||
+		t_unblocked:= { atask } <<| t_unblocked ||
+
+        IF atask = running	THEN
+            ANY
+                task
+            WHERE 
+                task : TASK & task : schedule_p (ready, t_priority)
+            THEN
+                running := task ||
+                ready := ready - { task }
+            END		
+        ELSIF atask : ready  THEN
+            ready_r(t_priority(atask)):= ready_r(t_priority(atask)) |>> {atask}
+        ELSIF atask : blocked  THEN
+            blocked := blocked - { atask }
+        ELSIF atask : suspended THEN
+            suspended := suspended - { atask }
+        END
+    END
+    ;
+END

@@ -312,6 +312,7 @@ OPERATIONS
         THEN
             ready := ready - { task } ||
             running := task
+           
         END
     END;
     
