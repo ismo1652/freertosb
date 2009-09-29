@@ -79,7 +79,9 @@ ASSERTIONS
     active = TRUE => tasks /= {};
     active = TRUE => idle /: blocked;
     active = TRUE => idle /: suspended;
-    active = TRUE => ((ready = {}) => (running = idle))
+    active = TRUE => ((ready = {}) => (running = idle));
+    active = TRUE => ((running = idle) => (ready /= {}))
+    
     
 INITIALISATION
     active := FALSE ||
@@ -149,7 +151,7 @@ OPERATIONS
         atask /= idle 
     THEN
         tasks := tasks - { atask } || 	
-        IF atask = running THEN
+        IF atask = running THEN /* Ready isn't empty because idle task*/
             ANY
                 task
             WHERE 
@@ -157,7 +159,7 @@ OPERATIONS
                 task : ready
             THEN
                 running := task ||
-                ready := ready - { task }
+                ready := ready-{task} /* Ready could became empty here*/
             END		
         ELSIF atask : ready  THEN
             ready := ready - { atask }
