@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2008.11.3)  3 AUG 2009 23:25
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2009.9.19)  18 NOV 2009 14:23
 entering extended mode
  Source specials enabled.
  %&-line parsing enabled.
@@ -293,7 +293,7 @@ Package: amsfonts 2001/10/25 v2.2f
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 132.
 )) (./commands.tex)
-(/usr/share/texmf-texlive/tex/generic/babel/babel.sty
+(./symbols.tex) (/usr/share/texmf-texlive/tex/generic/babel/babel.sty
 Package: babel 2005/11/23 v3.8h The Babel package
 
 (/usr/share/texmf-texlive/tex/generic/babel/portuges.ldf
@@ -371,230 +371,339 @@ LaTeX Font Info:    Font shape `T1/ptm/bx/it' in size <20.74> not available
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [1]
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <24.88> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 74.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 57.
 LaTeX Font Info:    Font shape `T1/ptm/bx/it' in size <24.88> not available
-(Font)              Font shape `T1/ptm/b/it' tried instead on input line 74.
- (./quali.toc
+(Font)              Font shape `T1/ptm/b/it' tried instead on input line 57.
+ [2
+
+
+] (./quali.toc
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 2.
 LaTeX Font Info:    Font shape `T1/ptm/bx/it' in size <12> not available
 (Font)              Font shape `T1/ptm/b/it' tried instead on input line 2.
- [2
+ [3
 
-])
+] [4])
 \tf@toc=\write3
 \openout3 = `quali.toc'.
 
- [3] (./quali.lof
-Overfull \hbox (95.09637pt too wide) in paragraph at lines 6--6
- [][][] []\T1/ptm/m/n/12 Funcionamento de um es-ca-lo-na-dor pre-emp-tivo ba-se
--ado na pri-o-ri-dade [[]] []  
- []
+ [5] (./quali.lof
+[6
 
 
-Overfull \hbox (34.90317pt too wide) in paragraph at lines 12--12
- [][][] []\T1/ptm/m/n/12 Etapas do de-sen-vol-vi-mento de sis-tema atra-vés do 
-mé-todo B [[]] []  
- []
-
-)
+])
 \tf@lof=\write4
 \openout4 = `quali.lof'.
 
- [4
-
-
-] (./quali.lot)
+ [7] (./quali.lot)
 \tf@lot=\write5
 \openout5 = `quali.lot'.
 
- [5
+ [8
 
 ]
 Cap\'{\i }tulo 1.
-
-LaTeX Warning: Citation `USReport' on page 6 undefined on input line 85.
-
-
-LaTeX Warning: Citation `GDSBC' on page 6 undefined on input line 96.
-
-
-LaTeX Warning: Citation `FM' on page 6 undefined on input line 105.
-
-
-LaTeX Warning: Citation `Jim09' on page 6 undefined on input line 106.
-
-[6
+[9
 
 ]
-Overfull \hbox (102.07489pt too wide) in paragraph at lines 125--132
-[][]\T1/ptm/m/n/12 Entre as pos-sí-veis abor-da-gens para a es-pe-ci-fi-ca-ção 
-do Fre-eR-TOS está o mé-todo B [[]][[]].
- []
-
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <17.28> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 133.
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 145.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 190.
+ [10]
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 203.
 
-(/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
+ (/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 145.
- [7]
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 203.
+ [11] [12]
+[13] [14] [15]
+Cap\'{\i }tulo 2.
+<../fig/rtos_pt.jpg, id=57, 176.66pt x 150.5625pt>
+File: ../fig/rtos_pt.jpg Graphic file (type jpg)
+ <use ../fig/rtos_pt.jpg>
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 401.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 401.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 401.
 
-LaTeX Warning: Citation `ermac' on page 8 undefined on input line 157.
+[16
+
+ <../fig/rtos_pt.jpg>] [17]
+<../fig/task_states_pt.jpg, id=64, 392.4261pt x 414.8298pt>
+File: ../fig/task_states_pt.jpg Graphic file (type jpg)
+
+<use ../fig/task_states_pt.jpg> [18 <../fig/task_states_pt.jpg>] [19]
+<../fig/croutine_states_pt.jpg, id=72, 291.0875pt x 238.8925pt>
+File: ../fig/croutine_states_pt.jpg Graphic file (type jpg)
+
+<use ../fig/croutine_states_pt.jpg> [20 <../fig/croutine_states_pt.jpg>]
+<../fig/scheduler_pt.jpg, id=76, 752.8125pt x 292.84406pt>
+File: ../fig/scheduler_pt.jpg Graphic file (type jpg)
+
+<use ../fig/scheduler_pt.jpg> [21 <../fig/scheduler_pt.jpg>] [22] [23] [24]
+[25] <../fig/queue_pt.jpg, id=93, 449.68pt x 37.13875pt>
+File: ../fig/queue_pt.jpg Graphic file (type jpg)
+
+<use ../fig/queue_pt.jpg> [26 <../fig/queue_pt.jpg>] [27]
+<../fig/counting_semaphore_pt.jpg, id=100, 758.835pt x 347.79938pt>
+File: ../fig/counting_semaphore_pt.jpg Graphic file (type jpg)
+
+<use ../fig/counting_semaphore_pt.jpg>
+<../fig/Priority_inheritance_pt.jpg, id=101, 662.475pt x 357.335pt>
+File: ../fig/Priority_inheritance_pt.jpg Graphic file (type jpg)
+
+<use ../fig/Priority_inheritance_pt.jpg>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[28 <../fig/counting_semaphore_pt.jpg>] [29 <../fig/Priority_inheritance_pt.jpg
+>] [30]
+LaTeX Font Info:    Try loading font information for T1+cmtt on input line 1075
+.
+ (/usr/share/texmf-texlive/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+) [31] [32]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
-LaTeX Warning: Citation `CompVerif' on page 8 undefined on input line 158.
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
+[33] [34] [35]
 
-LaTeX Warning: Citation `sbmf08' on page 8 undefined on input line 159.
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
+[36] [37]
+Cap\'{\i }tulo 3.
+[38
 
-LaTeX Warning: Citation `semish08' on page 8 undefined on input line 159.
+] <../fig/desenvolvimento_b.jpg, id=138, 363.60844pt x 273.27094pt>
+File: ../fig/desenvolvimento_b.jpg Graphic file (type jpg)
 
-[8] <../fig/class_diagram.jpg, id=35, 427.5975pt x 314.17375pt>
+<use ../fig/desenvolvimento_b.jpg>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[39] [40 <../fig/desenvolvimento_b.jpg>]
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1579.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1579.
+ [41] [42] [43] [44] [45] [46] [47]
+[48] [49] [50] [51] [52] [53]
+Cap\'{\i }tulo 4.
+[54
+
+] [55] <../fig/class_diagram.jpg, id=196, 427.5975pt x 314.17375pt>
 File: ../fig/class_diagram.jpg Graphic file (type jpg)
 
 <use ../fig/class_diagram.jpg>
 
-LaTeX Warning: Reference `' on page 9 undefined on input line 225.
-
-[9 <../fig/class_diagram.jpg>] [10]
-Cap\'{\i }tulo 2.
-LaTeX Font Info:    Try loading font information for T1+cmtt on input line 310.
-
-(/usr/share/texmf-texlive/tex/latex/base/t1cmtt.fd
-File: t1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
-)
-<../fig/rtos.jpg, id=42, 176.66pt x 150.5625pt>
-File: ../fig/rtos.jpg Graphic file (type jpg)
- <use ../fig/rtos.jpg>
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 334.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 334.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 334.
- [11
-
- <../fig/rtos.jpg>] <../fig/task_states.jpg, id=47, 392.4261pt x 414.8298pt>
-File: ../fig/task_states.jpg Graphic file (type jpg)
-
-<use ../fig/task_states.jpg>
-
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-
-Overfull \hbox (9.62787pt too wide) in paragraph at lines 398--404
-[][]\T1/ptm/m/n/12 Entretanto, vale en-fa-ti-zar que por tratar-se de um SOTR p
-ara ar-qui-te-tu-ras mono-processadores
- []
-
-[12] [13 <../fig/task_states.jpg>]
-<../fig/croutine_states.jpg, id=55, 291.0875pt x 238.8925pt>
-File: ../fig/croutine_states.jpg Graphic file (type jpg)
-
-<use ../fig/croutine_states.jpg> [14 <../fig/croutine_states.jpg>]
-<../fig/scheduler.jpg, id=59, 752.8125pt x 292.84406pt>
-File: ../fig/scheduler.jpg Graphic file (type jpg)
-
-<use ../fig/scheduler.jpg>
-Underfull \hbox (badness 4872) in paragraph at lines 519--519
-[][]\T1/ptm/m/n/12 Figura 2.4: Fun-ci-o-na-mento de um es-ca-lo-na-dor pre-emp-
-tivo ba-se-ado na pri-o-ri-dade
- []
-
-[15 <../fig/scheduler.jpg>] [16] [17] [18]
-<../fig/queue.jpg, id=73, 449.68pt x 37.13875pt>
-File: ../fig/queue.jpg Graphic file (type jpg)
- <use ../fig/queue.jpg>
-[19 <../fig/queue.jpg>] [20] [21] [22]
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[23]
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[24] [25]
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[26] [27]
-Cap\'{\i }tulo 3.
-[28
-
-] <../fig/desenvolvimento_b.jpg, id=106, 363.60844pt x 273.27094pt>
-File: ../fig/desenvolvimento_b.jpg Graphic file (type jpg)
-
-<use ../fig/desenvolvimento_b.jpg>
-Underfull \hbox (badness 10000) in paragraph at lines 1152--1152
-[][]\T1/ptm/m/n/12 Figura 3.1: Eta-pas do de-sen-vol-vi-mento de sis-tema atra-
-vés do mé-todo B
- []
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[29]
-
-LaTeX Warning: Citation `clearsy' on page 30 undefined on input line 1175.
-
-[30 <../fig/desenvolvimento_b.jpg>]
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1225.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1225.
- [31] [32] [33] [34] [35] [36] [37] [38]
-
-LaTeX Warning: Reference `s' on page 39 undefined on input line 1667.
-
-[39] [40] [41] [42] [43]
-Cap\'{\i }tulo 4.
-[44
-
-]
+[56] [57 <../fig/class_diagram.jpg>] [58] [59] [60] [61] [62] [63]
 Cap\'{\i }tulo 5.
-[45
+[64
+
+] [65] [66] [67] [68] [69] [70]
+Overfull \hbox (4.96544pt too wide) in paragraph at lines 3281--3314
+ [][][] 
+ []
+
+[71] [72]
+Cap\'{\i }tulo 6.
+[73
+
+] (./quali.bbl [74]
+! Missing $ inserted.
+<inserted text> 
+                $
+l.38   2016}
+            .
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Extra }, or forgotten $.
+<recently read> \egroup 
+                        
+l.38   2016}
+            .
+I've deleted a group-closing symbol because it seems to be
+spurious, as in `$x}$'. But perhaps the } is legitimate and
+you forgot something else, as in `\hbox{$x}'. In such cases
+the way to recover is to insert both the forgotten and the
+deleted material, e.g., by typing `I$}'.
+
+! Extra }, or forgotten $.
+l.39 [S.l.], 2006.}
+                   
+I've deleted a group-closing symbol because it seems to be
+spurious, as in `$x}$'. But perhaps the } is legitimate and
+you forgot something else, as in `\hbox{$x}'. In such cases
+the way to recover is to insert both the forgotten and the
+deleted material, e.g., by typing `I$}'.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.40 
+     
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing } inserted.
+<inserted text> 
+                }
+l.40 
+     
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin1'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.51 ...g}. [S.l.]: Springer, 2008. v.~1, p. 277â€
+                                                  “280.}
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin1'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.51 ...}. [S.l.]: Springer, 2008. v.~1, p. 277â€“
+                                                  280.}
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+Underfull \hbox (badness 3780) in paragraph at lines 55--58
+[][]\T1/ptm/m/n/12 Tony Ho-are; Jay Misra. \T1/ptm/m/it/12 Ve-ri-fied soft-ware
+: the-o-ries, to-ols, ex-pe-ri-ments\T1/ptm/m/n/12 . 2005.
+ []
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin1'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.72   2007. p. 277â€
+                     “280.}
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin1'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.72   2007. p. 277â€“
+                      280.}
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+[75
 
 ]
-Cap\'{\i }tulo 6.
-[46
 
-] (./quali.bbl)
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin1'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.152 ...\emph{Frama-Câ€™s value analysis plug-in}
+                                                  . 2009.
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin1'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.152 ...\emph{Frama-Câ€™s value analysis plug-in}
+                                                  . 2009.
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `latin1'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.158 {{Markus Dahlweid} {MichaÅ‚
+                                  Moskal}, T.~S. \emph{VCC: Contract-based M...
+
+You need to provide a definition with \DeclareInputText 
+or \DeclareInputMath before using this key.
+
+! Missing } inserted.
+<inserted text> 
+                }
+l.162 \end{thebibliography}
+                           
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+)
 +-------------------------------------------------------------------+
 | Comentario, sugestao ou critica sobre o abnTeX? Entre em contato: |
 |                  http://abntex.codigolivre.org.br                 |
 +-------------------------------------------------------------------+
-[47
-
-] (./quali.aux)
-
-LaTeX Warning: There were undefined references.
-
- ) 
+[76] (./quali.aux) ) 
 Here is how much of TeX's memory you used:
- 3248 strings out of 94101
- 40944 string characters out of 1165810
- 99727 words of memory out of 1500000
- 6382 multiletter control sequences out of 10000+50000
- 90165 words of font info for 134 fonts, out of 1200000 for 2000
- 637 hyphenation exceptions out of 8191
- 30i,15n,41p,258b,352s stack positions out of 5000i,500n,6000p,200000b,5000s
- </home/stepgalvao/.texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1095.600pk> </h
-ome/stepgalvao/.texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1200.600pk>{/usr/shar
-e/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share/texmf-texlive/fonts/typ
-e1/bluesky/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr10
-.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmsy10.pfb></usr/share/te
-xmf-texlive/fonts/type1/bluesky/ams/msbm10.pfb></usr/share/texmf-texlive/fonts/
-type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmb
-i8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr8a.pfb></usr/share/
-texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on quali.pdf (48 pages, 430184 bytes).
+ 3357 strings out of 94101
+ 42848 string characters out of 1165810
+ 102842 words of memory out of 1500000
+ 6473 multiletter control sequences out of 10000+50000
+ 98571 words of font info for 145 fonts, out of 1200000 for 2000
+ 639 hyphenation exceptions out of 8191
+ 30i,17n,41p,299b,352s stack positions out of 5000i,500n,6000p,200000b,5000s
+ </home/stepgalvao/.texmf-var/fonts/pk/ljfour/jknappen/ec/e
+ctt1095.600pk>{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/share
+/texmf-texlive/fonts/type1/bluesky/cm/cmmi10.pfb></usr/share/texmf-texlive/font
+s/type1/bluesky/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/c
+msy10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/ams/msbm10.pfb></usr/sh
+are/texmf-texlive/fonts/type1/urw/symbol/usyr.pfb></usr/share/texmf-texlive/fon
+ts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/u
+tmbi8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr8a.pfb></usr/sha
+re/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
+Output written on quali.pdf (77 pages, 661384 bytes).
 PDF statistics:
- 289 PDF objects out of 1000 (max. 8388607)
+ 371 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 131072)
- 36 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 46 words of extra memory for PDF output out of 10000 (max. 10000000)
 
