@@ -33,30 +33,19 @@ VARIABLES
 INVARIANT
     tickCount: TICK &
     tickMissed:TICK &
-    scheduler: SCHEDULER_STATE &
-    (scheduler = taskSCHEDULER_NOT_STARTED <=> (active = FALSE)) &
-    ((scheduler = taskSCHEDULER_RUNNING or scheduler = taskSCHEDULER_SUSPENDED) <=> (active = TRUE))
+    (schedulerRunning = active ) &
+    ran(mutex_holder)<:(tasks)-{idle}  \/ {TASK_NULL}&
+    !mt.(mt:queues & mt:mutexes & queue_items(mt)={} => mutex_holder(mt):tasks & mutex_holder(mt)/=idle) &
+    !(que,task).(que:queues & task:TASK & task:queue_sending(que)=> task:blocked)&
+    !(que,task).(que:queues & task:TASK & task:queue_receiving(que) => task:blocked) 
+    /*Put the request of all task in event queue have to be blocked*/
     
 INITIALISATION
     tickCount := 0 ||
     tickMissed := 0 
     
 OPERATIONS
-/*
-SG -> DD
-Professor essas funções (xQueueGenericSend,xQueueGenericReceive) não faz parte da API do FreeRTOS em si. Elas servem 
-funções intermediária que são utilizada pela maioria das funcionalidades da API Queue Management como :
 
-# xQueueSend
-# xQueueSendToBack
-# xQueueSendToFront
-# xQueueReceive
-# xQueuePeek 
-
-O Sr. uma vez me pediu para colocar essas duas funções em uma máquina intermediária que seria usada pela máquina 
-que especifica API Queue Management. Seria melhor eu criar uma Queue_Facade ou Queue_Basic para colocar essas duas operações,
-e depois chamar essas operações nas máquinas que especificam a API Queue Management ?
-*/
 
     /**
     /brief Queue Send
@@ -74,18 +63,17 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     **/    
     return <-- xQueueGenericSend(pxQueue, pvItemToQueue, xTicksToWait,copy_position)=
     PRE
-        pxQueue:queues  &  
+        pxQueue:queues &  
         pvItemToQueue:ITEM  &  
         xTicksToWait:TICK &
         copy_position:COPY_POSITION &
-        active = TRUE &
-        running /= idle
+        running /= idle &
+        running:ready
     THEN
-        IF (xTicksToWait>0) 
-        THEN 
-            CHOICE
-                insertTaskWaitingToSend(pxQueue,running) || 
-                t_delayTask(xTicksToWait) ||
+       
+      	 CHOICE
+           		t_delayTask(xTicksToWait,running) ||
+                q_insertTaskWaitingToSend(pxQueue,running) || 
                 return := pdTRUE        	
             OR
                 ANY 
@@ -93,32 +81,27 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
                 WHERE 
                     task:TASK & 
                     task:blocked & 
-                    task:queue_receiving(pxQueue)
+                    task:queue_receiving(pxQueue)&
+                    task/:queue_sending(pxQueue) &
+ 					task/:pending
                 THEN
-                    sendItem(pxQueue,pvItemToQueue,task,copy_position)||
-                    t_unblock(task)||
-                    return := pdPASS
-                END        
-            END
-        ELSE
-            CHOICE
-                ANY 
-                    task
-                WHERE 
-                    task:TASK & 
-                    task:blocked & 
-                    task:queue_receiving(pxQueue) 
-                    
-                THEN
-                    sendItem(pxQueue,pvItemToQueue,task,copy_position)||
-                    t_unblock(task)||
-                    return := pdPASS
+                    IF pxQueue: mutexes 
+                    THEN
+                        IF queue_items(pxQueue)={} 
+                        THEN
+                            q_sendItemMutex(pxQueue,task)||
+                            t_unblockMutex(task)
+                        END
+                    ELSE
+                        q_sendItem(pxQueue,pvItemToQueue,task,copy_position)||
+                    	t_unblock(task)
+                    END||
+                 return := pdPASS
                 END
             OR
                 return := errQUEUE_FULL	
-            END 		
-        END
-    END;
+            END
+	END;
     
     
     /**
@@ -137,48 +120,55 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     in the pvBuffer. Here it's implement as return of function and if the queue is empty, the ITEM_NULL is return
     
     **/ 
-    return,pvBuffer<--xQueueGenericReceive(xQueue,xTicksToWait,justPeeking)=
+    return,pvBuffer<--xQueueGenericReceive(pxQueue,xTicksToWait,justPeeking)=
     PRE
         active = TRUE &
         running /= idle &
-        xQueue : QUEUE &
-        xQueue : queues & 
+        pxQueue : QUEUE &
+        pxQueue : queues & 
         xTicksToWait:TICK &
         justPeeking : BOOL
     THEN
         IF xTicksToWait > 0
         THEN
-            CHOICE
-                insertTaskWaitingToRecived(xQueue,running)||
-                t_delayTask(xTicksToWait)||
+            IF (queue_items(pxQueue)={}) THEN
+                IF pxQueue:mutexes THEN
+                    t_PriorityInherit(xTicksToWait,mutex_holder(pxQueue))                
+                ELSE
+                    t_delayTask(xTicksToWait,running)
+                END||
+                
+                q_insertTaskWaitingToReceive(pxQueue,running)||/*no futuro será necessário uma reorganização para tratar a herança de prioridade*/
                 return,pvBuffer:=pdTRUE,ITEM_NULL
-            OR
+            ELSE
                 ANY 
                     task 
                 WHERE 
                     task:TASK & 
-                    task: queue_sending(xQueue) & 
-                    task:blocked
+                    task:queue_sending(pxQueue) & 
+                    task:blocked &
+                    task/:pending
                 THEN         
-                    pvBuffer<--receivedItem(xQueue,justPeeking,task)||
+                    pvBuffer<--q_receivedItem(pxQueue,justPeeking,task,running)||
                     IF justPeeking = FALSE THEN t_unblock(task) END
                 END|| 
                 return:=pdPASS
             END
         ELSE
-            CHOICE
+            IF (queue_items(pxQueue)/={})THEN
                 ANY 
                     task 
                 WHERE 
                     task:TASK & 
-                    task:queue_sending(xQueue) & 
-                    task:blocked
+                    task:queue_sending(pxQueue) & 
+                    task:blocked &
+                    task/:pending
                 THEN         
-                    pvBuffer<--receivedItem(xQueue,justPeeking,task)||
+                    pvBuffer<--q_receivedItem(pxQueue,justPeeking,task,running)||
                     IF justPeeking = FALSE THEN t_unblock(task) END
                 END|| 
                 return:=pdPASS
-            OR
+            ELSE
                 return,pvBuffer:=errQUEUE_EMPTY,ITEM_NULL
             END
         END
@@ -211,8 +201,7 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
         pcName : NAME & 
         usStackDepth : NAT &  
         pvParameters : POW(PARAMETER) & 
-        uxPriority : PRIORITY &
-        scheduler = taskSCHEDULER_NOT_STARTED
+        uxPriority : PRIORITY 
     THEN 
         CHOICE 
             handle <-- t_create (uxPriority) ||
@@ -241,10 +230,11 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
         pxTaskToDelete : TASK &
         pxTaskToDelete : tasks &
         pxTaskToDelete /= idle &
-        scheduler = taskSCHEDULER_RUNNING
+        pxTaskToDelete/:ran(mutex_holder)/*Essa proteção não existe no freertos, verificar o que ocorre quando 
+        									é uma excluida uma tarefa mantida pelo mutex */
     THEN
         t_delete (pxTaskToDelete) ||
-        removeFromEventListQueue(pxTaskToDelete)
+        q_removeFromEventListQueue(pxTaskToDelete)
     END;
     
     /**
@@ -267,11 +257,13 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
         INCLUDE_vTaskSuspend = 1 & 
         pxTaskToSuspend : TASK &
         pxTaskToSuspend : tasks &
-        pxTaskToSuspend /= idle &
-        scheduler = taskSCHEDULER_RUNNING
+        pxTaskToSuspend /= idle
     THEN
         IF pxTaskToSuspend /: suspended	THEN
-            t_suspend (pxTaskToSuspend) ||
+            t_suspend(pxTaskToSuspend) ||
+            IF pxTaskToSuspend:blocked THEN
+                q_removeFromEventListQueue(pxTaskToSuspend)
+            END||
             rr := pdTRUE	    
         ELSE 
             rr := pdFALSE   
@@ -290,11 +282,12 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     **/
     vTaskResume(pxTaskToResume) =
     PRE 
-        scheduler = taskSCHEDULER_RUNNING &
+        
         INCLUDE_vTaskSuspend = 1 &
         suspended /= {} & 
         pxTaskToResume : TASK & 
-        pxTaskToResume : suspended
+        pxTaskToResume : suspended &
+        pxTaskToResume/:pending
     THEN    
         t_resume (pxTaskToResume)	
     END;
@@ -333,7 +326,7 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     **/
     cTask <-- xTaskGetCurrentTaskHandle=
     PRE
-        scheduler = taskSCHEDULER_RUNNING &
+       
         INCLUDE_xTaskGetCurrentTaskHandle = 1
     THEN
         cTask <-- t_getCurrent
@@ -368,13 +361,14 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     **/
     vTaskDelay(xTicksToDelay)=
     PRE
-        scheduler = taskSCHEDULER_RUNNING &
+       
         xTicksToDelay : TICK & 
         INCLUDE_vTaskDelay = 1 &
         running /= idle &
-        not(TICK_INCREMENT (tickCount, xTicksToDelay)=0)
+        not(TICK_INCREMENT (tickCount, xTicksToDelay)=0) &
+        running:ready
     THEN
-        t_delayTask (TICK_INCREMENT (tickCount, xTicksToDelay))
+        t_delayTask (TICK_INCREMENT (tickCount, xTicksToDelay),running)
     END;
     
     /**
@@ -391,19 +385,22 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     **/
     vTaskDelayUntil(pxPreviousWakeTime, xTimeIncrement) =
     PRE
-        scheduler = taskSCHEDULER_RUNNING &
+       
         pxPreviousWakeTime : TICK & 
         xTimeIncrement : TICK & 
         running /= idle &
         INCLUDE_vTaskDelayUntil = 1
     THEN
-        SELECT
-            TICK_INCREMENT (pxPreviousWakeTime, xTimeIncrement) /= 0
-        THEN
-            t_delayTask (TICK_INCREMENT (pxPreviousWakeTime, xTimeIncrement))
-        ELSE
-            skip
-        END
+        IF schedulerRunning =TRUE THEN 
+        	SELECT
+          	  TICK_INCREMENT (pxPreviousWakeTime, xTimeIncrement) /= 0
+       		THEN
+            	t_delayTask (TICK_INCREMENT (pxPreviousWakeTime, xTimeIncrement),running)
+        	ELSE
+            	skip
+        	 END
+     	END
+     
     END;
     
     /**
@@ -419,7 +416,7 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     **/
     numberOfTicks <-- xTaskGetTickCount=
     PRE
-        scheduler = taskSCHEDULER_RUNNING &
+       
         INCLUDE_xTaskGetCurrentTaskHandle = 1
     THEN
         numberOfTicks := tickCount
@@ -434,13 +431,14 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     \returns
     schedulerState - The currently state of the scheduler
     
-    **/
+   
     schedulerState <-- xTaskGetSchedulerState =
     PRE
         INCLUDE_xTaskGetSchedulerState = 1
     THEN
         schedulerState <-- stateScheduler
-    END;
+        END;
+         **/
     
     /**
     \brief	Start Scheduler
@@ -450,8 +448,9 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     **/
     vTaskStartScheduler = 
     PRE
-        scheduler = taskSCHEDULER_NOT_STARTED &
-        blocked = {} & suspended = {} & ready = {}  	
+        
+        blocked = {} & suspended = {} & ready = {} &
+        active=FALSE
     THEN
         CHOICE
             t_startScheduler||
@@ -469,10 +468,11 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     **/
     vTaskEndScheduler =
     PRE
-        scheduler = taskSCHEDULER_RUNNING
+        schedulerRunning = TRUE
     THEN	
         stopScheduler ||
-        t_endScheduler
+        t_endScheduler ||
+        q_endScheduler
     END;
     
     /**
@@ -483,9 +483,10 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     **/
     vTaskSuspendAll=
     PRE
-        scheduler = taskSCHEDULER_RUNNING
+        schedulerSuspended< MAXINT
     THEN
-        suspendScheduler   		
+        
+        suspendScheduler 		
     END;
     
     /**
@@ -500,12 +501,20 @@ e depois chamar essas operações nas máquinas que especificam a API Queue Mana
     **/
     xTaskResumeAll = 
     PRE
-        scheduler = taskSCHEDULER_SUSPENDED
+        schedulerSuspended>0
     THEN
         CHOICE
             resumeScheduler ||
-            t_resumeAll (TICK_INCREMENT(tickCount, tickMissed)) ||
-            tickCount := TICK_INCREMENT(tickCount, tickMissed)
+            ANY
+                unblocked
+            WHERE
+                unblocked : FIN(TASK) &
+                unblocked <: blocked
+            THEN
+                t_resumeAll(unblocked) ||
+                q_resumeAll(unblocked\/pending)||
+                tickCount := TICK_INCREMENT(tickCount, tickMissed)
+            END
         OR
             skip
         END
@@ -531,32 +540,36 @@ uma coisa mais complicada
     **/
     incrementTick =
     PRE
-        scheduler /= taskSCHEDULER_NOT_STARTED
+        
+        schedulerRunning =TRUE
     THEN
-        IF scheduler = taskSCHEDULER_RUNNING THEN 
-            tickCount := TICK_INCREMENT(tickCount, 1)||
-        	t_incrementTick(TICK_INCREMENT(tickCount, 1))
-        	
+        IF schedulerSuspended = 0 THEN 
+            tickCount := TICK_INCREMENT(tickCount, 1)
+            
         ELSE 
             tickMissed := TICK_INCREMENT(tickCount, 1)
-        END 
+        END ||
+        	ANY
+                unblocked
+            WHERE
+                unblocked : FIN(TASK) &
+                unblocked <: blocked &
+                unblocked/\pending={}
+            THEN
+                t_resumeIncrement(unblocked) ||
+                q_resumeAll(unblocked)
+            END        
     END;
 
-/*
-SG->DD
-Adicionei essa operação
-*/    
+   
 	vQueueDelete(pxQueue)=
 	PRE
 	    pxQueue:queues
 	THEN
-	    queueDelete(pxQueue)
+	    q_queueDelete(pxQueue)
 	END;
 
-/*
-SG->DD
-Adicionei essa operação
-*/ 	
+ 	
 vTaskPrioritySet(pxTask,uxNewPriority )=
 PRE
     pxTask:tasks &
@@ -566,7 +579,43 @@ PRE
     
 THEN
     t_setPriority(pxTask,uxNewPriority)
+END;
+
+
+/*Semaphore functions*/
+
+/*
+	In FreeRTOS, semaphore is a parameter. This it will to be the return of the function
+*/
+semaphore<--vSemaphoreCreateBinary=
+BEGIN
+    semaphore<--q_createSemaphore(1,1)
 END
+;
+
+semaphore<--xSemaphoreCreateCounting(uxMaxCount,uxInitialCount)=
+PRE
+    uxMaxCount:NAT &
+    uxInitialCount:NAT &
+    1<=uxInitialCount &
+    uxInitialCount<=uxMaxCount 
+THEN
+    semaphore<--q_createSemaphore(uxMaxCount,uxInitialCount)
+END
+;
+
+/*Mutex functions*/
+
+xQueueHandle<--xQueueCreateMutex=
+BEGIN
+   xQueueHandle<--q_createMutex
+END;
+
+xQueueHandle<-- xSemaphoreCreateRecursiveMutex=
+BEGIN
+   xQueueHandle<--q_createMutex
+END
+
 
 	
 END

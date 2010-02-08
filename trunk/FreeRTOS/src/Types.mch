@@ -22,15 +22,18 @@ SETS
 	SCHEDULER_STATE = 
     {taskSCHEDULER_NOT_STARTED, taskSCHEDULER_RUNNING, taskSCHEDULER_SUSPENDED};
     
-    TASK;		/** tasks */	    
+    TASK;		/** tasks */	  
+    
+    
     STACK;		/** stack of task**/
     TASK_CODE;  /* pointer to code of task*/
     
     ITEM;			/** queue items */
     COPY_POSITION = {queueSEND_TO_BACK,queueSEND_TO_FRONT};
     
-    QUEUE; 			/** queues */
-
+    QUEUE;		/** queues */
+    QUEUE_TYPE={TQUE,TSEMAPH,TMUT}; /*Types that say the types of elemente stored in QUEUE*/
+    
 	ERROR_DEFINITION = {errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY, errNO_TASK_TO_RUN,
 	    errQUEUE_BLOCKED, errQUEUE_YIELD, errQUEUE_EMPTY, errQUEUE_FULL, pdPASS, pdFAIL,
 	    pdTRUE, pdFALSE}
@@ -40,13 +43,17 @@ CONSTANTS
     BIT,
     
     QUEUE_NULL,
-    ITEM_NULL,
-    REMOVE_EVENT,
+    ITEM_NULL,/*Used in semaphore when the task give the semaphore*/
+    TASK_NULL, /*represent the null task*/
+    ITEM_EMPTY,/*represent the mutex and semaphore items*/
     
+    REMOVE_EVENT,
+   
     PRIORITY,	/** task priorities */
     TICK, /*Tick available in freeRTOS*/
     TICK_INCREMENT, /** function used to update the tick counter */	
-	MAX_DELAY,  /** maximal value for TICK */
+    MAX_DELAY,  /** maximal value for TICK */
+    
     
 	NULL_PARAMETER /*represent a NULL parameter*/
 
@@ -68,11 +75,15 @@ PROPERTIES
     
     QUEUE_NULL:QUEUE &
     ITEM_NULL:ITEM &
+    ITEM_EMPTY:ITEM &
+    TASK_NULL:TASK&
     REMOVE_EVENT : TASK * POW(QUEUE) * (QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) &
     REMOVE_EVENT = 
     %(task, queues, pending).
     (task : TASK & queues : POW(QUEUE) & pending : QUEUE +-> POW(TASK) |
         %(queue).(queue : queues & queue : dom(pending) | pending(queue) - {task}))
+    
+
 
 ASSERTIONS
     BIT <: NATURAL

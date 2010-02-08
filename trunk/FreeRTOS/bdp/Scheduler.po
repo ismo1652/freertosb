@@ -1,0 +1,30 @@
+THEORY ProofList IS
+  _f(1) & _f(2) & _f(3) & _f(8) & resumeScheduler.2,(_f(5) => _f(10));
+  _f(1) & _f(2) & _f(3) & _f(8) & resumeScheduler.1,(_f(5) => _f(9));
+  _f(1) & _f(2) & _f(3) & _f(4) & suspendScheduler.2,(_f(5) => _f(7));
+  _f(1) & _f(2) & _f(3) & _f(4) & suspendScheduler.1,(_f(5) => _f(6))
+END
+&
+THEORY Formulas IS
+  ("`Seen and used machines properties'" & BIT = 0..1 & MAX_DELAY: 0..2147483647 & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TICK_INCREMENT: TICK*TICK +-> TICK & dom(TICK_INCREMENT) = TICK*TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & QUEUE_NULL: QUEUE & ITEM_NULL: ITEM & ITEM_EMPTY: ITEM & TASK_NULL: TASK & REMOVE_EVENT: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) & REMOVE_EVENT = %(task,queues,pending).(task: TASK & queues: POW(QUEUE) & pending: QUEUE +-> POW(TASK) | %queue.(queue: queues & queue: dom(pending) | pending(queue)-{task})) & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & ITEM: FIN(INTEGER) & not(ITEM = {}) & QUEUE: FIN(INTEGER) & not(QUEUE = {}) & (1..3)*{SCHEDULER_STATE}: FIN(NATURAL*{SCHEDULER_STATE}) & not((1..3)*{SCHEDULER_STATE} = {}) & (1..2)*{COPY_POSITION}: FIN(NATURAL*{COPY_POSITION}) & not((1..2)*{COPY_POSITION} = {}) & (1..3)*{QUEUE_TYPE}: FIN(NATURAL*{QUEUE_TYPE}) & not((1..3)*{QUEUE_TYPE} = {}) & (1..10)*{ERROR_DEFINITION}: FIN(NATURAL*{ERROR_DEFINITION}) & not((1..10)*{ERROR_DEFINITION} = {}));
+  ("`Seen and used machines assertions'" & BIT: POW(NATURAL));
+  ("`Component invariant'" & schedulerRunning: BOOL & schedulerSuspended: INTEGER & 0<=schedulerSuspended);
+  ("`suspendScheduler preconditions in this component'" & schedulerSuspended+1<=2147483647);
+  "`Check that the invariant (schedulerSuspended: NATURAL) is preserved by the operation - ref 3.4'";
+  (schedulerSuspended+1: INTEGER);
+  (0<=schedulerSuspended+1);
+  ("`resumeScheduler preconditions in this component'" & 1<=schedulerSuspended);
+  (schedulerSuspended-1: INTEGER);
+  (0<=schedulerSuspended-1)
+END
+&
+THEORY EnumerateX IS
+  SCHEDULER_STATE == {taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED};
+  COPY_POSITION == {queueSEND_TO_BACK,queueSEND_TO_FRONT};
+  QUEUE_TYPE == {TQUE,TSEMAPH,TMUT};
+  ERROR_DEFINITION == {errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,errQUEUE_EMPTY,errQUEUE_FULL,pdPASS,pdFAIL,pdTRUE,pdFALSE}
+END
+&
+THEORY Version IS
+  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO, genDivergencePO == KO, local_op == OK)
+END

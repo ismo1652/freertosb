@@ -9,27 +9,19 @@ SEES
     Types
     
 VARIABLES
-	scheduler
+    schedulerRunning,
+    schedulerSuspended
    
 INVARIANT
-	scheduler: SCHEDULER_STATE
+    schedulerRunning: BOOL &
+    schedulerSuspended:NATURAL
 
 INITIALISATION
-    scheduler := taskSCHEDULER_NOT_STARTED
+    schedulerRunning := FALSE||
+    schedulerSuspended:=0
     
 OPERATIONS
-	/**
-		\brief	Get Scheduler State
-		\do	
-			Get the currently state of the scheduler
-		\returns
-			schedulerState - The currently state of the scheduler
-			
-	**/
-	state <-- stateScheduler =
-	BEGIN
-	    state := scheduler
-	END;
+	
 
 	/**
 		\brief	Start Scheduler
@@ -39,9 +31,9 @@ OPERATIONS
 	**/
 	startScheduler = 
 	PRE
-    	scheduler = taskSCHEDULER_NOT_STARTED  	
+    	schedulerRunning = FALSE  	
 	THEN
-        scheduler:=taskSCHEDULER_RUNNING
+        schedulerRunning:=TRUE
  	END;
 	
 	/**
@@ -52,9 +44,9 @@ OPERATIONS
 	**/
 	stopScheduler =
 	PRE
-    	scheduler = taskSCHEDULER_RUNNING
+    	schedulerRunning = TRUE
 	THEN
-    	scheduler := taskSCHEDULER_NOT_STARTED
+    	schedulerRunning := FALSE
 	END;
 	
 	/**
@@ -65,9 +57,10 @@ OPERATIONS
 	**/
 	suspendScheduler =
 	PRE
-	    scheduler = taskSCHEDULER_RUNNING
+	    schedulerSuspended< MAXINT
+	    
 	THEN
-   		scheduler := taskSCHEDULER_SUSPENDED   		
+   		schedulerSuspended := schedulerSuspended + 1
 	END;
 
 	/**
@@ -82,9 +75,9 @@ OPERATIONS
 	**/
 	resumeScheduler = 
 	PRE
-	    scheduler = taskSCHEDULER_SUSPENDED
+	    schedulerSuspended > 0
 	THEN
-        scheduler := taskSCHEDULER_RUNNING
+        schedulerSuspended := schedulerSuspended - 1
 	END
 	
 END

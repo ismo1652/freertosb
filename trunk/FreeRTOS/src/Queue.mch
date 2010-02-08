@@ -1,10 +1,5 @@
-/*
-SG->DD:
-Queria saber se eu posso padronizar o nome dessas operações 
-como colocar q_ antes do nome da operação
-*/
-
-/* QueueCore
+/**********************************************************************************************************
+QueueCore
 
  \brief Basic layer of definitions for queue support in FreeRTOS.
  
@@ -17,14 +12,16 @@ como colocar q_ antes do nome da operação
  Departamento de Informática e Matemática Aplicada
  Programa de Pos-Graduacao em Sistemas e Computacao
  Formal Methods and Languages Research Laboratory
-*/ 
+**********************************************************************************************************/ 
 
 MACHINE
     Queue
 
 SEES
     Types
-                            
+    
+
+    
 /*ASSERTIONS
     
     !(task, queues, pending).
@@ -35,49 +32,88 @@ VARIABLES
 
     /** Different queues in FreeRTOS */
     queues,
+    semaphores,
+    mutexes,
     	
     /** miscellaneous queue properties */
     queue_items, /**Set of items of a queue **/
     queue_receiving, /**Set of tasks waiting to recive one item of queue **/
-    queue_sending	/**Set of tasks waiting to send one item to queue **/
+    queue_sending,/**Set of tasks waiting to send one item to queue **/
+  	mutex_holder
+   
+    
      
     
 INVARIANT
     queues : POW(QUEUE) & 
     queue_items : QUEUE +-> POW(ITEM) &
-    queue_receiving : QUEUE+-> POW(TASK) & 
+    queue_receiving : QUEUE +-> POW(TASK) & 
     queue_sending : QUEUE+-> POW(TASK) &
+    
+    /*Set for keep the queue of semaphore type*/
+    semaphores: POW(QUEUE) &
+    semaphores<:queues &
+    
+    mutexes: POW(QUEUE)& 
+    mutexes<:queues&
     	
 	/**All queue must have a set of item, a set of tasks waiting to recive, set of task waiting to send and a capacity **/
 	queues = dom(queue_items) &
 	queues = dom(queue_receiving) &
-	queues = dom(queue_sending) 
+	queues = dom(queue_sending) &
+	!(q1,q2,tk).(q1:queues & q2:queues & tk:TASK & tk:queue_receiving(q1)=> tk/:queue_sending(q2))&
+	!(q1,q2,tk).(q1:queues & q2:queues & tk:TASK & tk:queue_sending(q2)=> tk/:queue_receiving(q1))&
+	!(q1,q2,tk).(q1:queues & q2:queues & q1/=q2 & tk:TASK & tk:queue_receiving(q1) => tk/:queue_receiving(q2))&
+	!(q1,q2,tk).(q1:queues & q2:queues & q1/=q2 & tk:TASK & tk:queue_sending(q1) => tk/:queue_sending(q2))&
+	
+	mutex_holder: QUEUE +-> TASK &
+	
+	mutexes=dom(mutex_holder) &
+	
+	
+	!mt.(mt:mutexes & queue_items(mt)={} => mutex_holder(mt)/=TASK_NULL) &
+	!mt.(mt:mutexes & queue_items(mt)/={} => mutex_holder(mt)=TASK_NULL) &
+	!mt.(mt:mutexes => queue_items(mt)={} or queue_items(mt)={ITEM_EMPTY}) 
+	
+CONSTANTS 
+    remove_task
+    
+PROPERTIES 
+    remove_task : ((QUEUE+->POW(TASK)) * POW(TASK))--> (QUEUE+->POW(TASK)) &
+    remove_task = %(q_task,unblocked).(q_task:QUEUE+->POW(TASK) & unblocked:POW(TASK)|
+        										%(q1).(q1:QUEUE & q1:dom(q_task) | q_task(q1)-unblocked))
+    
+    
+ASSERTIONS
+    !(que).(que:QUEUE & que/:queues=> que/:mutexes) &
+    !(mt).(mt:mutexes & queue_items(mt)/={} => queue_items(mt)={ITEM_EMPTY})&
+    !(mt).(mt:mutexes & queue_items(mt)/={ITEM_EMPTY} => queue_items(mt)={})
+
     
 INITIALISATION
-    /**
-    queues := {QUEUE_NULL}||
-    queue_items := {QUEUE_NULL |-> {}}||
-    queue_receiving := {QUEUE_NULL |-> {}}||
-    queue_sending := {QUEUE_NULL |-> {}}||
-    **/
+    
     queues := {}||
     queue_items := {}||
     queue_receiving := {}||
-    queue_sending := {}
-    
+    queue_sending := {}||
+    semaphores:={}||
+    mutexes:={}||
+    mutex_holder:={}
     
 OPERATIONS
-	/**
-		/brief Create Queue
-		/do
-			Create a new queue that will be manage by FreeRTOS. The length queue and size itens of queue features aren't used in this level
-			of abstraction and the decision of when the queue can or not be create will be implemente in future refinement.
-			
-		/parameters
-			uxQueueLength - Queue length - No used in this abstraction level
-			uxItemSize - the size of one item of queue - No used in this abstraction level
+	/**********************************************************************************************************
+	/brief Create Queue
+	
+	/do
+		Create a new queue that will be manage by FreeRTOS. The length queue and size itens of queue 
+		features aren't used in this level of abstraction and the decision of when the queue can or not be 
+		create will be implemente in future refinement.
+		
+	/parameters
+		uxQueueLength - Queue length - No used in this abstraction level
+		uxItemSize - the size of one item of queue - No used in this abstraction level
  	
-	**/
+	**********************************************************************************************************/
 	xQueueHandle <-- xQueueCreate(uxQueueLength, uxItemSize) =
 	PRE
     	uxQueueLength: NAT & 
@@ -85,16 +121,16 @@ OPERATIONS
 	THEN    
     	CHOICE
 			ANY
-			    queue 
+			    pxQueue 
 			WHERE
-			    queue : QUEUE & 
-			    queue /: queues
+			    pxQueue : QUEUE & 
+			    pxQueue /: queues
 			THEN	
-		    	queues := queues \/ {queue}||
-		    	queue_items := queue_items \/ {queue |-> {}} ||
-		    	queue_receiving := queue_receiving \/ {queue |-> {}} ||
-		    	queue_sending := queue_sending \/ {queue |-> {}}||
-		    	xQueueHandle := queue
+		    	queues := queues \/ {pxQueue}||
+		    	queue_items := queue_items \/ {pxQueue |-> {}} ||
+		    	queue_receiving := queue_receiving \/ {pxQueue |-> {}} ||
+		    	queue_sending := queue_sending \/ {pxQueue |-> {}}||
+		    	xQueueHandle:=pxQueue
 			END		    
      	OR
         	xQueueHandle:=QUEUE_NULL
@@ -112,15 +148,21 @@ OPERATIONS
 			queue - Queue that will be delete
 
 	**/
-	queueDelete(queue) =
+	q_queueDelete(pxQueue) =
 	PRE
-		queue : queues
+		pxQueue : queues
 	THEN    
-    	queues := queues - {queue}||
-		queue_items := {queue} <<| queue_items  ||
-		queue_receiving := {queue} <<| queue_receiving ||
-		queue_sending := {queue} <<| queue_sending 
-		
+    	queues := queues - {pxQueue}||
+		queue_items := {pxQueue} <<| queue_items  ||
+		queue_receiving := {pxQueue} <<| queue_receiving ||
+		queue_sending := {pxQueue} <<| queue_sending ||
+		IF pxQueue:semaphores THEN
+		    semaphores:=semaphores-{pxQueue}
+		END||
+		IF pxQueue:mutexes THEN
+		    mutexes:=mutexes-{pxQueue}||
+		    mutex_holder:= {pxQueue} <<| mutex_holder
+		END
    	END;
    	
 	/**
@@ -138,9 +180,10 @@ OPERATIONS
 							a item in front and black respective
 			
 	**/
-	sendItem(pxQueue, pxItem, task, copy_position) =
+	q_sendItem(pxQueue, pxItem, task, copy_position) =
 	PRE
-    	pxQueue : queues & 
+	    pxQueue : queues & 
+	    pxQueue/:mutexes &
     	pxItem:ITEM & 
     	task:TASK & 
     	copy_position : COPY_POSITION &	    
@@ -148,6 +191,19 @@ OPERATIONS
 	THEN
     	queue_items(pxQueue) := queue_items(pxQueue) \/ {pxItem}||
     	queue_receiving(pxQueue) := queue_receiving(pxQueue) - {task}
+ 	END;
+ 
+	q_sendItemMutex(mutex,task) =
+	PRE
+    	mutex : mutexes & 
+    	task:TASK &     
+    	task:queue_receiving(mutex) &
+    	queue_items(mutex)={}  
+    	 
+ 	THEN     
+    	queue_items(mutex) := queue_items(mutex) \/ {ITEM_EMPTY}||
+    	queue_receiving(mutex) := queue_receiving(mutex) - {task}||
+    	mutex_holder(mutex):=TASK_NULL 
 	END;
 	
 	/**
@@ -160,10 +216,12 @@ OPERATIONS
 			pxQueue - Queue that the task will be insert in the reciving
 			pxTask - Task that will insert in the set of task waiting to recive (reciving)
 	**/
-	insertTaskWaitingToSend(pxQueue, pxTask) =
+	q_insertTaskWaitingToSend(pxQueue, pxTask) =
 	PRE
 		pxQueue : queues & 
-		pxTask : TASK
+		pxTask : TASK &
+		!q1.(q1:queues => pxTask/: queue_sending(q1) & pxTask/:queue_receiving(q1))
+		
 	THEN
     	queue_sending(pxQueue) := queue_sending(pxQueue) \/ {pxTask}
 	END;
@@ -178,13 +236,15 @@ OPERATIONS
 			pxQueue - Queue that the task will be insert in the sending
 			pxTask - Task that will insert in the set sending
 	**/
-	insertTaskWaitingToRecived(pxQueue, pxTask) =
-	PRE
-    	pxQueue : queues &
-    	pxTask : TASK
-	THEN
-    	queue_receiving(pxQueue) := queue_receiving(pxQueue) \/ {pxTask}
-	END	;
+    q_insertTaskWaitingToReceive(pxQueue, pxTask) =
+    PRE
+        pxQueue : queues &
+        pxTask : TASK &
+        !q1.(q1:queues => pxTask/: queue_sending(q1) & pxTask/:queue_receiving(q1))
+    THEN
+        
+        queue_receiving(pxQueue) := queue_receiving(pxQueue) \/ {pxTask}
+    END	;
 	
 	/**
 		/brief Received Item Recive
@@ -199,12 +259,15 @@ OPERATIONS
 			justPeeking - Flag that indicate if the item will reade and remove or only read
 			pxTask - Task that have the item that will be read
 	**/
-	xItem <-- receivedItem(pxQueue, justPeeking, task) =
+	xItem <-- q_receivedItem(pxQueue, justPeeking,task,rTask) =
 	PRE
     	pxQueue : queues & 
     	justPeeking : BOOL & 
     	task : TASK & 
-    	task : queue_sending(pxQueue)
+    	task : queue_sending(pxQueue) &
+    	queue_items(pxQueue)/={} &
+    	rTask:TASK &
+    	rTask/=TASK_NULL
 	THEN
 	    ANY
 	        item
@@ -213,10 +276,21 @@ OPERATIONS
 	        item : queue_items(pxQueue)
     	THEN
 	        IF justPeeking = FALSE
-    	    THEN 
-        	    queue_items(pxQueue) := queue_items(pxQueue) - {item}||
-	            queue_sending(pxQueue) := queue_sending(pxQueue) - {task}
-        	END ||
+    	    THEN        	    
+        	    IF pxQueue:mutexes THEN 
+        	        IF (queue_items(pxQueue) = {ITEM_EMPTY} )THEN
+        	            mutex_holder(pxQueue):= rTask||
+        	            queue_items(pxQueue) := queue_items(pxQueue) - {ITEM_EMPTY}
+	        	    ELSE
+	        	        mutex_holder(pxQueue):= TASK_NULL
+	        	    END
+	        	ELSE
+	        	    queue_items(pxQueue) := queue_items(pxQueue) - {item}
+	        	END||
+	        	
+	        	queue_sending(pxQueue) := queue_sending(pxQueue) - {task}
+	        END ||
+	        
         	xItem:=item
 	    END
 	END;
@@ -231,29 +305,101 @@ OPERATIONS
 			task - Task that will be removing
 		
 	**/	
-	removeFromEventListQueue(task) =
-	PRE
-    	task : TASK  
-	THEN
-	    ANY
-	        receiving, sending  
-    	WHERE
-        	receiving = REMOVE_EVENT(task, queues, queue_receiving) &
-        	sending = REMOVE_EVENT(task, queues, queue_sending)
-		THEN
-       		queue_receiving := queue_receiving <+ receiving ||
-       		queue_sending := queue_sending <+ sending
-    	END
-	END
-;
-full <-- queue_is_full(pxQueue) =
- 	PRE
- 	    pxQueue: queues
- 	THEN
- 		CHOICE
- 	    	full := TRUE
- 		OR
- 	        full := FALSE
- 	    END
-	END
+    q_removeFromEventListQueue(task) =
+    PRE
+        task : TASK  
+    THEN
+        ANY
+            pxQueue
+        WHERE
+            pxQueue:queues &
+            task:queue_receiving(pxQueue)
+        THEN
+            queue_receiving(pxQueue) := queue_receiving(pxQueue) -{task} 
+        END ||
+        ANY
+            pxQueue
+        WHERE
+            pxQueue:queues &
+            task:queue_sending(pxQueue)
+        THEN
+            queue_sending(pxQueue) := queue_sending(pxQueue) -{task}
+        END
+    END;
+    
+    q_endScheduler=
+    BEGIN
+        queues := {}||
+        queue_items := {}||
+        queue_receiving := {}||
+        queue_sending := {}||
+        semaphores:={}||
+        mutexes:={}||
+        mutex_holder:={}
+    END;
+    
+    q_resumeAll(unblocked)=
+    PRE
+        unblocked:POW(TASK)
+    THEN
+        IF queue_sending/={} 
+        THEN
+            queue_sending:=remove_task(queue_sending,unblocked)
+        END||
+        
+        IF queue_receiving/={} 
+        THEN
+            queue_receiving:=remove_task(queue_receiving,unblocked)
+        END
+    END;
+    
+    
+    semaph<--q_createSemaphore(length,initialCount)=
+    PRE
+        length:NAT&
+        length>0 &
+        initialCount:NAT &
+        initialCount<=length
+    THEN
+        ANY 
+            semaphore,s_items
+        WHERE
+            semaphore : QUEUE &
+            semaphore /: queues &
+            semaphore/: mutexes&
+            s_items: POW(ITEM)&
+            card(s_items)=initialCount
+            
+        THEN
+            queues:=queues\/{semaphore}||
+            semaphores:=semaphores\/{semaphore}||
+            queue_items:=queue_items\/{ semaphore |->s_items}||
+            queue_receiving := queue_receiving \/ {semaphore |-> {}} ||
+            queue_sending := queue_sending \/ {semaphore|-> {}}||
+            semaph:=semaphore
+            
+        END
+        	
+     END;
+     
+    mt<--q_createMutex=
+    BEGIN
+        ANY 
+            mutex
+        WHERE
+            mutex : QUEUE &
+            mutex /: queues 
+        THEN
+            queues:=queues\/{mutex}||
+            mutexes:=mutexes\/{mutex}||
+            queue_items:=queue_items\/{mutex |->{ITEM_EMPTY}}||
+            queue_receiving := queue_receiving \/ {mutex |-> {}} ||
+            queue_sending := queue_sending \/ {mutex|-> {}}||
+            mutex_holder := mutex_holder\/ {mutex|-> TASK_NULL}||
+            mt:=mutex
+        END
+        	
+    END
+    
+ 
 END
