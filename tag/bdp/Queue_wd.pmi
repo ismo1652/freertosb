@@ -1,0 +1,173 @@
+THEORY BalanceX IS
+  Queue,46,0,0,45,0,0,0;
+  Properties,0,0,0,0,0,0,0;
+  Invariants,14,0,0,14,0,0,0;
+  Assertions,4,0,0,4,0,0,0;
+  q_sendItemSubstitution,2,0,0,2,0,0,0;
+  q_sendItemPrecondition,1,0,0,1,0,0,0;
+  q_sendItemMutexSubstitution,2,0,0,2,0,0,0;
+  q_sendItemMutexPrecondition,2,0,0,2,0,0,0;
+  q_insertTaskWaitingToSendSubstitution,1,0,0,1,0,0,0;
+  q_insertTaskWaitingToSendPrecondition,2,0,0,2,0,0,0;
+  q_insertTaskWaitingToReceiveSubstitution,1,0,0,1,0,0,0;
+  q_insertTaskWaitingToReceivePrecondition,2,0,0,2,0,0,0;
+  q_receivedItemSubstitution,6,0,0,6,0,0,0;
+  q_receivedItemPrecondition,2,0,0,2,0,0,0;
+  q_removeFromEventListQueueSubstitution,4,0,0,4,0,0,0;
+  q_resumeAllSubstitution,2,0,0,2,0,0,0;
+  q_createSemaphoreSubstitution,1,0,0,0,0,0,0
+END
+&
+THEORY ProofState IS
+  Unproved;
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0);
+  Proved(0)
+END
+&
+THEORY MethodList IS
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr
+END
+&
+THEORY PassList IS
+  Force(0),(?;0);
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?
+END
+&
+THEORY ManForms 
+END
+&
+THEORY Version IS
+  PRVersion("V3.3.3.p39")(CLT == "V3.7.6")
+END
