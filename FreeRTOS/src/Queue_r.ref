@@ -27,7 +27,8 @@ ABSTRACT_VARIABLES
   queue_receiving, 
   queue_sending,
   mutex_holder,
- 
+ 	first_sending,
+  first_receiving,
   
   
   /************************************************************************************************************************/
@@ -107,7 +108,9 @@ INITIALISATION
   queue_items_r := {}||
   queue_quant:={}||
   queues_msg_empty:={}||
-  queues_msg_full:={}
+  queues_msg_full:={}||
+  first_sending :={}||
+  first_receiving :={}
 OPERATIONS
   
   xQueueHandle <-- q_queueCreate(uxQueueLength, uxItemSize) =
@@ -126,7 +129,9 @@ OPERATIONS
       queue_sending := queue_sending \/ {pxQueue |-> {}}||
       queue_quant:=queue_quant\/ {pxQueue |-> 0}||
       queues_msg_empty:=queues_msg_empty\/{pxQueue}||
-      xQueueHandle:=pxQueue
+      xQueueHandle:=pxQueue||
+      first_sending:=first_sending\/{pxQueue|->TASK_NULL}||
+      first_receiving:=first_receiving\/{pxQueue|->TASK_NULL}
     END		    
   END;
   
@@ -139,19 +144,32 @@ OPERATIONS
     queue_size := {pxQueue} <<| queue_size||
     queue_receiving := {pxQueue} <<| queue_receiving ||
     queue_sending := {pxQueue} <<| queue_sending ||
+    first_sending := {pxQueue} <<| first_sending||
+		first_receiving := {pxQueue} <<| first_receiving||
     queue_quant:={pxQueue}<<|queue_quant||
     queues_msg_empty:=queues_msg_empty- {pxQueue}||
     queues_msg_full:=queues_msg_full- {pxQueue}
   END;
   
-  q_sendItem(pxQueue, pxItem, task, copy_position) =
+   q_sendItem(pxQueue, pxItem, copy_position) =
   BEGIN
     IF copy_position = queueSEND_TO_BACK THEN
       queue_items_r(pxQueue) := queue_items_r(pxQueue) <- pxItem
     ELSE
       queue_items_r(pxQueue) := pxItem -> queue_items_r(pxQueue) 
     END||
-    queue_receiving(pxQueue) := queue_receiving(pxQueue) - {task}||
+    IF queue_receiving(pxQueue)/={} THEN
+      ANY n_receiving, n_first
+      WHERE
+        n_receiving:POW(TASK) &
+        n_first:TASK &
+        n_receiving = (queue_receiving(pxQueue)-{first_receiving(pxQueue)})&
+        n_first:n_receiving
+      THEN
+        queue_receiving(pxQueue) := n_receiving||
+      	first_receiving(pxQueue):= n_first
+      END
+    END|| 
     IF pxQueue:queues_msg_empty THEN
       queues_msg_empty := queues_msg_empty-{pxQueue}
     END||
@@ -161,50 +179,76 @@ OPERATIONS
     queue_quant(pxQueue):= queue_quant(pxQueue)+1
   END;
   
-  xItem <-- q_receivedItem(pxQueue,justPeeking,task) =
+  xItem <-- q_receivedItem(pxQueue,justPeeking) =
   BEGIN
     xItem:=first(queue_items_r(pxQueue))||
-    IF justPeeking = FALSE
-    THEN        	    
-      queue_items_r(pxQueue) := tail( queue_items_r(pxQueue) ) ||
-      queue_sending(pxQueue) := queue_sending(pxQueue) - {task}||
-      IF pxQueue: queues_msg_full THEN
-        queues_msg_full:=queues_msg_full-{pxQueue}
-      END ||
-      IF queue_quant(pxQueue)-1 = 0 THEN
-        queues_msg_empty := queues_msg_empty\/{pxQueue}
-      END||
-      queue_quant(pxQueue):= queue_quant(pxQueue)-1
+    IF justPeeking = FALSE THEN        	    
+      IF queue_sending(pxQueue)/={} THEN
+        ANY n_sending,n_first
+        WHERE
+          n_sending:POW(TASK) &
+          n_first:TASK &
+          n_sending = (queue_sending(pxQueue) - {first_sending(pxQueue)}) &
+          n_first:n_sending
+        THEN
+          queue_items_r(pxQueue) := tail( queue_items_r(pxQueue) ) ||
+          queue_sending(pxQueue) := n_sending||            
+          first_sending(pxQueue):=n_first||
+          IF pxQueue: queues_msg_full THEN
+            queues_msg_full:=queues_msg_full-{pxQueue}
+          END ||
+          IF queue_quant(pxQueue)-1 = 0 THEN
+            queues_msg_empty := queues_msg_empty\/{pxQueue}
+          END||
+          queue_quant(pxQueue):= queue_quant(pxQueue)-1
+        END
+      END
     END
   END;
   
   q_insertTaskWaitingToSend(pxQueue, pxTask) =
   BEGIN
-    queue_sending(pxQueue) := queue_sending(pxQueue) \/ {pxTask}
+    queue_sending(pxQueue) := queue_sending(pxQueue) \/ {pxTask}||
+    IF queue_sending(pxQueue)={} THEN
+      first_sending(pxQueue):=pxTask
+    END
   END;
   
   q_insertTaskWaitingToReceive(pxQueue, pxTask) =
   BEGIN
-    queue_receiving(pxQueue) := queue_receiving(pxQueue) \/ {pxTask}
+    queue_receiving(pxQueue) := queue_receiving(pxQueue) \/ {pxTask}||
+    IF queue_receiving(pxQueue)={} THEN
+      first_receiving(pxQueue):=pxTask
+    END
   END	;
   
   q_removeFromEventListQueue(task) =
   BEGIN
     ANY
-      pxQueue
+      pxQueue, n_receiving , n_first
     WHERE
       pxQueue:queues &
-      task:queue_receiving(pxQueue)
+      task:queue_receiving(pxQueue) &
+      n_receiving: POW(TASK) &
+      n_receiving = queue_receiving(pxQueue)-{first_receiving(pxQueue)} &
+      n_first:TASK&
+      n_first: queue_receiving(pxQueue)
     THEN
-      queue_receiving(pxQueue) := queue_receiving(pxQueue)-{task} 
+      queue_receiving(pxQueue) := n_receiving||
+     	first_receiving(pxQueue):=n_first
     END ||
     ANY
-      pxQueue
+      pxQueue, n_sending ,n_first
     WHERE
       pxQueue:queues &
-      task:queue_sending(pxQueue)
+      n_sending: POW(TASK) &
+      n_first:TASK &
+      task:queue_sending(pxQueue) &
+      n_sending = queue_sending(pxQueue) -{first_sending(pxQueue)} &
+      n_first = first_sending(pxQueue)
     THEN
-      queue_sending(pxQueue) := queue_sending(pxQueue) -{task}
+      queue_sending(pxQueue) := n_sending||
+			first_sending(pxQueue):=n_first
     END
   END; 
   
@@ -218,7 +262,9 @@ OPERATIONS
     THEN
       queues:= queues \/ {semaphore} ||
       queue_receiving := queue_receiving \/ {semaphore |-> {}} ||
+      first_receiving := first_receiving \/ {semaphore|-> TASK_NULL}||
       queue_sending := queue_sending \/ {semaphore |-> {}}||
+      first_sending := first_sending \/ {semaphore|-> TASK_NULL}||
       semaphores:= semaphores \/ {semaphore} ||
       queue_size:= queue_size \/ {semaphore |->maxCount}||
       queue_quant:=queue_quant\/ {semaphore |-> initialCount}||
@@ -251,16 +297,26 @@ OPERATIONS
     END
   END;
   
-  q_takeSemaphore(semaphore,pxTask)=
+ 	q_takeSemaphore(semaphore)=
   BEGIN
     queue_quant(semaphore):=queue_quant(semaphore)-1||
     IF queue_quant(semaphore)-1 =0 THEN
       semaphores_busy:= semaphores_busy \/ {semaphore}
     END||
-    queue_sending(semaphore):=queue_sending(semaphore)-{pxTask} 
+    ANY
+      n_sending,n_first
+    WHERE
+      n_sending:POW(TASK) &
+      n_sending=queue_sending(semaphore)-{first_sending(semaphore)} &
+      n_first:TASK&
+      n_first:n_sending
+    THEN
+      queue_sending(semaphore):=n_sending||
+      first_sending(semaphore):=n_first
+    END
   END;
   
-  q_giveSemaphore(semaphore,pxTask)=
+  q_giveSemaphore(semaphore)=
   BEGIN
     IF queue_quant(semaphore)<queue_size(semaphore)
     THEN
@@ -268,7 +324,16 @@ OPERATIONS
       IF queue_quant(semaphore)=0 THEN
         semaphores_busy := semaphores_busy - {semaphore}
       END||
-      queue_receiving(semaphore):=queue_receiving(semaphore)-{pxTask}
+      ANY n_receiving, n_first
+      WHERE
+        n_receiving:POW(TASK) &
+        n_receiving = queue_receiving(semaphore)-{first_receiving(semaphore)}&
+        n_first:TASK &
+        n_first: n_receiving
+      THEN
+        queue_receiving(semaphore):=n_receiving ||
+        first_receiving(semaphore):=n_first
+      END
     END
   END;
 
@@ -299,12 +364,21 @@ OPERATIONS
     mutex_holder(mutex):=task 
   END;
   
-  q_giveMutex(mutex,pxTask)=
+  q_giveMutex(mutex)=
   BEGIN
     queue_quant(mutex) := queue_quant(mutex)+1||
     mutexes_busy:=mutexes_busy-{mutex}||
     mutex_holder(mutex):=TASK_NULL||
-    queue_receiving(mutex):=queue_receiving(mutex)-{pxTask}
+    ANY n_receiving, n_first
+    WHERE
+      n_receiving:POW(TASK)&
+      n_receiving = queue_receiving(mutex)-{first_receiving(mutex)} &
+      n_first:TASK &
+      n_first:n_receiving
+    THEN
+      queue_receiving(mutex):= n_receiving||
+      first_receiving(mutex):= n_first
+    END
   END;
   
   q_endScheduler=
@@ -312,7 +386,9 @@ OPERATIONS
     queues := {}||
     queues_msg:={}||
     queue_receiving := {}||
+    first_receiving:={}||
     queue_sending := {}||
+    first_sending :={}||
     semaphores:={}||
     semaphores_busy:={}||
     mutexes:={}||
@@ -329,12 +405,36 @@ OPERATIONS
   BEGIN
     IF queue_sending/={} 
     THEN
-      queue_sending:=remove_task(queue_sending,unblocked)
+      ANY 
+        n_sending,n_first
+      WHERE
+        n_sending:QUEUE +-> POW(TASK) &
+        dom(n_sending) = dom(queue_sending) &
+        n_sending = remove_task(queue_sending,unblocked) &
+        n_first:QUEUE +-> TASK &
+        dom(n_first) = dom(first_sending) &
+        !(q1).(q1:queues & q1:dom(n_first) & n_sending(q1)/={} => n_first(q1):n_sending(q1)) 
+      THEN
+        queue_sending:=n_sending||
+        first_sending:=n_first
+      END  
     END||
     
     IF queue_receiving/={} 
     THEN
-      queue_receiving:=remove_task(queue_receiving,unblocked)
+      ANY 
+        n_receiving,n_first
+      WHERE
+        n_receiving:QUEUE +-> POW(TASK) &
+        dom(n_receiving) = dom(queue_receiving)&
+        n_receiving = remove_task(queue_receiving,unblocked) &
+        n_first:QUEUE +-> TASK &
+        dom(n_first) = dom(first_receiving) &
+        !(q1).(q1:queues & q1:dom(n_first) & n_receiving(q1)/={} => n_first(q1):n_receiving(q1)) 
+      THEN
+        queue_receiving:=n_receiving||
+        first_receiving:=n_first
+      END  
     END
   END
   

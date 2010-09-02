@@ -16,8 +16,7 @@ MACHINE
   
 SEES
   FreeRTOSConfig,
-  Types,
-  Scheduler
+  Types
   
 VARIABLES
   active, /** the system is in active mode: the scheduler is functionning and tasks are executed */
@@ -27,8 +26,8 @@ VARIABLES
   runable, /** set of runable task*/
   suspended, /** set of suspend task*/
   running, /** task current*/
-  idle /* a private task that runs when all other tasks are suspended or blocked */
-  
+  idle, /* a private task that runs when all other tasks are suspended or blocked */
+  unblocked
 INVARIANT
   
   active : BOOL &
@@ -38,6 +37,9 @@ INVARIANT
   
   blocked : FIN(TASK) &
   blocked <: tasks &
+  
+  unblocked: FIN(TASK) &
+  unblocked<:blocked &
   
   runable : FIN(TASK) &
   runable <: tasks &
@@ -77,7 +79,7 @@ ASSERTIONS
   
 INITIALISATION
   active := FALSE ||
-  tasks,blocked, runable, suspended := {}, {}, {}, {} ||
+  tasks,blocked, runable, suspended,unblocked := {}, {}, {}, {},{} ||
   idle::TASK ||
   running::TASK
   
@@ -154,7 +156,10 @@ OPERATIONS
         END
       END
     ELSIF atask : blocked  THEN
-      blocked := blocked - { atask }
+      blocked := blocked - {atask}||
+      IF atask:unblocked THEN
+        unblocked := unblocked - {atask}
+      END
     ELSIF atask : suspended THEN
       suspended := suspended - { atask }
     END
@@ -200,7 +205,10 @@ OPERATIONS
         
       END                
     ELSIF stask : blocked THEN
-      blocked := blocked - { stask }
+      blocked := blocked - { stask }||
+      IF stask:unblocked THEN
+        unblocked := unblocked - {stask}
+      END
     END||
     suspended := suspended \/ { stask } 
   END;
@@ -343,6 +351,7 @@ OPERATIONS
     THEN
       idle := idle_task ||
       tasks := tasks\/{idle_task}||
+      runable:=n_runable||
       running::n_runable
     END
   END;
@@ -358,7 +367,7 @@ OPERATIONS
     active = TRUE
   THEN
     active := FALSE ||
-    tasks, blocked, suspended, runable := {}, {}, {}, {}
+    tasks, blocked, suspended, runable,unblocked := {}, {}, {}, {}, {}
   END;
   
   
@@ -369,18 +378,18 @@ OPERATIONS
   Method used for resume the scheduler. It increment the tick with missed ticks and verify the list of 
   blocked tasks to unblock the tasks with expired timers.
   **********************************************************************************************************/
-  t_resumeAll (unblocked) = 
+  t_resumeAll (tunblocked) = 
   PRE
-    unblocked : FIN(TASK) &
-    unblocked <: blocked &
-    running:runable
+    tunblocked : FIN(TASK) &
+    tunblocked <: blocked &
+    tunblocked=unblocked 
   THEN
-    IF unblocked /= {} THEN
+    IF tunblocked /= {} THEN
       ANY
         n_runable
       WHERE
         n_runable<:tasks &
-        n_runable = runable \/ unblocked
+        n_runable = runable \/ tunblocked
       THEN
         runable:=n_runable ||
         CHOICE
@@ -389,7 +398,8 @@ OPERATIONS
           skip
         END 
       END||
-      blocked := blocked - unblocked
+      blocked := blocked - tunblocked||
+      unblocked:={}
     END
   END;
   /*
@@ -424,6 +434,10 @@ OPERATIONS
     active= TRUE
   THEN
     blocked := blocked - {task}||
+    IF task:unblocked THEN
+      unblocked:= unblocked - {task}
+    END||
+    
     ANY
       n_runable
     WHERE
@@ -451,7 +465,10 @@ OPERATIONS
     IF 
       task: blocked 
     THEN
-      blocked:= blocked - {task}
+      blocked:= blocked - {task}||
+      IF task:unblocked THEN
+        unblocked:=unblocked -{task}
+      END
     END||
     IF
       task:suspended
@@ -534,7 +551,7 @@ OPERATIONS
     blocked := blocked \/ {running}
   END;
   
-  t_returnPriority(btask)=
+  t_returnPriority(btask)=/*bstask é a tarefa que foi desbloqueada com a liberação do mutex*/
   PRE
     btask: TASK & 
     btask:tasks &
@@ -545,7 +562,10 @@ OPERATIONS
     IF 
       btask: blocked 
     THEN
-      blocked:= blocked - {btask}
+      blocked:= blocked - {btask}||
+      IF btask:unblocked THEN
+        unblocked:=unblocked - {btask}
+      END
     END||
     IF
       btask:suspended
@@ -565,8 +585,35 @@ OPERATIONS
         skip
       END     
     END
+  END;
+  
+  t_incrementTick(tickCount)=
+  PRE
+    active =TRUE&
+    tickCount:TICK
+  THEN
+    ANY 
+      n_unblocked
+    WHERE
+      n_unblocked : FIN(TASK)&
+      n_unblocked <:blocked
+    THEN
+      unblocked := n_unblocked
+    END
+  END;
+  
+  t_beforeResumeAll(tickCount,tickIncrement)=
+  PRE
+    tickCount:TICK &
+    tickIncrement:TICK
+  THEN
+    ANY 
+      n_unblocked
+    WHERE
+      n_unblocked : FIN(TASK)&
+      n_unblocked <:blocked
+    THEN
+      unblocked := n_unblocked
+    END
   END
-  
-  
-  
 END

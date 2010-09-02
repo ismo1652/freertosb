@@ -9,16 +9,13 @@ SEES
     Types
     
 VARIABLES
-    schedulerRunning,
-    schedulerSuspended
+    active
    
 INVARIANT
-    schedulerRunning: BOOL &
-    schedulerSuspended:NATURAL
+    active: BOOL 
 
 INITIALISATION
-    schedulerRunning := FALSE||
-    schedulerSuspended:=0
+    active := FALSE
     
 OPERATIONS
 	
@@ -31,9 +28,9 @@ OPERATIONS
 	**/
 	startScheduler = 
 	PRE
-    	schedulerRunning = FALSE  	
+    	active = FALSE  	
 	THEN
-        schedulerRunning:=TRUE
+        active:=TRUE
  	END;
 	
 	/**
@@ -44,9 +41,9 @@ OPERATIONS
 	**/
 	stopScheduler =
 	PRE
-    	schedulerRunning = TRUE
+    	active = TRUE
 	THEN
-    	schedulerRunning := FALSE
+    	active := FALSE
 	END;
 	
 	/**
@@ -57,10 +54,10 @@ OPERATIONS
 	**/
 	suspendScheduler =
 	PRE
-	    schedulerSuspended< MAXINT
+	    active=TRUE
 	    
 	THEN
-   		schedulerSuspended := schedulerSuspended + 1
+   		active := TRUE
 	END;
 
 	/**
@@ -75,9 +72,9 @@ OPERATIONS
 	**/
 	resumeScheduler = 
 	PRE
-	    schedulerSuspended > 0
+	    active =TRUE
 	THEN
-        schedulerSuspended := schedulerSuspended - 1
+      active := TRUE
 	END
 	
 END
