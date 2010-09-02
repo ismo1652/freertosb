@@ -356,7 +356,7 @@ OPERATIONS
   rSemaphore<--q_createSemaphore(maxCount,initialCount)=
   PRE
     maxCount:QUEUE_LENGTH &
-    initialCount:QUEUE_LENGTH &
+    initialCount:QUEUE_QUANT &
     initialCount <= maxCount
   THEN
     ANY 
@@ -415,11 +415,15 @@ OPERATIONS
     pxTask:TASK &
     pxTask: queue_receiving(semaphore)
   THEN
-    IF semaphore: semaphores_busy 
-    THEN
-      semaphores_busy := semaphores_busy - {semaphore}
-    END||
-    queue_receiving(semaphore):=queue_receiving(semaphore)-{pxTask}
+    CHOICE
+    	IF semaphore: semaphores_busy 
+    	THEN
+      	semaphores_busy := semaphores_busy - {semaphore}
+    	END||
+    		queue_receiving(semaphore):=queue_receiving(semaphore)-{pxTask}
+    OR
+      skip
+    END
   END;
   
   rMutex<--q_createMutex =
