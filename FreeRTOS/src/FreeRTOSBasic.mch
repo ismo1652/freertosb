@@ -92,7 +92,7 @@ OPERATIONS
     IF
       xTicksToDelay>0 
     THEN
-      ANY
+      ANY/*Sem necessidade, basta apenas somar*/
         tickWakeup
       WHERE
         tickWakeup:TICK
@@ -201,7 +201,7 @@ OPERATIONS
   PRE
     active=FALSE
   THEN
-    ANY
+    ANY/*Problema, precisa do tempo de bloqueio*/
       unblocked
     WHERE
       unblocked : FIN(TASK) &
@@ -217,7 +217,7 @@ OPERATIONS
   PRE
     active=FALSE
   THEN
-    CHOICE
+    CHOICE/*Memória suficiente para criar a tarefa inicial*/
       t_startScheduler
     OR
       skip
@@ -278,15 +278,15 @@ OPERATIONS
     running:runable &
     pvItemToQueue/: queue_items(pxQueue)
   THEN
-    CHOICE
+    CHOICE/*Fila cheia*/
       t_delayTask(xTicksToWait,running) ||
       q_insertTaskWaitingToSend(pxQueue,running) || 
       return := pdPASS   	
-    OR
+    OR/*Fila cheia e tempo de bloqueio MAX*/
       t_suspend(running) ||
       q_insertTaskWaitingToSend(pxQueue,running) ||
       return := pdPASS
-    OR
+    OR/*Item enviado*/
       ANY 
         task
       WHERE 
@@ -298,7 +298,7 @@ OPERATIONS
         t_removeFromEventList(task)
       END||
       return := pdPASS  
-    OR
+    OR/*Fila cheia e tempo de bloqueio 0*/
       return := pdFAIL	
     END
   END;
@@ -315,18 +315,18 @@ OPERATIONS
     running/=TASK_NULL
   THEN
     IF queue_items(pxQueue) ={} THEN
-      CHOICE
+      CHOICE/*tempo de bloqueio maior que 0*/
         t_delayTask(xTicksToWait,running)||
         q_insertTaskWaitingToReceive(pxQueue,running)||
         return,pvBuffer:=pdPASS,ITEM_NULL
-      OR
+      OR/*tempo de bloqueio MAX*/
         t_suspend(running)||
         q_insertTaskWaitingToReceive(pxQueue,running)||
         return,pvBuffer:=pdPASS,ITEM_NULL
-      OR
+      OR/*tempo de bloqueio igual a 0*/
         return,pvBuffer:=pdFAIL,ITEM_NULL
       END
-    ELSE
+    ELSE/* recebimento normal*/
       ANY 
         task 
       WHERE 
@@ -354,7 +354,7 @@ OPERATIONS
     initialCount:INT&
     initialCount<=maxCount
   THEN
-    CHOICE
+    CHOICE/* espaço para criar o semaforo*/
       semaphore<--q_createSemaphore(maxCount,initialCount)
     OR
       semaphore:=QUEUE_NULL
@@ -381,7 +381,7 @@ OPERATIONS
     IF
       semaphore/:semaphores_busy
     THEN 
-      ANY 
+      ANY /*primeiro item da fila de espera, possível problema*/
         task
       WHERE
         task:TASK&
@@ -393,15 +393,15 @@ OPERATIONS
         return:=pdPASS
       END
     ELSE
-      CHOICE
+      CHOICE/*tempo de espera maior q 0*/
         t_delayTask(xTicksToWait,running)||
         q_insertTaskWaitingToReceive(semaphore,running)||
         return:=pdPASS
-      OR
+      OR/*tempo de espera máximo*/
         t_suspend(running)||
         q_insertTaskWaitingToReceive(semaphore,running)||
         return:=pdPASS
-      OR
+      OR/*tempo de espera igual a 0*/
         return := pdFAIL
       END
     END
@@ -416,8 +416,8 @@ OPERATIONS
     running:runable & 
     running/=TASK_NULL
   THEN
-    CHOICE
-      ANY 
+    CHOICE/*semaphoro desponível*/
+      ANY/*primeiro item da fila*/
         task
       WHERE
         task:blocked\/suspended &
@@ -427,15 +427,15 @@ OPERATIONS
         t_removeFromEventList(task)||
         return:=pdPASS
       END
-    OR
+    OR/*semaforo ocupado com tempo >0*/
       t_delayTask(xTicksToWait,running)||
       q_insertTaskWaitingToSend(semaphore,running)||
       return:=pdPASS
-    OR
+    OR/*semaforo ocupado com tempo Maximo*/
       t_suspend(running)||
       q_insertTaskWaitingToSend(semaphore,running)||
       return:=pdPASS
-    OR
+    OR/*ocupado sem tempo de espera*/
       return := pdFAIL
     END  
   END;
@@ -478,7 +478,7 @@ OPERATIONS
     mutex_holder(mutex)=running &
     xTicksToWait:TICK
   THEN
-    ANY 
+    ANY /*primeiro iten da fila*/
       task
     WHERE
       task:blocked\/suspended &
