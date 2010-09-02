@@ -21,8 +21,7 @@ REFINES
   
 SEES
   FreeRTOSConfig ,
-  Types,
-  Scheduler
+  Types
   
 CONSTANTS
   max_prt,
@@ -51,7 +50,8 @@ ABSTRACT_VARIABLES
   running, /** task current*/
   idle, 
   t_priority,
-  t_bpriority
+  t_bpriority,
+  unblocked
   
 INVARIANT
   active : BOOL &
@@ -118,7 +118,7 @@ INITIALISATION
   idle :: TASK ||
   t_priority := {} ||
   t_bpriority:={}||
-  blocked, runable, suspended:= {},{},{}
+  blocked, runable, suspended, unblocked:= {},{},{},{}
   
 OPERATIONS
   /**	
@@ -211,11 +211,14 @@ OPERATIONS
             running::schedule_p(n_runable,n_priority)
           END
         END
-    	ELSIF atask : blocked  THEN
-      	blocked := blocked - { atask }
-    	ELSIF atask : suspended THEN
-      	suspended := suspended - { atask }
-    	END
+      ELSIF atask : blocked  THEN
+        blocked := blocked - { atask }||
+        IF atask:unblocked THEN
+          unblocked := unblocked - {atask}
+        END
+      ELSIF atask : suspended THEN
+        suspended := suspended - { atask }
+      END
     END
   END;  
   
@@ -252,7 +255,10 @@ OPERATIONS
         END
       END                
     ELSIF stask : blocked THEN
-      blocked := blocked - { stask }
+      blocked := blocked - { stask }||
+      IF stask:unblocked THEN
+        unblocked := unblocked - {stask}
+      END
     END||
     suspended := suspended \/ { stask } 
   END;
@@ -402,7 +408,7 @@ BEGIN
   tasks := {} ||
   t_priority:= {} ||
   t_bpriority:={} ||
-  blocked , runable , suspended := {},{},{}
+  blocked , runable , suspended,unblocked := {},{},{},{}
 END;
 
 
@@ -413,19 +419,20 @@ END;
 Method used for resume the scheduler. It increment the tick with missed ticks and verify the list of 
 blocked tasks to unblock the tasks with expired timers.
 **/
-t_resumeAll(unblocked) = 
+t_resumeAll(tunblocked) = 
 BEGIN
-  IF unblocked /= {} THEN
+  IF tunblocked /= {} THEN
     ANY
       n_runable
     WHERE
       n_runable<:tasks &
-      n_runable = runable \/ unblocked
+      n_runable = runable \/ tunblocked
     THEN
       runable:=n_runable ||
       running::schedule_p(n_runable,t_priority)
     END||
-    blocked := blocked - unblocked
+    blocked := blocked - tunblocked||
+    unblocked:={}
   END
 END;
 
@@ -437,47 +444,53 @@ END;
 Unblock the given task
 
 **/
-t_unblock(task)=
-BEGIN
-  blocked := blocked - {task}||
-  ANY
-    n_runable
-  WHERE
-    n_runable<:tasks &
-    n_runable = runable \/ {task}
-  THEN
-    runable := n_runable||
-    IF t_priority(task) >= t_priority(running) THEN
-      running :: schedule_p(n_runable,t_priority)
+  t_unblock(task)=
+  BEGIN
+    blocked := blocked - {task}||
+    IF task:unblocked THEN
+      unblocked:= unblocked - {task}
+    END||
+    ANY
+      n_runable
+    WHERE
+      n_runable<:tasks &
+      n_runable = runable \/ {task}
+    THEN
+      runable := n_runable||
+      IF t_priority(task) >= t_priority(running) THEN
+        running :: schedule_p(n_runable,t_priority)
+      END
     END
-  END
-END;
+  END;
+  
 
-
-t_removeFromEventList(task)=
-BEGIN
-  IF 
-    task: blocked 
-  THEN
-    blocked:= blocked - {task}
-  END||
-  IF
-    task:suspended
-  THEN
-    suspended:= suspended - {task}
-  END||  
-  ANY
-    n_runable
-  WHERE
-    n_runable<:tasks &
-    n_runable = runable \/ {task}
-  THEN
-    runable := n_runable||
-    IF t_priority(task) >= t_priority(running) THEN
-      running :: schedule_p(n_runable,t_priority)
-    END     
-  END
-END;
+  t_removeFromEventList(task)=
+  BEGIN
+    IF 
+      task: blocked 
+    THEN
+      blocked:= blocked - {task}||
+      IF task:unblocked THEN
+        unblocked:=unblocked -{task}
+      END
+    END||
+    IF
+      task:suspended
+    THEN
+      suspended:= suspended - {task}
+    END||  
+    ANY
+      n_runable
+    WHERE
+      n_runable<:tasks &
+      n_runable = runable \/ {task}
+    THEN
+      runable := n_runable||
+      IF t_priority(task) >= t_priority(running) THEN
+        running :: schedule_p(n_runable,t_priority)
+      END     
+    END
+  END;
 
 /*
 SG->DD
@@ -536,36 +549,39 @@ BEGIN
 END;
 
 
-t_returnPriority(btask)=
-BEGIN
-  IF 
-    btask: blocked 
-  THEN
-    blocked:= blocked - {btask}
-  END||
-  IF
-    btask:suspended
-  THEN
-    suspended:= suspended - {btask}
-  END||
-  ANY
-    n_runable,
-    n_priority
-  WHERE
-    n_runable<:tasks &
-    n_runable = runable \/ {btask} &
-    n_priority :TASK +-> PRIORITY &
-    n_priority = t_priority <+ {running|->t_bpriority(running)}
-  THEN
-    runable := n_runable||
-    IF t_bpriority(running)/= t_priority(running) THEN
-      t_priority := n_priority||
-      running :: schedule_p(n_runable,n_priority)
-    ELSIF t_priority(btask) >= t_priority(running) THEN
+  t_returnPriority(btask)=
+  BEGIN
+    IF 
+      btask: blocked 
+    THEN
+      blocked:= blocked - {btask}||
+      IF btask:unblocked THEN
+        unblocked:=unblocked - {btask}
+      END
+    END||
+    IF
+      btask:suspended
+    THEN
+      suspended:= suspended - {btask}
+    END||
+    ANY
+      n_runable,
+      n_priority
+    WHERE
+      n_runable<:tasks &
+      n_runable = runable \/ {btask} &
+      n_priority :TASK +-> PRIORITY &
+      n_priority = t_priority <+ {running|->t_bpriority(running)}
+    THEN
+      runable := n_runable||
+      IF t_bpriority(running)/= t_priority(running) THEN
+        t_priority := n_priority||
+        running :: schedule_p(n_runable,n_priority)
+      ELSIF t_priority(btask) >= t_priority(running) THEN
         running :: schedule_p(n_runable,t_priority)
+      END
     END
   END
-END
 
 END
 

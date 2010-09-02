@@ -36,17 +36,27 @@ VARIABLES
   tickMissed
   
 INVARIANT
+  
+  
+  
   tickCount: TICK &
   tickMissed:TICK &
   
-  ran(mutex_holder) <: tasks \/ {TASK_NULL} &
-  (active=TRUE => idle/:ran(mutex_holder)&
-  								!mt.(mt:mutexes_busy  => mutex_holder(mt):tasks) &
-  								!mt.(mt:mutexes & mt/:mutexes_busy  => mutex_holder(mt)/:tasks)) &
-  !mt.(mt:mutexes => queue_sending(mt)={}) & /* Só quem pode liberar o mutex é o task holder não devendo 
-  existir uma lista para liberação do mutex*/
   !que.(que:queues  => queue_sending(que)<:(blocked\/suspended)) &
-  !que.(que:queues  => queue_receiving(que)<:(blocked\/suspended)) 
+  !que.(que:queues  => queue_receiving(que)<:(blocked\/suspended)) &
+  
+  ran(mutex_holder) <: tasks \/ {TASK_NULL} &
+  !mt.(mt:mutexes => queue_sending(mt)={}) & 
+  
+  
+  (active=TRUE => 
+    idle/:ran(mutex_holder)&
+    !mt.(mt:mutexes_busy  => mutex_holder(mt):tasks) &
+    !mt.(mt:mutexes & mt/:mutexes_busy  => mutex_holder(mt)/:tasks) )
+ 
+/* Só quem pode liberar o mutex é o task holder não devendo 
+  existir uma lista para liberação do mutex*/
+ 
   
 ASSERTIONS
   !mt.(mt:mutexes_busy & active=TRUE => mutex_holder(mt)/=idle) &
@@ -191,26 +201,28 @@ OPERATIONS
     INCLUDE_vTaskSuspend = 1 &
     suspended /= {} & 
     pxTaskToResume : TASK & 
-    pxTaskToResume : suspended 
+    pxTaskToResume : suspended &
+    active=TRUE
   THEN    
     t_resume (pxTaskToResume)||
     q_removeFromEventListQueue(pxTaskToResume)
+  END;
+  
+  
+  beforeResumeAll=
+  PRE
+    active=FALSE
+  THEN
+    t_beforeResumeAll(tickCount,TICK_INCREMENT(tickCount, tickMissed))
   END;
   
   xTaskResumeAll = 
   PRE
     active=FALSE
   THEN
-    ANY/*Problema, precisa do tempo de bloqueio*/
-      unblocked
-    WHERE
-      unblocked : FIN(TASK) &
-      unblocked <: blocked
-    THEN
-      t_resumeAll(unblocked) ||
-      q_resumeAll(unblocked)||
-      tickCount := TICK_INCREMENT(tickCount, tickMissed)
-    END
+    t_resumeAll(unblocked) ||
+    q_resumeAll(unblocked)||
+    tickCount := TICK_INCREMENT(tickCount, tickMissed)
   END;
   
   vTaskStartScheduler = 
@@ -249,7 +261,7 @@ OPERATIONS
   ************************************************************************************************************************/
   xQueueHandle <--xQueueCreate(uxQueueLength,uxItemSize)=
   PRE
-    uxQueueLength: NAT & 
+    uxQueueLength: QUEUE_LENGTH & 
     uxItemSize:NAT
   THEN
     CHOICE
@@ -275,31 +287,27 @@ OPERATIONS
     xTicksToWait:TICK &
     copy_position:COPY_POSITION &
     running /= idle &
-    running:runable &
+    active=TRUE &
     pvItemToQueue/: queue_items(pxQueue)
   THEN
-    CHOICE/*Fila cheia*/
-      t_delayTask(xTicksToWait,running) ||
-      q_insertTaskWaitingToSend(pxQueue,running) || 
-      return := pdPASS   	
-    OR/*Fila cheia e tempo de bloqueio MAX*/
-      t_suspend(running) ||
-      q_insertTaskWaitingToSend(pxQueue,running) ||
-      return := pdPASS
-    OR/*Item enviado*/
-      ANY 
-        task
-      WHERE 
-        task:TASK & 
-        task:blocked\/suspended & 
-        task:queue_receiving(pxQueue)
-      THEN
-        q_sendItem(pxQueue,pvItemToQueue,task,copy_position)||
-        t_removeFromEventList(task)
-      END||
+    IF pxQueue/:queues_msg_full THEN 
+      q_sendItem(pxQueue,pvItemToQueue,copy_position)||
+     	IF queue_receiving(pxQueue)/={} THEN 
+     	  t_removeFromEventList(first_receiving(pxQueue))
+     	END||
       return := pdPASS  
-    OR/*Fila cheia e tempo de bloqueio 0*/
-      return := pdFAIL	
+    ELSE
+      CHOICE/*Fila cheia*/
+        t_delayTask(xTicksToWait,running) ||
+        q_insertTaskWaitingToSend(pxQueue,running) || 
+        return := pdPASS   	
+      OR/*Fila cheia e tempo de bloqueio MAX*/
+        t_suspend(running) ||
+        q_insertTaskWaitingToSend(pxQueue,running) ||
+        return := pdPASS
+      OR/*Fila cheia e tempo de bloqueio 0*/
+        return := pdFAIL	
+      END
     END
   END;
   
@@ -314,7 +322,7 @@ OPERATIONS
     running:runable & 
     running/=TASK_NULL
   THEN
-    IF queue_items(pxQueue) ={} THEN
+    IF pxQueue:queues_msg_empty  THEN
       CHOICE/*tempo de bloqueio maior que 0*/
         t_delayTask(xTicksToWait,running)||
         q_insertTaskWaitingToReceive(pxQueue,running)||
@@ -327,19 +335,13 @@ OPERATIONS
         return,pvBuffer:=pdFAIL,ITEM_NULL
       END
     ELSE/* recebimento normal*/
-      ANY 
-        task 
-      WHERE 
-        task:TASK & 
-        task:queue_sending(pxQueue) & 
-        task:blocked \/suspended
-      THEN         
-        pvBuffer<--q_receivedItem(pxQueue,justPeeking,task)||
-        return:=pdPASS||
-        IF 
-          justPeeking = FALSE 
-        THEN 
-          t_removeFromEventList(task)
+      pvBuffer<--q_receivedItem(pxQueue,justPeeking)||
+      return:=pdPASS||
+      IF 
+        justPeeking = FALSE 
+      THEN 
+        IF queue_sending(pxQueue)/={} THEN
+          t_removeFromEventList(first_sending(pxQueue))
         END
       END
     END
@@ -348,10 +350,20 @@ OPERATIONS
   /***************************************************************************************************************************
   Semaphore Functions
   ***************************************************************************************************************************/
-  semaphore<--createSemaphore(maxCount,initialCount)=
+  semaphore<--vSemaphoreCreateBinary=
+  BEGIN
+    CHOICE/* espaço para criar o semaforo*/
+      semaphore<--q_createSemaphore(1,1)
+    OR
+      semaphore:=QUEUE_NULL
+    END
+  END;
+  
+  
+  semaphore<--vSemaphoreCreateCounting(maxCount,initialCount)=
   PRE
-    maxCount:INT&
-    initialCount:INT&
+    maxCount:QUEUE_LENGTH &
+    initialCount:QUEUE_QUANT&
     initialCount<=maxCount
   THEN
     CHOICE/* espaço para criar o semaforo*/
@@ -375,23 +387,18 @@ OPERATIONS
     semaphore:semaphores &
     xTicksToWait:TICK&
     running /= idle &
-    running:runable & 
+    active=TRUE & 
     running/=TASK_NULL
   THEN
     IF
       semaphore/:semaphores_busy
     THEN 
-      ANY /*primeiro item da fila de espera, possível problema*/
-        task
-      WHERE
-        task:TASK&
-        task:blocked \/suspended&
-        task:queue_sending(semaphore)
-      THEN
-        q_takeSemaphore(semaphore,task)||
-        t_removeFromEventList(task)||
-        return:=pdPASS
-      END
+      
+      q_takeSemaphore(semaphore)||
+      IF queue_sending(semaphore)/={} THEN
+        t_removeFromEventList(first_sending(semaphore))
+      END||
+      return:=pdPASS
     ELSE
       CHOICE/*tempo de espera maior q 0*/
         t_delayTask(xTicksToWait,running)||
@@ -413,37 +420,34 @@ OPERATIONS
     semaphore:semaphores &
     xTicksToWait:TICK & 
     running /= idle &
-    running:runable & 
+    active=TRUE & 
     running/=TASK_NULL
   THEN
-    CHOICE/*semaphoro desponível*/
-      ANY/*primeiro item da fila*/
-        task
-      WHERE
-        task:blocked\/suspended &
-        task:queue_receiving(semaphore)
-      THEN
-        q_giveSemaphore(semaphore,task)||
-        t_removeFromEventList(task)||
+    IF semaphore/:semaphores_full THEN
+      q_giveSemaphore(semaphore)||
+      IF queue_receiving(semaphore) /={} THEN
+        t_removeFromEventList(first_receiving(semaphore))
+      END||
+      return:=pdPASS
+    ELSE
+      CHOICE/*semaforo ocupado com tempo >0*/
+        t_delayTask(xTicksToWait,running)||
+        q_insertTaskWaitingToSend(semaphore,running)||
         return:=pdPASS
-      END
-    OR/*semaforo ocupado com tempo >0*/
-      t_delayTask(xTicksToWait,running)||
-      q_insertTaskWaitingToSend(semaphore,running)||
-      return:=pdPASS
-    OR/*semaforo ocupado com tempo Maximo*/
-      t_suspend(running)||
-      q_insertTaskWaitingToSend(semaphore,running)||
-      return:=pdPASS
-    OR/*ocupado sem tempo de espera*/
-      return := pdFAIL
-    END  
+      OR/*semaforo ocupado com tempo Maximo*/
+        t_suspend(running)||
+        q_insertTaskWaitingToSend(semaphore,running)||
+        return:=pdPASS
+      OR/*ocupado sem tempo de espera*/
+        return := pdFAIL
+      END  
+    END
   END;
   
   /*********************************************************************************************************************
   Mutex Functions
   ************************************************************************************************************************/
-  mutex<--createMutex =
+  mutex<--xQueueCreateMutex =
   BEGIN
     CHOICE
       mutex <--q_createMutex
@@ -476,17 +480,13 @@ OPERATIONS
     mutex:mutexes &
     mutex:mutexes_busy &
     mutex_holder(mutex)=running &
-    xTicksToWait:TICK
+    xTicksToWait:TICK&
+    active=TRUE
   THEN
-    ANY /*primeiro iten da fila*/
-      task
-    WHERE
-      task:blocked\/suspended &
-      task:queue_sending(mutex)
-    THEN
-      q_giveMutex(mutex,task)||
-      t_returnPriority(task)
-    END  
+    q_giveMutex(mutex)||
+    IF queue_receiving(mutex)/={} THEN
+      t_returnPriority(first_receiving(mutex))
+    END
   END;
   
   
@@ -494,7 +494,7 @@ OPERATIONS
   /*********************************************************************************************************************
   Other Functions
   **********************************************************************************************************************/
-  numberOfTicks <-- getTickCount=
+  numberOfTicks <--xTaskGetTickCount=
   PRE 
     INCLUDE_xTaskGetCurrentTaskHandle = 1
   THEN
@@ -506,25 +506,15 @@ OPERATIONS
     active =TRUE
   THEN
     tickCount := TICK_INCREMENT(tickCount, 1)||
-    ANY
-      unblocked
-    WHERE
-      unblocked:FIN(TASK) &
-      unblocked <: blocked  
-    THEN
-      t_resumeAll(unblocked)||
-      q_resumeAll(unblocked)
-    END
+    t_incrementTick(TICK_INCREMENT(tickCount, 1))
   END;
   
-  xQueueHandle<--xQueueCreateMutex=
-  BEGIN
-    xQueueHandle<--q_createMutex
-  END;
-  
-  xQueueHandle<-- xSemaphoreCreateRecursiveMutex=
-  BEGIN
-    xQueueHandle<--q_createMutex
+  afterIncrementTick=
+  PRE 
+    active=TRUE
+  THEN
+    t_resumeAll(unblocked)||
+    q_resumeAll(unblocked)
   END
   
 END
