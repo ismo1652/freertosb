@@ -217,7 +217,8 @@ OPERATIONS
   t_resume (rtask) =
   PRE 
     rtask : TASK & 
-    rtask : suspended
+    rtask : suspended &
+    active=TRUE
   THEN 
     ANY 
       n_runable
@@ -371,7 +372,8 @@ OPERATIONS
   t_resumeAll (unblocked) = 
   PRE
     unblocked : FIN(TASK) &
-    unblocked <: blocked
+    unblocked <: blocked &
+    running:runable
   THEN
     IF unblocked /= {} THEN
       ANY
@@ -418,7 +420,8 @@ OPERATIONS
   t_unblock(task)=
   PRE
     task : TASK &
-    task : blocked
+    task : blocked &
+    active= TRUE
   THEN
     blocked := blocked - {task}||
     ANY
@@ -442,7 +445,8 @@ OPERATIONS
   t_removeFromEventList(task)=
   PRE
     task:TASK &
-    task:(blocked\/suspended)
+    task:(blocked\/suspended)&
+    active=TRUE
   THEN
     IF 
       task: blocked 
