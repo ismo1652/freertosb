@@ -1,0 +1,76 @@
+
+THEORY ProofList IS
+_f(5) & _f(4) & _f(3) & _f(2) & _f(1) & _f(8) & _f(7) & _f(11) & _f(10) & _f(6) & _f(9) & _f(27) & t_getNumberOfTasksSubstitution.1,(_f(28) => _f(29))
+
+END
+&
+
+THEORY Formulas IS
+("`Component constraints'" & btrue);
+("`Used machines constraints'" & btrue);
+("`Component properties'" & btrue);
+("`Seen and used machines properties'" & configMAX_PRIORITIES: INTEGER & 0<=configMAX_PRIORITIES & configMAX_PRIORITIES<=maxint & 1<=configMAX_PRIORITIES & configTOTAL_HEAP_SIZE: INTEGER & 0<=configTOTAL_HEAP_SIZE & configTOTAL_HEAP_SIZE<=maxint & 0<=configTOTAL_HEAP_SIZE & configMINIMAL_STACK_SIZE: INTEGER & 0<=configMINIMAL_STACK_SIZE & configMINIMAL_STACK_SIZE<=maxint & 0<=configMINIMAL_STACK_SIZE & INCLUDE_uxTaskPriorityGet: BIT & INCLUDE_vTaskDelete: BIT & INCLUDE_vTaskSuspend: BIT & INCLUDE_xTaskGetSchedulerState: BIT & INCLUDE_vTaskPrioritySet: BIT & INCLUDE_xTaskGetCurrentTaskHandle: BIT & INCLUDE_vTaskDelayUntil: BIT & INCLUDE_vTaskDelay: BIT & PRIORITY = 0..configMAX_PRIORITIES-1 & BIT = 0..1 & MAX_DELAY: 0..maxint & 1<=MAX_DELAY & NULL_PARAMETER: PARAMETER & PRIORITY: POW(NAT) & TICK: POW(NAT) & TICK = 0..MAX_DELAY & TICK_INCREMENT: TICK*TICK +-> TICK & dom(TICK_INCREMENT) = TICK*TICK & TICK_INCREMENT = %(tick,inc).(tick: TICK & inc: TICK | (tick+inc) mod MAX_DELAY) & QUEUE_NULL: QUEUE & ITEM_NULL: ITEM & ITEM_EMPTY: ITEM & TASK_NULL: TASK & REMOVE_EVENT: TASK*POW(QUEUE)*(QUEUE +-> POW(TASK)) +-> (QUEUE +-> POW(TASK)) & REMOVE_EVENT = %(task,queues,pending).(task: TASK & queues: POW(QUEUE) & pending: QUEUE +-> POW(TASK) | %queue.(queue: queues & queue: dom(pending) | pending(queue)-{task})) & semGIVE_BLOCK_TIME: TICK & IDLE_PRIORITY: PRIORITY & IDLE_PRIORITY = 0 & QUEUE_LENGTH: POW(NAT) & QUEUE_LENGTH = 1..maxint & QUEUE_QUANT: POW(NAT) & QUEUE_QUANT = 0..maxint & NAME: FIN(INTEGER) & not(NAME = {}) & PARAMETER: FIN(INTEGER) & not(PARAMETER = {}) & TASK: FIN(INTEGER) & not(TASK = {}) & STACK: FIN(INTEGER) & not(STACK = {}) & TASK_CODE: FIN(INTEGER) & not(TASK_CODE = {}) & ITEM: FIN(INTEGER) & not(ITEM = {}) & QUEUE: FIN(INTEGER) & not(QUEUE = {}) & (1..3)*{SCHEDULER_STATE}: FIN(NATURAL*{SCHEDULER_STATE}) & not((1..3)*{SCHEDULER_STATE} = {}) & (1..2)*{COPY_POSITION}: FIN(NATURAL*{COPY_POSITION}) & not((1..2)*{COPY_POSITION} = {}) & (1..3)*{QUEUE_TYPE}: FIN(NATURAL*{QUEUE_TYPE}) & not((1..3)*{QUEUE_TYPE} = {}) & (1..10)*{ERROR_DEFINITION}: FIN(NATURAL*{ERROR_DEFINITION}) & not((1..10)*{ERROR_DEFINITION} = {}));
+("`Included,imported and extended machines properties'" & btrue);
+("`Component invariant'" & active: BOOL & tasks: FIN(TASK) & blocked: FIN(TASK) & blocked: POW(tasks) & unblocked: FIN(TASK) & unblocked: POW(blocked) & runable: FIN(TASK) & runable: POW(tasks) & suspended: FIN(TASK) & suspended: POW(tasks) & runable/\blocked = {} & blocked/\suspended = {} & suspended/\runable = {} & tasks = suspended\/blocked\/runable & running: TASK & idle: TASK & (active = TRUE => not(runable = {}) & running: runable & idle: runable & not(TASK_NULL: tasks)) & btrue & btrue);
+("`Seen and used machines invariants'" & btrue);
+("`Included,imported and extended machines invariants'" & btrue);
+("`Component assertions'" & (active = TRUE => not(runable = {})) & (active = TRUE => not(tasks = {})) & (active = TRUE => idle: runable) & (active = TRUE => not(idle: blocked)) & (active = TRUE => not(idle: suspended)) & (active = TRUE => not(idle = TASK_NULL)) & (active = TRUE => running: runable) & (active = TRUE => not(running: blocked)) & (active = TRUE => not(running: suspended)));
+("`Seen and used machines assertions'" & configMAX_PRIORITIES: INTEGER & 0<=configMAX_PRIORITIES & BIT: POW(NATURAL) & QUEUE_LENGTH: POW(QUEUE_QUANT));
+("`Included,imported and extended machines assertions'" & btrue);
+("`t_create preconditions in previous components'" & btrue);
+("`t_create preconditions in this component'" & priority: PRIORITY);
+("`t_delete preconditions in previous components'" & btrue);
+("`t_delete preconditions in this component'" & atask: TASK & atask: tasks & not(atask = idle));
+("`t_yield preconditions in previous components'" & btrue);
+("`t_yield preconditions in this component'" & active = TRUE);
+("`t_suspend preconditions in previous components'" & btrue);
+("`t_suspend preconditions in this component'" & stask: TASK & stask: tasks & not(stask = idle));
+("`t_resume preconditions in previous components'" & btrue);
+("`t_resume preconditions in this component'" & rtask: TASK & rtask: suspended & active = TRUE);
+("`t_getPriority preconditions in previous components'" & btrue);
+("`t_getPriority preconditions in this component'" & atask: TASK & atask: tasks);
+("`t_getCurrent preconditions in previous components'" & btrue);
+("`t_getCurrent preconditions in this component'" & btrue);
+("`t_getNumberOfTasks preconditions in previous components'" & btrue);
+("`t_getNumberOfTasks preconditions in this component'" & btrue);
+("`Local hypotheses'" & btrue);
+(tasks: FIN(tasks));
+("`t_delayTask preconditions in previous components'" & btrue);
+("`t_delayTask preconditions in this component'" & task: TASK & task = running & running: runable & not(running = idle) & ticks: TICK);
+("`t_startScheduler preconditions in previous components'" & btrue);
+("`t_startScheduler preconditions in this component'" & active = FALSE);
+("`t_endScheduler preconditions in previous components'" & btrue);
+("`t_endScheduler preconditions in this component'" & active = TRUE);
+("`t_resumeAll preconditions in previous components'" & btrue);
+("`t_resumeAll preconditions in this component'" & tunblocked: FIN(TASK) & tunblocked: POW(blocked) & tunblocked = unblocked);
+("`t_unblock preconditions in previous components'" & btrue);
+("`t_unblock preconditions in this component'" & task: TASK & task: blocked & active = TRUE);
+("`t_removeFromEventList preconditions in previous components'" & btrue);
+("`t_removeFromEventList preconditions in this component'" & task: TASK & task: blocked\/suspended & active = TRUE);
+("`t_setPriority preconditions in previous components'" & btrue);
+("`t_setPriority preconditions in this component'" & task: tasks & priority: PRIORITY & not(task = idle) & active = TRUE);
+("`t_suspendAll preconditions in previous components'" & btrue);
+("`t_suspendAll preconditions in this component'" & active = TRUE);
+("`t_priorityInherit preconditions in previous components'" & btrue);
+("`t_priorityInherit preconditions in this component'" & xTicksToWait: TICK & holderTask: tasks & not(holderTask = idle) & not(running = idle) & running: runable & active = TRUE);
+("`t_returnPriority preconditions in previous components'" & btrue);
+("`t_returnPriority preconditions in this component'" & btask: TASK & btask: tasks & btask: blocked\/suspended & active = TRUE & not(running = idle));
+("`t_incrementTick preconditions in previous components'" & btrue);
+("`t_incrementTick preconditions in this component'" & active = TRUE & tickCount: TICK);
+("`t_beforeResumeAll preconditions in previous components'" & btrue);
+("`t_beforeResumeAll preconditions in this component'" & tickCount: TICK & tickIncrement: TICK)
+
+END
+&
+
+THEORY EnumerateX IS
+(SCHEDULER_STATE == {taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED});
+(COPY_POSITION == {queueSEND_TO_BACK,queueSEND_TO_FRONT});
+(QUEUE_TYPE == {TQUE,TSEMAPH,TMUT});
+(ERROR_DEFINITION == {errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,errQUEUE_EMPTY,errQUEUE_FULL,pdPASS,pdFAIL,pdTRUE,pdFALSE});
+(SCHEDULER_STATE == {taskSCHEDULER_NOT_STARTED,taskSCHEDULER_RUNNING,taskSCHEDULER_SUSPENDED});
+(COPY_POSITION == {queueSEND_TO_BACK,queueSEND_TO_FRONT});
+(QUEUE_TYPE == {TQUE,TSEMAPH,TMUT});
+(ERROR_DEFINITION == {errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY,errNO_TASK_TO_RUN,errQUEUE_BLOCKED,errQUEUE_YIELD,errQUEUE_EMPTY,errQUEUE_FULL,pdPASS,pdFAIL,pdTRUE,pdFALSE})
+
+END

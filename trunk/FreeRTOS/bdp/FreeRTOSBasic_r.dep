@@ -1,0 +1,6 @@
+file:d93b61d6c669ed51a12b31e108b9fab5
+abst:FreeRTOSBasic
+incl:Task
+incl:Queue
+sees:Types
+sees:FreeRTOSConfig
