@@ -471,13 +471,13 @@ OPERATIONS
   THEN
     IF semaphore:semaphores_full THEN
       semaphores_full:=semaphores_full-{semaphore}
-    ELSE
-      CHOICE
-        semaphores_busy:= semaphores_busy\/{semaphore}
-      OR
-        skip
-      END
     END||
+    CHOICE
+      semaphores_busy:= semaphores_busy\/{semaphore}
+    OR
+      skip
+    END||
+    
     ANY
       n_sending,n_first
     WHERE
@@ -497,23 +497,26 @@ OPERATIONS
   PRE
     semaphore:semaphores 
   THEN
-    CHOICE
+    IF semaphore/:semaphores_full THEN
       IF semaphore: semaphores_busy 
       THEN
         semaphores_busy := semaphores_busy - {semaphore}
+      END||
+      CHOICE
+        semaphores_full:= semaphores_full \/ {semaphore}
+      OR
+        skip
+      END||
+      ANY n_receiving, n_first
+      WHERE
+        n_receiving:POW(TASK) &
+        n_receiving = queue_receiving(semaphore)-{first_receiving(semaphore)}&
+        n_first:TASK &
+        n_first: n_receiving
+      THEN
+        queue_receiving(semaphore):=n_receiving ||
+        first_receiving(semaphore):=n_first
       END
-    OR
-      skip
-    END||
-    ANY n_receiving, n_first
-    WHERE
-      n_receiving:POW(TASK) &
-      n_receiving = queue_receiving(semaphore)-{first_receiving(semaphore)}&
-      n_first:TASK &
-      n_first: n_receiving
-    THEN
-      queue_receiving(semaphore):=n_receiving ||
-			first_receiving(semaphore):=n_first
     END
   END;
   
@@ -561,6 +564,7 @@ OPERATIONS
       n_first:TASK &
       n_first:n_receiving
     THEN
+    
       queue_receiving(mutex):= n_receiving||
       first_receiving(mutex):= n_first
     END

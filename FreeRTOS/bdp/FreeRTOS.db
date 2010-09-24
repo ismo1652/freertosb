@@ -1,37 +1,43 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <db_xml>
     <atelierb version="3_7_ubuntu-cvs" />
-    <project decomp_dir="/home/stepgalvao/AtelierB/FreeRTOS/bdp/expand_src" old_decomp_dir="/home/stepgalvao/AtelierB/FreeRTOS/bdp/src">
+    <project decomp_dir="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/bdp/expand_src" old_decomp_dir="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/bdp/src">
         <!-- Definition directory list -->
         <!-- Component file list -->
-        <component_file path="/home/stepgalvao/AtelierB/FreeRTOS/src" name="FreeRTOS" suffix="mch" user="stepgalvao">
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="FreeRTOS" suffix="mch" user="stepgalvao">
             <component name="FreeRTOS" type="specification" />
         </component_file>
-        <component_file path="/home/stepgalvao/AtelierB/FreeRTOS/src" name="FreeRTOSBasic" suffix="mch" user="stepgalvao">
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="FreeRTOSBasic" suffix="mch" user="stepgalvao">
             <component name="FreeRTOSBasic" type="specification" />
         </component_file>
-        <component_file path="/home/stepgalvao/AtelierB/FreeRTOS/src" name="FreeRTOSConfig" suffix="mch" user="stepgalvao">
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="FreeRTOSConfig" suffix="mch" user="stepgalvao">
             <component name="FreeRTOSConfig" type="specification" />
         </component_file>
-        <component_file path="/home/stepgalvao/AtelierB/FreeRTOS/src" name="Queue" suffix="mch" user="stepgalvao">
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Queue" suffix="mch" user="stepgalvao">
             <component name="Queue" type="specification" />
         </component_file>
-        <component_file path="/home/stepgalvao/AtelierB/FreeRTOS/src" name="Queue_r" suffix="ref" user="stepgalvao">
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Queue_r" suffix="ref" user="stepgalvao">
             <component name="Queue_r" type="refinement" />
         </component_file>
-        <component_file path="/home/stepgalvao/AtelierB/FreeRTOS/src" name="Scheduler" suffix="mch" user="stepgalvao">
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Scheduler" suffix="mch" user="stepgalvao">
             <component name="Scheduler" type="specification" />
         </component_file>
-        <component_file path="/home/stepgalvao/AtelierB/FreeRTOS/src" name="Task" suffix="mch" user="stepgalvao">
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Task" suffix="mch" user="stepgalvao">
             <component name="Task" type="specification" />
         </component_file>
-        <component_file path="/home/stepgalvao/AtelierB/FreeRTOS/src" name="Task_r" suffix="ref" user="stepgalvao">
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Task_Ready" suffix="ref" user="stepgalvao">
+            <component name="Task_Ready" type="refinement" />
+        </component_file>
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Task_block_time" suffix="ref" user="stepgalvao">
+            <component name="Task_block_time" type="refinement" />
+        </component_file>
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Task_r" suffix="ref" user="stepgalvao">
             <component name="Task_r" type="refinement" />
         </component_file>
-        <component_file path="/home/stepgalvao/AtelierB/FreeRTOS/src" name="TesteAtelierbBug" suffix="mch" user="stepgalvao">
-            <component name="TesteAtelierbBug" type="specification" />
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Task_rr" suffix="ref" user="stepgalvao">
+            <component name="Task_rr" type="refinement" />
         </component_file>
-        <component_file path="/home/stepgalvao/AtelierB/FreeRTOS/src" name="Types" suffix="mch" user="stepgalvao">
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Types" suffix="mch" user="stepgalvao">
             <component name="Types" type="specification" />
         </component_file>
     </project>

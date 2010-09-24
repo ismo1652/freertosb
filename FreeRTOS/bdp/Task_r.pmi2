@@ -680,7 +680,7 @@ THEORY PassList IS
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(1),(?;0;1);
+  Force(1),?;
   Force(0),?;
   Force(0),?;
   Force(1),?;
@@ -801,33 +801,29 @@ THEORY PassList IS
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(1),(?;0;1;2);
+  Force(1),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(1),(?;0;1;2);
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(1),(?;0;1;2);
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(1),(?;0;1;2);
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(1),(?;0;1;2);
+  Force(1),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(1),(?;0;1;2);
+  Force(1),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(1),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(1),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
+  Force(1),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
@@ -846,20 +842,24 @@ THEORY PassList IS
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(1),(?;0;1;2);
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(1),(?;0;1;2);
   Force(0),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(0),(?;0;1;2);
+  Force(1),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(1),(?;0;1;2);
+  Force(1),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
+  Force(1),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
@@ -991,6 +991,6 @@ THEORY ManForms
 END
 &
 THEORY Version IS
-  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO,genDivergencePO == KO,local_op == OK);
+  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO, genDivergencePO == KO, local_op == OK);
   PRVersion("V3.3.3.p39")(CLT == "V3.7.6")
 END
