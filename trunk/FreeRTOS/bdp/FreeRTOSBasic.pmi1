@@ -1,5 +1,5 @@
 THEORY BalanceX IS
-  FreeRTOSBasic,780,240,0,460,77,3,0;
+  FreeRTOSBasic,777,238,0,457,79,3,0;
   InstanciatedConstraintsLemmas,0,0,0,0,0,0,0;
   AssertionLemmas,5,2,0,3,0,0,0;
   Initialisation,2,0,0,2,0,0,0;
@@ -22,35 +22,20 @@ THEORY BalanceX IS
   queueDelete,15,0,0,14,0,1,0;
   sendItem,106,56,0,42,8,0,0;
   receiveItem,150,60,0,72,18,0,0;
-  createSemaphore,9,3,0,0,6,0,0;
+  vSemaphoreCreateBinary,11,0,0,5,6,0,0;
+  vSemaphoreCreateCounting,9,3,0,0,6,0,0;
   deleteSemaphore,12,0,0,12,0,0,0;
   takeSemaphore,122,45,0,50,27,0,0;
   giveSemaphore,87,44,0,36,7,0,0;
-  createMutex,7,1,0,4,2,0,0;
+  xQueueCreateMutex,7,1,0,4,2,0,0;
   takeMutex,14,5,0,9,0,0,0;
   giveMutex,79,18,0,56,3,2,0;
-  getTickCount,0,0,0,0,0,0,0;
+  xTaskGetTickCount,0,0,0,0,0,0,0;
   incrementTick,2,0,0,2,0,0,0;
-  afterIncrementTick,27,0,0,27,0,0,0;
-  xQueueCreateMutex,7,1,0,4,2,0,0;
-  xSemaphoreCreateRecursiveMutex,7,1,0,4,2,0,0
+  afterIncrementTick,27,0,0,27,0,0,0
 END
 &
 THEORY ProofState IS
-  Proved(Util);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(1);
-  Proved(1);
-  Proved(Util);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(1);
-  Proved(1);
   Proved(0);
   Proved(0);
   Proved(0);
@@ -410,6 +395,17 @@ THEORY ProofState IS
   Proved(1);
   Proved(Util);
   Proved(1);
+  Proved(0);
+  Proved(1);
+  Proved(1);
+  Proved(0);
+  Proved(1);
+  Proved(1);
+  Proved(0);
+  Proved(1);
+  Proved(1);
+  Proved(0);
+  Proved(0);
   Proved(0);
   Proved(1);
   Proved(0);
@@ -820,20 +816,6 @@ THEORY ProofState IS
 END
 &
 THEORY MethodList IS
-  dc(mutex = mt) & pr & dd & dd & ah((mutex_holder\/{mutex|->TASK_NULL})(mt) = mutex_holder(mt)) & pr & dd & eh((mutex_holder\/{mutex|->TASK_NULL})(mt),_h,Goal) & ph(mt,!mt.(mt: mutexes & not(mt: mutexes_busy) => not(mutex_holder(mt): tasks))) & ah(mt: mutexes\/{mutex} & mt/:{mutex}) & pr & pr & pr & pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  dc(mutex = mt) & pr & dd & dd & ah((mutex_holder\/{mutex|->TASK_NULL})(mt) = mutex_holder(mt)) & pr & dd & eh((mutex_holder\/{mutex|->TASK_NULL})(mt),_h,Goal) & ph(mt,!mt.(mt: mutexes & not(mt: mutexes_busy) => not(mutex_holder(mt): tasks))) & pr & pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
   pr;
   pr;
   pr;
@@ -1192,6 +1174,17 @@ THEORY MethodList IS
   pr;
   pr;
   dc(semaphore$0 = que) & pr & dd & dd & ah((queue_receiving\/{semaphore$0|->{}})(que) = queue_receiving(que)) & pr & dd & eh((queue_receiving\/{semaphore$0|->{}})(que),_h,Goal) & ph(que,!que.(que: queues => queue_receiving(que) <: blocked\/suspended)) & ah(que/:{semaphore$0}) & pr & dd & pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
   pr;
   pr;
   pr;
@@ -1603,20 +1596,6 @@ THEORY MethodList IS
 END
 &
 THEORY PassList IS
-  Force(1),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(1),?;
-  Force(1),?;
-  Force(1),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(1),?;
-  Force(1),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
@@ -1976,6 +1955,17 @@ THEORY PassList IS
   Force(1),?;
   Force(0),?;
   Force(1),?;
+  Force(0),?;
+  Force(1),(?;0);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(1),(?;0);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(1),(?;0);
+  Force(1),(?;0);
+  Force(0),?;
+  Force(0),?;
   Force(0),?;
   Force(1),?;
   Force(0),?;

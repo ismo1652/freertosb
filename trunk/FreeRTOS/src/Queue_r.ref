@@ -1,6 +1,12 @@
-/* Queue_r
-* Author: Stephenson Galvão
-* Creation date:  Thu Dec 03 2009
+/***************************************** 
+Queue_r
+Author: Stephenson Galvão
+Creation date:  Thu Dec 03 2009
+*****************************************/
+
+/*
+This refinement will concerns with the size of the queues elements and became the specification
+of Queue hardware abstraction more concret change the set items for a sequence of items.
 */
 REFINEMENT
   Queue_r
@@ -16,10 +22,11 @@ ABSTRACT_VARIABLES
   queues,
   queues_msg,
   queues_msg_empty,
-   queues_msg_full,
+  queues_msg_full,
   
   semaphores,
   semaphores_busy,
+  semaphores_full,
   
   mutexes,
   mutexes_busy,
@@ -31,11 +38,11 @@ ABSTRACT_VARIABLES
   first_receiving,
   
   
-  /************************************************************************************************************************/
+/** Refinement variables**/
 
-  queue_size,
-  queue_items_r,
-  queue_quant
+  queue_size, /*size of queue*/
+  queue_items_r, /*sequences of queue's messagem*/
+  queue_quant /*messagens queue quant*/
   
 INVARIANT
   queue_size : QUEUE +-> QUEUE_LENGTH &
@@ -53,46 +60,55 @@ INVARIANT
     ran(queue_items_r(queue)) = queue_items(queue) &
     size(queue_items_r(queue))=queue_quant(queue)) &
   
+  /* About empty queue and its size*/
   !queue.(queue:queues_msg_empty=>queue_quant(queue)=0)&
-  !queue.(queue:queues_msg_full=>queue_quant(queue)=queue_size(queue)) &
-  !queue.(queue:queues_msg & queue_quant(queue)=queue_size(queue) =>queue:queues_msg_full)&
-  !queue.(queue:queues_msg & queue_quant(queue)=queue_size(queue) =>queue:queues_msg_full)&
   !queue.(queue:queues_msg & queue_quant(queue)=0 =>queue:queues_msg_empty)&
   
   
-  !queue.(queue:queues_msg & queue/:queues_msg_full=>queue_quant(queue)<queue_size(queue)) &
-  !queue.(queue:queues_msg & queue/:queues_msg_empty=>queue_quant(queue)>0) &
-  !queue.(queue:queues_msg & queue_quant(queue)>0 => queue/:queues_msg_empty) &
-  !queue.(queue:queues_msg & queue_quant(queue)<queue_size(queue) => queue/:queues_msg_full)&
-
   
+  /* About full queue and its size*/
+  !queue.(queue:queues_msg_full=>queue_quant(queue)=queue_size(queue)) &
+  !queue.(queue:queues_msg & queue_quant(queue)=queue_size(queue) =>queue:queues_msg_full)&
   
+  /* About busy semaphore and its size*/
   !semaphore.(semaphore:semaphores_busy => queue_quant(semaphore)=0) &
   !semaphore.(semaphore:semaphores & queue_quant(semaphore)=0 =>semaphore:semaphores_busy) &
+  
+	/* About full semaphore and its size*/
+  !semaphore.(semaphore:semaphores_full => queue_quant(semaphore)=queue_size(semaphore)) &
+  !semaphore.(semaphore:semaphores & queue_quant(semaphore)=queue_size(semaphore) =>semaphore:semaphores_full) &
     
+  
+
+	!mutex.(mutex:mutexes => queue_size(mutex)=1) &
+  !mutex.(mutex:mutexes_busy => queue_quant(mutex)=0 ) &
+  !mutex.(mutex:mutexes & queue_quant(mutex)=0 => mutex:mutexes_busy) 
+  
+ 
+  
+ASSERTIONS
+  /*About full queue and its size*/
+  !queue.(queue:queues_msg & queue/:queues_msg_full=>queue_quant(queue)<queue_size(queue)) &
+  !queue.(queue:queues_msg & queue_quant(queue)<queue_size(queue) => queue/:queues_msg_full)&
+  
+  /*About empty queue and its size*/
+  !queue.(queue:queues_msg & queue/:queues_msg_empty=>queue_quant(queue)>0) &
+  !queue.(queue:queues_msg & queue_quant(queue)>0 => queue/:queues_msg_empty) &
+  
+  /*About busy semaphore and its size*/
   !semaphore.(semaphore:semaphores & semaphore/:semaphores_busy => queue_quant(semaphore)/=0) &
   !semaphore.(semaphore:semaphores & queue_quant(semaphore)/=0 => semaphore/:semaphores_busy) &
   
-  !mutex.(mutex:mutexes => queue_size(mutex)=1) &
+  /*About full semaphore and its size*/
+  !semaphore.(semaphore:semaphores & queue_quant(semaphore)/=queue_size(semaphore) =>semaphore/:semaphores_full) &
+  !semaphore.(semaphore:semaphores & semaphore/:semaphores_full => queue_quant(semaphore)/=queue_size(semaphore)) &
+
   
-  !mutex.(mutex:mutexes_busy => queue_quant(mutex)=0 ) &
-  !mutex.(mutex:mutexes & queue_quant(mutex)=0 => mutex:mutexes_busy) &
-  
+  /*About mutexes*/ 
+  !mutex.(mutex:mutexes => (queue_quant(mutex)=0 or queue_quant(mutex)=1) )&
   !mutex.(mutex:mutexes & mutex/:mutexes_busy => queue_quant(mutex)=1 ) &
-  !mutex.(mutex:mutexes & queue_quant(mutex)=1 => mutex/:mutexes_busy)
+  !mutex.(mutex:mutexes & queue_quant(mutex)=1 => mutex/:mutexes_busy) 
   
-  
-  
-  
-/*
-CONSTANTS
-  queue_is_full
-  
-PROPERTIES
-  queue_is_full:QUEUE * (QUEUE+->iseq(ITEM)) * (QUEUE+->NAT) --> BOOL &
-  queue_is_full = %(queue,items,queue_size).(queue:QUEUE & items:(QUEUE+->iseq(ITEM)) & queue_size:(QUEUE+->NAT)
-  | bool(queue_size(queue) = size(items(queue))))
-*/
 INITIALISATION
   
   queues := {}||
@@ -101,6 +117,7 @@ INITIALISATION
   queue_sending := {}||
   semaphores:={}||
   semaphores_busy:={}||
+  semaphores_full:={}||
   mutexes:={}||
   mutexes_busy:={}||
   mutex_holder:={}||
@@ -271,7 +288,9 @@ OPERATIONS
       IF initialCount=0 THEN
         semaphores_busy:=semaphores_busy\/{semaphore}
       ELSE
-        skip
+        IF  initialCount=maxCount THEN
+          semaphores_full:=semaphores_full\/{semaphore}
+        END
       END||
       rSemaphore:=semaphore
     END
@@ -290,16 +309,22 @@ OPERATIONS
     queue_sending := {semaphore} <<| queue_sending ||
     queue_size:= {semaphore} <<|queue_size||
     queue_quant:= {semaphore} <<| queue_quant||
-    IF 
-      semaphore:semaphores_busy 
-    THEN
+    first_sending:={semaphore} <<| first_sending||
+    first_receiving:={semaphore} <<| first_receiving||
+    IF semaphore:semaphores_busy THEN
       semaphores_busy := semaphores_busy-{semaphore}
+    END;
+    IF semaphore:semaphores_full THEN
+      semaphores_full:=semaphores_full-{semaphore}
     END
   END;
   
  	q_takeSemaphore(semaphore)=
   BEGIN
     queue_quant(semaphore):=queue_quant(semaphore)-1||
+    IF queue_quant(semaphore) = queue_size(semaphore) THEN
+      semaphores_full:=semaphores_full-{semaphore}
+    END||
     IF queue_quant(semaphore)-1 =0 THEN
       semaphores_busy:= semaphores_busy \/ {semaphore}
     END||
@@ -323,6 +348,9 @@ OPERATIONS
       queue_quant(semaphore):=queue_quant(semaphore)+1||
       IF queue_quant(semaphore)=0 THEN
         semaphores_busy := semaphores_busy - {semaphore}
+      END||
+      IF queue_quant(semaphore)+1=queue_size(semaphore) THEN
+        semaphores_full:= semaphores_full\/{semaphore}
       END||
       ANY n_receiving, n_first
       WHERE
@@ -349,7 +377,9 @@ OPERATIONS
       queues:=queues\/{mutex}||
       mutexes:=mutexes\/{mutex}||
       queue_receiving := queue_receiving \/ {mutex |-> {}} ||
+      first_receiving := first_receiving \/ {mutex |-> TASK_NULL} ||
       queue_sending := queue_sending\/ {mutex|-> {}}||
+      first_sending := first_sending \/ {mutex |-> TASK_NULL} ||
       mutex_holder := mutex_holder\/ {mutex|-> TASK_NULL}||
       queue_size:= queue_size \/ {mutex |->1}||
       queue_quant:=queue_quant\/ {mutex |-> 1}||
@@ -391,6 +421,7 @@ OPERATIONS
     first_sending :={}||
     semaphores:={}||
     semaphores_busy:={}||
+    semaphores_full := {}||
     mutexes:={}||
     mutexes_busy:={}||
     mutex_holder:={}||

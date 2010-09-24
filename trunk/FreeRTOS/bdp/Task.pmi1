@@ -1,5 +1,5 @@
 THEORY BalanceX IS
-  Task,529,45,0,398,67,17,2;
+  Task,531,45,0,401,66,17,2;
   AssertionLemmas,6,0,0,6,0,0,0;
   Initialisation,2,0,0,2,0,0,0;
   t_create,24,1,0,23,0,0,0;
@@ -11,7 +11,7 @@ THEORY BalanceX IS
   t_getCurrent,0,0,0,0,0,0,0;
   t_getNumberOfTasks,0,0,0,0,0,0,0;
   t_delayTask,12,1,0,8,3,0,0;
-  t_startScheduler,11,0,0,8,3,0,0;
+  t_startScheduler,13,0,0,11,2,0,0;
   t_endScheduler,2,0,0,2,0,0,0;
   t_resumeAll,24,2,0,15,5,2,0;
   t_unblock,46,4,0,32,4,6,0;
@@ -380,7 +380,9 @@ THEORY ProofState IS
   Proved(0);
   Proved(0);
   Proved(0);
-  Proved(1);
+  Proved(0);
+  Proved(0);
+  Proved(0);
   Proved(1);
   Proved(1);
   Proved(0);
@@ -900,6 +902,8 @@ THEORY MethodList IS
   pr;
   pr;
   dd & eh(tasks,_h,Goal) & eh(n_runable,_h,Goal) & pp(rp.1);
+  pr;
+  pr;
   pr;
   pr;
   pr;
@@ -1444,7 +1448,9 @@ THEORY PassList IS
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(1),?;
+  Force(0),?;
+  Force(0),?;
+  Force(0),?;
   Force(1),?;
   Force(1),?;
   Force(0),?;
@@ -1624,6 +1630,6 @@ THEORY ManForms
 END
 &
 THEORY Version IS
-  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO, genDivergencePO == KO, local_op == OK);
+  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO,genDivergencePO == KO,local_op == OK);
   PRVersion("V3.3.3.p39")(CLT == "V3.7.6")
 END
