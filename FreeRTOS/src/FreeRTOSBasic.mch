@@ -21,27 +21,8 @@ INCLUDES
   Task,
   Queue
   
-  
-  /*
-  CONSTANTS
-  getTask
-  
-  PROPERTIES
-  getTask: TASK *TASK --> TASK
-  getTask = %(tk,ctk).(tk:TASK & ctk:TASK =
-  */  
-  
-VARIABLES
-  tickCount,		/** total tick count */
-  tickMissed
-  
 INVARIANT
-  
-  
-  
-  tickCount: TICK &
-  tickMissed:TICK &
-  
+
   !que.(que:queues  => queue_sending(que)<:(blocked\/suspended)) &
   !que.(que:queues  => queue_receiving(que)<:(blocked\/suspended)) &
   
@@ -57,7 +38,6 @@ INVARIANT
 /* Só quem pode liberar o mutex é o task holder não devendo 
   existir uma lista para liberação do mutex*/
  
-  
 ASSERTIONS
   !mt.(mt:mutexes_busy & active=TRUE => mutex_holder(mt)/=idle) &
   !(que,task).(que:queues & task:TASK & task/:blocked & task/:suspended=> task/:queue_sending(que))&
@@ -65,10 +45,6 @@ ASSERTIONS
   
   !(que,task).(que:queues & task:tasks & task:queue_sending(que) => task:blocked\/suspended) &
   !(que,task).(que:queues & task:tasks & task:queue_receiving(que) => task:blocked \/ suspended)
-  
-INITIALISATION
-  tickCount := 0 ||
-  tickMissed := 0 
   
 OPERATIONS
   
@@ -102,13 +78,7 @@ OPERATIONS
     IF
       xTicksToDelay>0 
     THEN
-      ANY/*Sem necessidade, basta apenas somar*/
-        tickWakeup
-      WHERE
-        tickWakeup:TICK
-      THEN
-        t_delayTask(tickWakeup,running)
-      END
+      t_delayTask(TICK_INCREMENT (xTicksToDelay, tickCount),running)
     ELSE
       IF 
         active=TRUE 
@@ -213,7 +183,7 @@ OPERATIONS
   PRE
     active=FALSE
   THEN
-    t_beforeResumeAll(tickCount,TICK_INCREMENT(tickCount, tickMissed))
+    t_beforeResumeAll
   END;
   
   xTaskResumeAll = 
@@ -221,8 +191,7 @@ OPERATIONS
     active=FALSE
   THEN
     t_resumeAll(unblocked) ||
-    q_resumeAll(unblocked)||
-    tickCount := TICK_INCREMENT(tickCount, tickMissed)
+    q_resumeAll(unblocked)
   END;
   
   vTaskStartScheduler = 
@@ -298,7 +267,7 @@ OPERATIONS
       return := pdPASS  
     ELSE
       CHOICE/*Fila cheia*/
-        t_delayTask(xTicksToWait,running) ||
+        t_delayTask(TICK_INCREMENT (xTicksToWait, tickCount),running) ||
         q_insertTaskWaitingToSend(pxQueue,running) || 
         return := pdPASS   	
       OR/*Fila cheia e tempo de bloqueio MAX*/
@@ -324,7 +293,7 @@ OPERATIONS
   THEN
     IF pxQueue:queues_msg_empty  THEN
       CHOICE/*tempo de bloqueio maior que 0*/
-        t_delayTask(xTicksToWait,running)||
+        t_delayTask(TICK_INCREMENT (xTicksToWait, tickCount),running)||
         q_insertTaskWaitingToReceive(pxQueue,running)||
         return,pvBuffer:=pdPASS,ITEM_NULL
       OR/*tempo de bloqueio MAX*/
@@ -401,7 +370,7 @@ OPERATIONS
       return:=pdPASS
     ELSE
       CHOICE/*tempo de espera maior q 0*/
-        t_delayTask(xTicksToWait,running)||
+        t_delayTask(TICK_INCREMENT (xTicksToWait, tickCount),running)||
         q_insertTaskWaitingToReceive(semaphore,running)||
         return:=pdPASS
       OR/*tempo de espera máximo*/
@@ -431,7 +400,7 @@ OPERATIONS
       return:=pdPASS
     ELSE
       CHOICE/*semaforo ocupado com tempo >0*/
-        t_delayTask(xTicksToWait,running)||
+        t_delayTask(TICK_INCREMENT (xTicksToWait, tickCount),running)||
         q_insertTaskWaitingToSend(semaphore,running)||
         return:=pdPASS
       OR/*semaforo ocupado com tempo Maximo*/
@@ -502,11 +471,8 @@ OPERATIONS
   END;
   
   incrementTick =
-  PRE
-    active =TRUE
-  THEN
-    tickCount := TICK_INCREMENT(tickCount, 1)||
-    t_incrementTick(TICK_INCREMENT(tickCount, 1))
+  BEGIN
+    t_incrementTick
   END;
   
   afterIncrementTick=
