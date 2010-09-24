@@ -1,5 +1,0 @@
-file:723b4dd99396ea0e1d61f4901937cea1
-abst:Task_r
-sees:FreeRTOSConfig
-sees:Types
-sees:Scheduler
