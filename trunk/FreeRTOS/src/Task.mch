@@ -19,6 +19,8 @@ SEES
   Types
   
 VARIABLES
+  tickCount,		/** total tick count */
+  tickMissed,
   active, /** the system is in active mode: the scheduler is functionning and tasks are executed */
   
   tasks,	/** all existing tasks */   
@@ -31,6 +33,9 @@ VARIABLES
 INVARIANT
   
   active : BOOL &
+  
+  tickCount: TICK &
+  tickMissed:TICK &
   
   tasks : FIN(TASK) &
   
@@ -78,6 +83,8 @@ ASSERTIONS
   
   
 INITIALISATION
+  tickCount := 0 ||
+  tickMissed := 0 ||
   active := FALSE ||
   tasks,blocked, runable, suspended,unblocked := {}, {}, {}, {},{} ||
   idle::TASK ||
@@ -371,90 +378,7 @@ OPERATIONS
   END;
   
   
-  /**********************************************************************************************************
-  \brief	Resume All
   
-  \do	
-  Method used for resume the scheduler. It increment the tick with missed ticks and verify the list of 
-  blocked tasks to unblock the tasks with expired timers.
-  **********************************************************************************************************/
-  t_resumeAll (tunblocked) = 
-  PRE
-    tunblocked : FIN(TASK) &
-    tunblocked <: blocked &
-    tunblocked=unblocked 
-  THEN
-    IF tunblocked /= {} THEN
-      ANY
-        n_runable
-      WHERE
-        n_runable<:tasks &
-        n_runable = runable \/ tunblocked
-      THEN
-        runable:=n_runable ||
-        CHOICE
-          running::n_runable
-        OR
-          skip
-        END 
-      END||
-      blocked := blocked - tunblocked||
-      unblocked:={}
-    END
-  END;
-  /*
-  t_resumeIncrement(unblocked)=
-  PRE
-  unblocked : FIN(TASK) &
-  unblocked <: blocked 
-  THEN
-  IF unblocked /= {} THEN
-  CHOICE
-  running::unblocked 
-  OR
-  skip
-  END ||
-  runable := runable \/ unblocked ||
-  blocked := blocked - unblocked 
-  END
-  END;
-  */
-  
-  
-  /*************************************************************************************************
-  \brief	Remove From Block List
-  
-  \do
-  Unblock the given task
-  *************************************************************************************************/
-  t_unblock(task)=
-  PRE
-    task : TASK &
-    task : blocked &
-    active= TRUE
-  THEN
-    blocked := blocked - {task}||
-    IF task:unblocked THEN
-      unblocked:= unblocked - {task}
-    END||
-    
-    ANY
-      n_runable
-    WHERE
-      n_runable<:tasks &
-      n_runable = runable \/ {task}
-    THEN
-      runable := n_runable||
-      /*
-      No futuro fazer o tratamento para a heranças de prioridade do mutex
-      */
-      CHOICE
-        running::n_runable
-      OR
-        skip
-      END 
-    END
-  END;
   
   t_removeFromEventList(task)=
   PRE
@@ -491,22 +415,7 @@ OPERATIONS
     END
   END;
   
-  /*
-  t_unblockMutex(task)=
-  PRE
-  task : TASK &
-  task : blocked
-  THEN
-  blocked := blocked - {task}||
-  runable := runable \/ {task}||
   
-  CHOICE
-  running:=task
-  OR
-  skip
-  END 
-  END;
-  */
   
   t_setPriority(task,priority)=
   PRE
@@ -572,7 +481,7 @@ OPERATIONS
     THEN
       suspended:= suspended - {btask}
     END||
-  	ANY
+    ANY
       n_runable
     WHERE
       n_runable<:tasks &
@@ -587,11 +496,13 @@ OPERATIONS
     END
   END;
   
-  t_incrementTick(tickCount)=
-  PRE
-    active =TRUE&
-    tickCount:TICK
-  THEN
+  t_incrementTick =
+  BEGIN
+    IF active = TRUE THEN
+      tickCount := TICK_INCREMENT(tickCount, 1)
+    ELSE
+      tickMissed:=TICK_INCREMENT(tickMissed, 1)
+    END||
     ANY 
       n_unblocked
     WHERE
@@ -601,12 +512,45 @@ OPERATIONS
       unblocked := n_unblocked
     END
   END;
+  /**********************************************************************************************************
+  \brief	Resume All
   
-  t_beforeResumeAll(tickCount,tickIncrement)=
+  \do	
+  Method used for resume the scheduler. It increment the tick with missed ticks and verify the list of 
+  blocked tasks to unblock the tasks with expired timers.
+  **********************************************************************************************************/
+  t_resumeAll (tunblocked) = 
   PRE
-    tickCount:TICK &
-    tickIncrement:TICK
+    tunblocked : FIN(TASK) &
+    tunblocked <: blocked &
+    tunblocked=unblocked 
   THEN
+    
+    IF tunblocked /= {} THEN
+      ANY
+        n_runable
+      WHERE
+        n_runable<:tasks &
+        n_runable = runable \/ tunblocked
+      THEN
+        runable:=n_runable ||
+        CHOICE
+          running::n_runable
+        OR
+          skip
+        END 
+      END||
+      blocked := blocked - tunblocked||
+      unblocked:={}
+    END
+  END;
+  
+  t_beforeResumeAll=
+  PRE
+    active=FALSE
+  THEN
+    tickCount := TICK_INCREMENT(tickCount, tickMissed)||
+    tickMissed:=0||
     ANY 
       n_unblocked
     WHERE

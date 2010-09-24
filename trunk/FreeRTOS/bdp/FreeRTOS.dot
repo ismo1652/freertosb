@@ -1,11 +1,11 @@
 digraph {
 FreeRTOS [ label=" FreeRTOS " shape= box ]
-FreeRTOSBasic [ label=" FreeRTOSBasic " shape= box ]
+FreeRTOSBasic_r [ label=" FreeRTOSBasic\nFreeRTOSBasic_r " shape= box ]
 FreeRTOSConfig [ label=" FreeRTOSConfig " shape= box ]
 Queue_r [ label=" Queue\nQueue_r " shape= box ]
 Scheduler [ label=" Scheduler " shape= box ]
 Task_Ready [ label=" Task\nTask_Ready " shape= box ]
-Task_block_time [ label=" Task\nTask_r\nTask_block_time " shape= box ]
+Task_block_time [ label=" Task\nTask_priority\nTask_block_time " shape= box ]
 Task_rr [ label=" Task\nTask_r\nTask_rr " shape= box ]
 Types [ label=" Types " shape= box ]
 
