@@ -134,29 +134,36 @@ OPERATIONS
     blocked , runable , suspended,unblocked := {},{},{},{}
   END;
   
-  t_removeFromEventList (task) =
+  
+  t_removeFromEventList(task)=
   BEGIN
-    IF task : blocked
+    IF 
+      task: blocked 
     THEN
-      blocked := blocked - {task}||
-      t_tblock:= {task} <<| t_tblock
-    END ||
-    IF task : suspended
-    THEN
-      suspended := suspended - { task }
-    END ||
-    ANY n_runable
-    WHERE
-      n_runable <: tasks & n_runable = runable \/ { task }
-    THEN
-      runable := n_runable ||
-      IF t_priority ( task ) >= t_priority ( running )
-      THEN
-        running :: schedule_p ( n_runable , t_priority )
+      blocked:= blocked - {task}||
+      t_tblock:= {task} <<| t_tblock||
+      IF task:unblocked THEN
+        unblocked:=unblocked -{task}
       END
+    END||
+    IF
+      task:suspended
+    THEN
+      suspended:= suspended - {task}
+    END||  
+    ANY
+      n_runable
+    WHERE
+      n_runable<:tasks &
+      n_runable = runable \/ {task}
+    THEN
+      runable := n_runable||
+      IF t_priority(task) >= t_priority(running) THEN
+        running :: schedule_p(n_runable,t_priority)
+      END     
     END
-  END
-  ;
+  END;
+  
   
   t_priorityInherit(holderTask,xTicksToWait)=
   BEGIN
