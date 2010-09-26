@@ -29,8 +29,7 @@ ABSTRACT_VARIABLES
   
 INVARIANT
   t_tblock: TASK +-> TICK &
-  dom(t_tblock) = blocked &
-  !task.(task:unblocked => t_tblock(task)=tickCount)
+  dom(t_tblock) = blocked
   
 INITIALISATION
   tickCount := 0 ||
@@ -248,13 +247,23 @@ OPERATIONS
   BEGIN
     tickCount := TICK_INCREMENT(tickCount, tickMissed)||
     tickMissed:=0||
-    ANY 
-      n_unblocked
-    WHERE
-      n_unblocked : FIN(TASK)&
-      n_unblocked= {task|task:blocked & t_tblock(task)=TICK_INCREMENT(tickCount, tickMissed)}
-    THEN
-      unblocked := n_unblocked
+    CHOICE   
+      ANY n_unblocked
+      WHERE
+        n_unblocked : FIN ( TASK ) & 
+        n_unblocked = {task|task: blocked & tickCount<=t_tblock(task) & t_tblock(task) <= TICK_INCREMENT(tickCount,tickMissed)}
+      THEN
+        unblocked := n_unblocked
+      END
+    OR 
+      ANY n_unblocked
+      WHERE
+        n_unblocked : FIN ( TASK ) & 
+        n_unblocked = {task|task:blocked & ((tickCount<=t_tblock(task) & t_tblock(task)<=MAXINT) or
+            																								t_tblock(task)<=TICK_INCREMENT(tickCount,tickMissed)) }
+      THEN
+        unblocked := n_unblocked
+      END
     END
   END;
   
@@ -271,15 +280,7 @@ OPERATIONS
         unblocked := n_unblocked
       END
     ELSE
-      tickMissed:=TICK_INCREMENT(tickMissed, 1)||
-      ANY 
-        n_unblocked
-      WHERE
-        n_unblocked : FIN(TASK)&
-        n_unblocked = {task|task:blocked & t_tblock(task)=tickCount}
-      THEN
-        unblocked := n_unblocked
-      END
+      tickMissed:=TICK_INCREMENT(tickMissed, 1)
     END
     
   END
