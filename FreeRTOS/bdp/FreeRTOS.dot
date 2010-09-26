@@ -5,9 +5,7 @@ FreeRTOSConfig [ label=" FreeRTOSConfig " shape= box ]
 Queue_r [ label=" Queue\nQueue_r " shape= box ]
 Scheduler [ label=" Scheduler " shape= box ]
 Task_Ready [ label=" Task\nTask_Ready " shape= box ]
-Task_block_time [ label=" Task\nTask_priority\nTask_block_time " shape= box ]
-Task_r [ label=" Task_r " shape= boxshape= rhombcolor= pink ]
-Task_rr [ label=" Task_rr " shape= boxshape= rhombcolor= pink ]
+Task_overflow [ label=" Task\nTask_priority\nTask_block_time\nTask_overflow " shape= box ]
 Types [ label=" Types " shape= box ]
 
 }

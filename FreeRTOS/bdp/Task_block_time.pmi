@@ -1,16 +1,16 @@
 THEORY BalanceX IS
-  Task_block_time,211,18,0,192,1,0,0;
+  Task_block_time,181,24,0,156,1,0,0;
   Initialisation,2,0,0,2,0,0,0;
-  t_delete,34,1,0,33,0,0,0;
-  t_suspend,13,1,0,12,0,0,0;
-  t_delayTask,7,1,0,5,1,0,0;
+  t_delete,32,1,0,31,0,0,0;
+  t_suspend,11,1,0,10,0,0,0;
+  t_delayTask,6,1,0,4,1,0,0;
   t_endScheduler,2,0,0,2,0,0,0;
-  t_removeFromEventList,42,3,0,39,0,0,0;
-  t_priorityInherit,16,2,0,14,0,0,0;
-  t_returnPriority,66,6,0,60,0,0,0;
+  t_removeFromEventList,34,4,0,30,0,0,0;
+  t_priorityInherit,14,3,0,11,0,0,0;
+  t_returnPriority,54,10,0,44,0,0,0;
   t_resumeAll,4,1,0,3,0,0,0;
   t_beforeResumeAll,2,0,0,2,0,0,0;
-  t_incrementTick,4,0,0,4,0,0,0;
+  t_incrementTick,1,0,0,1,0,0,0;
   t_create,12,0,0,12,0,0,0;
   t_yield,0,0,0,0,0,0,0;
   t_resume,3,1,0,2,0,0,0;
@@ -47,9 +47,6 @@ THEORY ProofState IS
   Proved(0);
   Proved(0);
   Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
   Proved(Util);
   Proved(0);
   Proved(0);
@@ -57,7 +54,7 @@ THEORY ProofState IS
   Proved(0);
   Proved(0);
   Proved(0);
-  Proved(0);
+  Proved(Util);
   Proved(Util);
   Proved(0);
   Proved(Util);
@@ -66,25 +63,19 @@ THEORY ProofState IS
   Proved(0);
   Proved(0);
   Proved(0);
+  Proved(Util);
+  Proved(Util);
   Proved(0);
   Proved(0);
   Proved(0);
   Proved(Util);
   Proved(0);
   Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
+  Proved(Util);
   Proved(0);
   Proved(Util);
   Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
   Proved(Util);
-  Proved(0);
   Proved(0);
   Proved(0);
   Proved(0);
@@ -113,16 +104,8 @@ THEORY ProofState IS
   Proved(0);
   Proved(0);
   Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
   Proved(Util);
-  Proved(0);
+  Proved(Util);
   Proved(0);
   Proved(0);
   Proved(0);
@@ -143,14 +126,6 @@ THEORY ProofState IS
   Proved(0);
   Proved(0);
   Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
-  Proved(0);
   Proved(Util);
   Proved(0);
   Proved(0);
@@ -160,8 +135,7 @@ THEORY ProofState IS
   Proved(0);
   Proved(0);
   Proved(0);
-  Proved(0);
-  Proved(0);
+  Proved(Util);
   Proved(0);
   Proved(0);
   Proved(0);
@@ -192,11 +166,7 @@ THEORY ProofState IS
   Proved(0);
   Proved(0);
   Proved(0);
-  Proved(0);
-  Proved(0);
   Proved(Util);
-  Proved(0);
-  Proved(0);
   Proved(0);
   Proved(0);
   Proved(0);
@@ -261,9 +231,6 @@ THEORY MethodList IS
   pr;
   pr;
   pr;
-  pr;
-  pr;
-  pr;
   dd & ah(running$2: schedule_p(n_runable,t_priority$1)) & eh(n_runable,_h,Goal);
   pr;
   pr;
@@ -271,8 +238,30 @@ THEORY MethodList IS
   pr;
   pr;
   pr;
+  dd & pr;
+  dd & eh(runable$1\/{btask},_h,Goal) & pr;
+  pr;
+  dd & eh(runable$1\/{btask},_h,Goal) & eh(t_priority$1<+{running$1|->t_bpriority$1(running$1)},_h,Goal) & pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  pr;
+  dd & pr;
+  dd & eh(runable$1\/{btask},_h,Goal) & pr;
+  pr;
+  pr;
+  pr;
+  dd & eh(t_priority$1<+{running$1|->t_bpriority$1(running$1)},_h,Goal) & pr;
+  pr;
   pr;
   dd & eh(runable$1\/{btask},_h,Goal) & pr;
+  pr;
+  dd & pr;
+  pr;
+  dd & eh(runable$1\/{btask},_h,Goal) & eh(t_priority$1<+{running$1|->t_bpriority$1(running$1)},_h,Goal) & pr;
+  pr;
+  pr;
   pr;
   dd & eh(runable$1\/{btask},_h,Goal) & eh(t_priority$1<+{running$1|->t_bpriority$1(running$1)},_h,Goal) & pr;
   pr;
@@ -283,26 +272,6 @@ THEORY MethodList IS
   pr;
   pr;
   pr;
-  dd & eh(runable$1\/{btask},_h,Goal) & pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  dd & eh(runable$1\/{btask},_h,Goal) & pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  dd & eh(runable$1\/{btask},_h,Goal) & eh(t_priority$1<+{running$1|->t_bpriority$1(running$1)},_h,Goal) & pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  dd & eh(runable$1\/{btask},_h,Goal) & eh(t_priority$1<+{running$1|->t_bpriority$1(running$1)},_h,Goal) & pr;
   pr;
   pr;
   pr;
@@ -319,24 +288,8 @@ THEORY MethodList IS
   pr;
   pr;
   pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
+  dd & pr;
   dd & eh(runable$1-{running$1},_h,Goal) & pr;
-  pr;
   pr;
   pr;
   pr;
@@ -357,15 +310,7 @@ THEORY MethodList IS
   pr;
   pr;
   pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  pr;
-  dd & eh(runable$1\/{task},_h,Goal) & pr;
+  dd & pr;
   pr;
   pr;
   pr;
@@ -374,8 +319,7 @@ THEORY MethodList IS
   pr;
   pr;
   pr;
-  pr;
-  pr;
+  dd & eh(runable$1\/{task},_h,Goal) & pr;
   pr;
   pr;
   pr;
@@ -396,8 +340,6 @@ THEORY MethodList IS
   pr;
   pr;
   dd & ah(running$2: schedule_p(n_runable,t_priority$1)) & eh(n_runable,_h,Goal);
-  pr;
-  pr;
   pr;
   pr;
   pr;
@@ -440,8 +382,6 @@ THEORY MethodList IS
   pr;
   pr;
   pr;
-  pr;
-  pr;
   dd & eh({atask}<<|t_priority$1,_h,Goal) & eh(runable$1-{atask},_h,Goal) & ah(running$2: schedule_p(n_runable,n_priority));
   pr;
   pr;
@@ -451,32 +391,6 @@ THEORY MethodList IS
 END
 &
 THEORY PassList IS
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
   Force(0),?;
   Force(0),?;
   Force(0),?;
@@ -657,10 +571,6 @@ THEORY PassList IS
   Force(0),?;
   Force(0),?;
   Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
-  Force(0),?;
   Force(0),?
 END
 &
@@ -668,6 +578,6 @@ THEORY ManForms
 END
 &
 THEORY Version IS
-  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO,genDivergencePO == KO,local_op == OK);
+  POVersion(V3.8.3)(CLT == "V3.7.6")(genOPO == KO, genDivergencePO == KO, local_op == OK);
   PRVersion("V3.3.3.p39")(CLT == "V3.7.6")
 END

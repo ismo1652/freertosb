@@ -34,14 +34,11 @@
         <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Task_block_time" suffix="ref" user="stepgalvao">
             <component name="Task_block_time" type="refinement" />
         </component_file>
+        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS" name="Task_overflow" suffix="ref" user="stepgalvao">
+            <component name="Task_overflow" type="refinement" />
+        </component_file>
         <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Task_priority" suffix="ref" user="stepgalvao">
             <component name="Task_priority" type="refinement" />
-        </component_file>
-        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Task_r" suffix="ref" user="stepgalvao">
-            <component name="Task_r" type="refinement" />
-        </component_file>
-        <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Task_rr" suffix="ref" user="stepgalvao">
-            <component name="Task_rr" type="refinement" />
         </component_file>
         <component_file path="/home/stepgalvao/Developments/AtelierB/svn/FreeRTOS/src" name="Types" suffix="mch" user="stepgalvao">
             <component name="Types" type="specification" />
