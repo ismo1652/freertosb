@@ -251,7 +251,8 @@ OPERATIONS
       ANY n_unblocked
       WHERE
         n_unblocked : FIN ( TASK ) & 
-        n_unblocked = {task|task: blocked & tickCount<=t_tblock(task) & t_tblock(task) <= TICK_INCREMENT(tickCount,tickMissed)}
+        n_unblocked <: blocked &
+        n_unblocked <: {task|task: blocked & tickCount<=t_tblock(task) & t_tblock(task) <= TICK_INCREMENT(tickCount,tickMissed)}
       THEN
         unblocked := n_unblocked
       END
@@ -259,7 +260,8 @@ OPERATIONS
       ANY n_unblocked
       WHERE
         n_unblocked : FIN ( TASK ) & 
-        n_unblocked = {task|task:blocked & ((tickCount<=t_tblock(task) & t_tblock(task)<=MAXINT) or
+         n_unblocked <:blocked&
+        n_unblocked <: {task|task:blocked & ((tickCount<=t_tblock(task) & t_tblock(task)<=MAXINT) or
             																								t_tblock(task)<=TICK_INCREMENT(tickCount,tickMissed)) }
       THEN
         unblocked := n_unblocked
