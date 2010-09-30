@@ -1,0 +1,796 @@
+\mychapter{O método B}
+\label{cap:metodob}
+
+Métodos Formais provêem abordagens formais para a especificação e construção de sistemas computacionais. Eles utilizam conceitos matemáticos sólidos como lógica de primeira ordem e teorias dos conjuntos para a criação e verificação de sistemas consistentes, seguros e sem ambiguidades. Devido aos seus rigorosos  métodos de construção, a sua principal utilização tem sido na criação de sistemas críticos para as indústrias de aeronáutica, viação férrea, equipamentos médicos e empresas que movimentam grandes quantidades monetárias, como os bancos\cite{Jim09}.
+
+%SG->DD:
+% Talvez seja melhor retirar o par?grafo abaixo, mas acho que ele da uma
+% atrativo a mais para a utilização de métodos formais
+% A base teórica dele esta em
+% www51.honeywell.com/aero/technology/common/documents/formal-methods.pdf
+% não sei se é uma fonte bibligr?fica v?lida
+
+Segundo a Honeywell, uma empresa que desenvolve sistemas para aeronaves, a
+utilização de métodos formais no processo de desenvolvimento provê várias
+vantagens, entre eles estão \cite{honeywell03}:
+\begin{itemize}
+  \item A produção mensurada pela corretude: métodos formais provêem uma forma
+  objetiva de mensurar a corretude do sistema;  
+  \item Antecipação na detecção de erros: métodos formais são usados previamente
+  em projetos de artefatos do sistema, permitindo assim a sua verificação e com
+  isso a detecção antecipada de possíveis erros do projeto;  
+  \item Garantia da corretude: através de mecanismo de verificação formal é
+  possível provar que sistema funcionará de forma coerente com a sua especificação inicial.
+\end{itemize} 
+  
+O método B\cite{abrial96} é uma abordagem formal usada para especificar e
+construir sistemas computacionais seguros. Seu criador, Jean-Raymond Abrial,
+junto com a colaboração de outros pesquisadores da universidade de Oxford, procurou
+reunir no método B vários conceitos presentes nos demais métodos formais. Entre
+esses conceitos, destacam-se as pré e pós condições (seção~\ref{sec:operacao}), o
+desenvolvimento incremental através de refinamentos (seção~\ref{sec:refinamento})
+e a modularização da especificação. A seguir, tem a explicação de como é
+feito o desenvolvimento de sistemas utilizando o método B.
+
+
+
+
+%o método B proporciona uma criação de sistemas através de sucessiveis níveis de
+%abstração, na qual inicialmente cria-se um modulo abstrato em uma linguagem de
+%modelagem. Esse módulo é refinado através de vários outros módulos até chegar
+%em uma linguagem algorítmica, denominada B0, que pode ser traduzida
+%automaticamente em algumas linguagem de programação imperativa com C, Ada,
+%Java, JavaCard e C\#.
+
+%Cada módulo criado no desenvolvimento do sistema com o método B deve ser
+%analisado estaticamente para saber se ele é implementável ou consistente, ou
+%seja, que sua execução não leve a um estado não permitido pela especificação.
+%Assim como também cada nível de abstração deve ser analisado estaticamente para
+%saber se ele é coerente com o nível acima.
+
+\section{Etapas do desenvolvimento em B}
+
+O processo de desenvolvimento através do método B inicia com a criação de um
+módulo, que define em alto nível um modelo funcional do sistema. Em B, esses
+módulos são denominados de Máquinas Abstratas (\textit{MACHINE}). Nessa fase de
+modelagem, técnicas semi-formais como UML podem ser utilizadas e, em seguida,
+transformadas para a notação formal do método B. Após a criação dos módulos,
+esses são analisados estaticamente para verificar se são coerentes e
+implementáveis.
+
+Uma vez estabelecido o modelo abstrato inicial do sistema, o método B permite que
+sejam construídos módulos mais concretos do sistema, denominados refinamentos.
+Mais especificamente, refinamentos correspondem a uma decisão de projeto, na qual
+partes da especificação abstrata do sistema devem ser modeladas em um nível mais
+concreto. Assim, um refinamento deve necessariamente estar relacionado com o
+módulo abstrato imediatamente anterior. Como ocorre na criação das máquinas
+abstratas, um refinamento também é passível de uma análise estática, na qual é
+verificada a relação entre o refinamento e o seu nível abstrato anterior.
+
+Devido à técnica de refinamentos, o desenvolvimento de sistemas utilizando o
+método B pode chegar a um nível de abstração semelhante aos das linguagens de
+programação imperativas e sequenciais. Para isso, sucessivos refinamentos devem
+ser desenvolvidos até a especificação chegar a um último nível de refinamento
+denominado implementação (\textit{IMPLEMENTATION}). Nesse nível, a linguagem
+utilizada, chamada B0, é um formalismo algorítmico passível de ser sintetizado
+em linguagens de programação como C, Java e JavaCard.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=1.0]{figuras/desenvolvimento_b.jpg}
+\caption{Etapas do desenvolvimento de sistema através do método B.}
+%\cite{dantas08}.
+\label{fig:desenvolvimento_b}
+\end{figure}
+
+O desenvolvimento de sistemas utilizando o método B é feito como demonstra
+a figura~\ref{fig:desenvolvimento_b}. Nela, os requisitos do sistema são
+inicialmente especificados em um alto nível de abstração e, após sucessivos
+refinamentos, um nível algorítmico do sistema é alcançado. Em seguida, essa
+especificação é sintetizada para um código de linguagem de programação, para o
+qual é possível, a partir da especificação funcional inicial, gerar testes para
+validar a sua correta transformação.
+
+Atualmente, o desenvolvimento de sistemas utilizando o método B pode ser apoiado
+por diversas ferramentas com funcionalidades que vão da análise estática da
+especificação até a geração de código em linguagens de programação. Uma das mais
+famosas e completas ferramentas de apoio ao desenvolvimento de sistemas
+utilizando o método B é o AtelierB \cite{atelierb}. Nela, é possível, além da
+análise sintática e estática da especificação, gerenciar projetos e controlar
+as dependências entre os vários módulos que constituem uma especificação. Devido
+as suas vastas funcionalidades e popularidade, o AtelierB será adotado como
+ferramenta padrão desse trabalho.
+
+Um exemplo de sistema desenvolvidos através da abordagem B, com o apoio da ferramenta Atelier B, é o controle de porta de plataforma em uma linha de metrô de Paris, desenvolvido pela Clearsy\footnote{www.clearsy.com}, empresa especialista em sistemas críticos.\cite{behm99}.
+
+\section{Máquina abstrata}
+\label{sec:maquina_abstrata}
+
+A base do método B está na notação de máquina abstrata (em inglês:
+\textit{Abstract Machine Notation} - AMN), a qual disponibiliza um framework
+comum para a especificação, construção e verificação estática de sistemas. Em
+outras palavras, a AMN é uma linguagem de especificação de sistemas formada por
+módulos básicos de construção chamados de máquina abstrata ou simplesmente
+máquina.
+
+Cada máquina abstrata é composta por diferentes seções, sendo que cada seção é
+responsável por definir um aspecto da especificação do sistema como: parâmetros,
+tipos, constantes, variáveis de estado, estados iniciais e transições do sistema.
+Por exemplo, a figura~\ref{fig:maquina_kernel} contêm uma máquina abstrata,
+chamada \textit{Kernel}, a qual especifica um sistema que permite incluir e
+excluir tarefas até o limite de 10. Essa máquina possui as seguintes seções:
+
+\begin{description}
+\item[MACHINE] é onde se inicia o código da máquina abstrata. Nela,
+é identificado a natureza e o nome do módulo, seguido opcionalmente por um ou mais parâmetros de máquina, os quais são separados por vírgula e limitados por parênteses;
+\item[SETS] introduz um novo tipo de entidade, como é o caso de $\mathit{TASK}$ no exemplo em questão. Nesse momento, nenhum detalhe é fornecido quanto a maneira como essa entidade será implementada;
+\item[VARIABLES] informa o nome das diferentes variáveis que compõem o estado da máquina. No exemplo da figura~\ref{fig:maquina_kernel}, há apenas uma
+variável de estado, $\mathit{tasks}$;
+\item[INVARIANT] especifica o tipo das variáveis de estado e os estados válidos do sistema. No exemplo em questão, a variável $\mathit{tasks}$ é um conjunto de até 10 elementos do tipo $\mathit{TASK}$. A caracterização lógica do conjunto dos estados válidos é uma das atividades mais importantes da especificação;
+\item[INITIALISATION] identifica quais são os possíveis estados iniciais do sistema. No caso da figura~\ref{fig:maquina_kernel}, $\mathit{tasks}$ é inicializado como um o conjunto vazio; e
+\item[OPERATIONS] determina os diferentes tipos de eventos que o sistema pode sofrer. No exemplo demonstrado, tem-se operações para adicionar e eliminar um elemento de $\mathit{tasks}$. Uma operação pode ter parâmetros, resultados e alterar o valor de variáveis de estado. Um ponto importante encontrado nas operações são as pré-condições, as quais são condições que devem ser satisfeitas para que a operação seja realizada com sucesso.
+\end{description}  
+\begin{figure}[!ht]
+\begin{small}
+
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\MACHINE\\
+\quad \mathit{Kernel}\\
+    
+\SETS\\
+\quad \mathit{TASK}\\
+    
+\VARIABLES\\
+\quad \mathit{tasks}\\
+    
+\INVARIANT\\
+\quad \mathit{tasks} \in \pow(\mathit{TASK}) \land \\
+\quad \card(\mathit{tasks})\leq 10\\
+    
+\INITIALISATION\\
+\quad \mathit{tasks}:=\emptyset\\
+    
+\end{array}
+\begin{array}[t]{l}
+\OPERATIONS\\\\
+\mathit{task\_add}(\mathit{task}) = \\
+\quad \PRE \\
+\quad\quad \mathit{task}\in \mathit{TASK} \land \\
+\quad\quad \mathit{task}\not\in \mathit{tasks} \land\\
+\quad\quad \card(\mathit{tasks})<10\\
+\quad \THEN\\
+\quad\quad \mathit{tasks}:=\mathit{tasks}\cup \{\mathit{task}\}\\
+\quad   \END;\\
+
+\end{array}
+
+\begin{array}[t]{l}
+\ldots\\
+\mathit{task\_delete}(\mathit{task})=\\
+\quad \PRE\\
+\quad \quad \mathit{task}\in \mathit{tasks}\\
+\quad \THEN\\
+\quad \quad \mathit{tasks}:=\mathit{tasks}-\{\mathit{task}\}\\
+\quad \END\\
+	
+\END\\
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Máquina abstrata de tarefas.}
+\label{fig:maquina_kernel}
+\end{figure}
+
+Para uma melhor compreensão, a especificação de sistemas através das máquinas
+abstratas será resumidamente dividida em duas partes principais. Na primeira
+parte, serão colocadas informações a respeito dos estados da máquina, suas
+variáveis e restrições. Na segunda parte, será especificado o comportamento da
+máquina, ou seja, a sua parte dinâmica, como a inicialização e as operações.
+Essas duas partes serão melhor discutidas a seguir.
+
+\subsection{Especificação do estado da máquina}
+
+Nessa parte, são determinados os estados que uma máquina pode assumir. Esses
+estados são definidos através das variáveis e dos seus invariantes
+($\INVARIANT$). As variáveis são diferentes elementos que compõem o estado do
+sistema. Os invariantes são expressões lógicas que determinam os valores que as
+variáveis podem assumir. Assim, uma especificação só pode definir o correto
+funcionamento da máquina, quando ela encontra-se em um estado válido, nada sendo
+especificado para os demais casos.
+
+O estado de uma máquina é especificado por meio de lógica dos predicados, teoria
+dos conjuntos e aritmética dos inteiros, permitindo com isso uma análise
+estática da máquina através das expressões lógicas geradas a partir de sua
+especificação. No exemplo da figura~\ref{fig:maquina_kernel}, o estado da máquina
+\textit{kernel} foi especificado através da variável $\mathit{tasks}$, sendo
+$\mathit{tasks} \in \pow(\mathit{TASK})$ e $ \card(\mathit{tasks})\leq 10$, o que
+define que $\mathit{tasks}$ deve ser um conjunto de $\mathit{TASK}$ e que o
+tamanho máximo permitido para o conjunto $\mathit{tasks}$ é de dez elementos.
+
+\subsection{Especificação das operações da máquina}
+\label{sec:operacao}
+Nas operações da máquina é especificado o comportamento dinâmico do sistema. É
+através das operações que o estado da máquina é alterado, respeitando sempre as
+suas restrições. Mais especificamente, as condições declaradas no invariante da
+máquina devem ser sempre satisfeitas ao final da operação, levando assim a
+máquina a um estado válido.
+
+O cabeçalho de uma operação é composto por um nome, uma lista de parêmetros de entrada e uma lista de parâmetros de saída \footnote{A notação de máquina abstrata permite que uma operação retorne mais de um valor.}, sendo os parâmetros de entrada e os parâmetros de saída argumentos opcionais. Um exemplo de uma operação com parâmetros de entrada e saída pode ser visto na figura~\ref{fig:query_task}. Nela, o nome da operação é $\mathit{query\_task}$, o parâmetro de entrada é $\mathit{task}$ e o parâmetro de saída $\mathit{ans}$.
+
+\begin{figure}[!ht]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{ans}\leftarrow \mathit{query\_task}(\mathit{task}) =\\
+\PRE
+\quad \mathit{task} \in \mathit{TASK}\\
+\THEN\\
+\quad\quad \IF \quad \mathit{task} \in \mathit{tasks} \\
+\quad\quad \THEN \quad ans := yes\\
+\quad\quad \ELSE \quad ans:=no\\
+\END
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Operação que consulta se uma tarefa pertence a máquina
+$\mathit{Kernel}$.}
+\label{fig:query_task}
+\end{figure}
+
+
+A operação propriamente dita é formada por pré-condição e corpo da operação. Na pré-condição são colocadas as informações sobre todos os parâmetros de entrada e as condições que devem ser satisfeitas para que a operação seja executada com sucesso. Com isso, a pré-condição funciona como uma premissa que deve ser suprida para que a operação funcione corretamente. Por exemplo, na figura~\ref{fig:addtask}, tem-se a operação $\mathit{task\_add}$ da máquina \textit{kernel} (figura~\ref{fig:maquina_kernel}). Para que essa operação  funcione corretamente, ou seja, não leve a máquina para um estado inválido, as pré condições $\mathit{task}\in \mathit{TASK}$, $\mathit{task}\not\in \mathit{tasks}$ e $\card(\mathit{tasks})<10$ devem ser obedecidas. Assim, para o seguro funcionamento dessas operação $\mathit{task}$ deve ser do tipo $\mathit{TASK}$ e não deve pertencer ao conjunto $\mathit{tasks}$ e esse conjunto deve conter menos de 10 elementos.
+
+
+\begin{figure}[!ht]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{task\_add}(\mathit{task}) = \\
+\quad \PRE \\
+\quad\quad \mathit{task}\in \mathit{TASK} \land \\
+\quad\quad \mathit{task}\not\in \mathit{tasks} \land\\
+\quad\quad \card(\mathit{tasks})<10\\
+\quad \THEN\\
+\quad\quad \mathit{tasks}:=\mathit{tasks}\cup \{\mathit{task}\}\\
+\quad   \END;\\
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Operação inclui uma nova tarefa na máquina $\mathit{Kernel}$}
+\label{fig:addtask}
+\end{figure}
+
+No corpo da operação é especificado o seu comportamento. Neste, os parâmetros de
+saída devem ser obrigatoriamente valorados e os estados da máquina podem ser
+alterados ou consultados. Assim, para realizar, de um modo formal as
+atualizações de estado e definições de parâmetros de saída, a notação de máquina
+abstrata possui um conjunto de atribuições abstratas, denominadas substituições,
+as quais serão explicadas a seguir.
+
+Formalmente, uma substituição é um transformador de predicados (ou de fórmulas).
+Elas funcionam da seguinte maneira: se $\mathit{P}$ for um predicado,
+$[\mathit{S}]\mathit{P}$ é um predicado resultado da aplicação da substituição de
+$\mathit{S}$ à $\mathit{P}$. A seguir, são demonstradas algumas das principais
+substituições da AMN e como são transformados os predicados utilizados por elas.
+
+\subsubsection{Substituição simples}
+
+A substituição simples é definida da seguinte forma: $$\mathit{x}:= \mathit{E}$$
+Nela, $\mathit{x}$ é uma variável de máquina ou parâmetro de saída, para o
+qual será atribuído o valor da expressão $\mathit{E}$. Mais precisamente, uma
+substituição simples é interpretada da seguinte maneira:
+
+$$[\mathit{x}:=\mathit{E}]\mathit{P} \Rightarrow \mathit{P}(\mathit{x}\setminus
+\mathit{E})$$
+
+Onde se tem que, no predicado $\mathit{P}$, a variável $\mathit{x}$ deve ser
+substituída por $\mathit{E}$.
+
+
+
+\subsubsection{Substituição múltipla}
+
+A substituição múltipla é uma generalização da substituição simples. Ela permite
+que várias variáveis sejam atribuídas simultaneamente. Uma substituição múltipla
+utilizando duas variáveis tem a seguinte forma:
+
+$$\mathit{x},\mathit{y}:=\mathit{E},\mathit{F} $$
+
+Na definição acima, às variáveis $\mathit{x}$ e $\mathit{y}$ são substituidas pelas 
+expressões $\mathit{E}$ e $\mathit{F}$, respectivamente. Assim, da
+mesma forma que a substituição simples, a substituição múltipla é definida da
+seguinte maneira:
+
+$$[\mathit{x}:=\mathit{E},\mathit{y}:=\mathit{F}] \mathit{P} \Rightarrow
+\mathit{P}[\mathit{E},\mathit{F} \setminus \mathit{x},\mathit{y}]$$ Na qual, no
+predicado $\mathit{P}$, as variáveis $\mathit{x}$ e $\mathit{y}$ são substituidas
+por $\mathit{E}$ e $\mathit{F}$, respectivamente. Por exemplo,
+$[\mathit{x},\mathit{y} :=\mathit{y}+5 , \mathit{x}+10]$ resulta em
+$\mathit{y}+5<\mathit{x}+10$.
+
+\subsubsection{Substituição condicional}
+
+As substituições simples e múltipla permitem somente uma opção de especificação,
+onde uma atribuição é sempre feita de maneira uniforme, sem opções e sem levar em
+consideração os estados iniciais da operação. Entretanto, as linguagens de
+programação convencionais disponibilizam um tipo condicional de atribuição, na
+qual são permitidos caminhos diferentes escolhidos de acordo com expressões
+lógicas que utilizam os valores iniciais das variáveis do sistema e os parâmetros
+passados.
+
+Como nas linguagens de programação, a notação de máquina abstrata também permite
+a construção de atribuições condicionais, as quais são feitas através da
+substituição condicional. Com isso, uma substituição condicional funciona da
+mesma forma que nas linguagens de programação. Nela, inicialmente uma expressão
+lógica é avaliada e, em seguida o caminho que a estrutura deve seguir, quais
+atribuições devem ser realizadas, é escolhido de acordo com o resultado da
+expressão. A forma como é especificada uma substituição condicional na ANM pode
+ser vista a seguir:
+
+$$
+\IF \quad \mathit{E}\quad \THEN\quad \mathit{S}\quad \ELSE\quad
+\mathit{T}\quad \END
+$$
+
+Na especificação acima, $\mathit{S}$ e $\mathit{T}$ são substituições quaisquer.
+Elas tem as suas aplicações condicionadas pela expressão lógica $\mathit{E}$, que
+pode conter variáveis da máquina e parâmetros de entrada. Com isso, caso
+$\mathit{E}$ seja satisfeita a substituição $\mathit{S}$ é realizada e, caso
+contrário, a substituição $\mathit{T}$ é executada. Assim, uma
+substituição condicional pode ser interpretada da seguinte forma:
+
+$$[\IF \quad \mathit{E} \quad \THEN \quad \mathit{S} \quad \ELSE
+\quad \mathit{T}\quad \END] \mathit{P} \quad = \quad (\mathit{E} \Longrightarrow
+[\mathit{S}] P )\land (\neg\mathit{E} \Longrightarrow [\mathit{T}]
+\mathit{P})$$.
+
+Nessa interpretação, se $\mathit{E}$ for verdadeiro a substituição $\mathit{S}$ é
+aplicada ao predicado $\mathit{P}$. Caso contrário, a substituição $\mathit{T}$ é
+aplicada ao predicado $\mathit{P}$.
+
+Um exemplo simples da utilização dessa substituição pode ser visto na
+figura~\ref{fig:query_task}. Nela, a expressão $\mathit{task} \in
+\mathit{TASK}$ é primeiramente analisada para decidir qual substituição simples deve ser
+aplicada. Caso o resultado da expressão seja afirmativo $\mathit{ans} :=
+\mathit{yes}$ é aplicada e, caso a expressão seja negativa, $\mathit{ans} :=
+\mathit{no}$ é aplicada.
+ 
+\subsubsection{Substituição não determinística $\ANY$}
+
+As substituições vistas até agora seguem uma metodologia determinística, ou seja, são substituições que possuem um comportamento previsível, levam a apenas um resultado final pré-determinado. Entretanto, as máquinas abstratas em B são utilizadas para fazer especificações iniciais de sistemas ou componentes e, na maioria das vezes, no início de uma especificação, o comportamento do sistema não é totalmente conhecido. Assim, para especificar o não-determinismo inicial de uma especificação, a notação de máquina abstrata disponibiliza um tipo especial de substituição denominada de substituição não determinística.
+
+Substituições não determinísticas são substituições que introduzem escolhas
+aleatórias no corpo da operação, levando-a a um conjunto de estados finais
+diferentes a cada execução. Em uma substituição não determinística, a
+especificação define apenas o conjunto sobre o qual deve ser feita a escolha,
+abstraindo assim informações de como tal escolha deve ser realizada. Em outras
+palavras, em uma substituição não determinística existe um conjunto de estados
+finais possíveis, que podem ser alcançados a cada execução da substituição.
+
+Uma substituição não determinística definida na AMN é a substituição $\ANY$.
+Essa substituição possui o seguinte formato:
+  
+$$
+\ANY\quad\mathit{x}\quad\WHERE \quad\mathit{Q}\quad\THEN\quad\mathit{T}\quad\END
+$$
+
+Através da definição acima, percebe-se que a substituição $\ANY$ é formada por
+três elementos:
+
+\begin{description}
+\item[$\mathit{x}$] é uma lista de variáveis que serão utilizadas no
+corpo $\mathit{T}$ da substituição. Essa variáveis serão restringidas pelo predicado $\mathit{Q}$;
+\item[$\mathit{Q}$] predicado que delimita o conjunto de valores para as variáveis $\mathit{x}$. Nessa parte, as variáveis $\mathit{x}$ devem obrigatoriamente ser  tipadas; e
+\item[$\mathit{T}$] é uma substituição que utiliza-se das variáveis $\mathit{x}$ para atualizar estados ou atribuir valores para os parâmetros de saída da operação.
+\end{description}
+
+Um exemplo da substituição $\ANY$ pode ser visto na operação da
+figura~\ref{fig:random_create}. Nela, uma tarefa é aleatoriamente adicionada na
+máquina $\mathit{Kernel}$. Para isso, primeiramente a variável $\mathit{task}$ é
+criada para representar um valor aleatório. Em seguida, o tipo e a restrição
+sobre $\mathit{task}$ são definidos, conjunto de valores possíveis de $\mathit{task}$. Por último, a
+variável $\mathit{task}$ é adicionada ao conjunto $\mathit{tasks}$. Assim, um
+comportamento não determinístico é atribuído à operação, pois para cada execução
+da operação a variável $\mathit{task}$ pode assumir um valor qualquer de um
+conjunto definido.
+ 
+
+\begin{figure}[!ht]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{random\_create}=\\
+\PRE\\
+\quad\card(\mathit{tasks})<10 \\
+\THEN\\
+\quad \ANY \\
+\quad\quad \mathit{task}\\
+\quad \WHERE \\
+\quad\quad \mathit{task}\in \mathit{TASK} \land\\
+\quad\quad \mathit{task} \not\in \mathit{tasks}\\
+\quad \THEN\\
+\quad\quad \mathit{tasks}:=\mathit{tasks}\cup \{\mathit{task}\}\\
+\quad \END\\
+
+
+\END
+\end{array}
+\end{array}
+$$
+\end{small}
+\caption{Operação que cria uma tarefa aleatéria na máquina
+$\mathit{Kernel}$.}
+\label{fig:random_create}
+\end{figure}
+
+Uma definição para a substituição $\ANY$ seria: 
+
+$$[\ANY\quad\mathit{x}\quad\WHERE
+\quad\mathit{Q}\quad\THEN\quad\mathit{T}\quad\END]\mathit{P} \Rightarrow \forall
+\mathit{x}.(\mathit{Q} \Rightarrow [\mathit{T}]\mathit{P})$$
+
+Indicando que, para todo valor que for escolhido para o conjunto de variável $\mathit{x}$ que satisfaça $\mathit{Q}$, a substituição $\mathit{T}$ devem establecer o predicado $\mathit{P}$.
+
+\section{Obrigações de prova}\label{subsec:obrigacao_de_prova}
+
+Após a criação de uma máquina abstrata utilizando o método B, ela deve ser
+avaliada estaticamente para saber se a mesma é coerente e passível de
+implementação. Para realizar tal avaliação, o método B dispõe de um conjunto de
+obrigações de prova, que são expressões lógicas geradas a partir de uma
+especificação em B.
+
+Resumidamente, a análise estática de uma máquina abstrata, através das obrigações
+de prova, avalia primeiramente se a máquina possui estados válidos, ou seja, se
+pelo menos uma combinação dos estados é alcançada pela máquina. Caso a máquina
+possua estados válidos, é avaliado se estes são alcançados na inicialização da
+máquina e ao final de cada operação. Com isso, as principais obrigações de
+prova gerada em uma máquina abstrata são: consistência do invariante, obrigação
+de prova da inicialização e obrigação de prova das operações. A seguir, tem
+em maior detalhe cada uma dessas obrigações de prova e como elas são geradas.
+
+\subsection{Consistência do Invariante}
+
+Nessa obrigação de prova, é analisado se o invariante da máquina possui pelo
+menos uma combinação em que todas variáveis tenham valores válidos, ou seja, a
+máquina possui pelo menos um estado válido. Essa obrigação de prova é definida da
+seguinte maneira:
+ 
+$$\exists\mathit{v}.\mathit{I}$$
+
+Onde $\mathit{v}$ indica o vetor de todos as variáveis da máquina e $\mathit{I}$
+representa o invariante da máquina. Com isso, a definição acima pode ser
+entendida como: deve existir pelo menos um valor para o vetor de variáveis
+$\mathit{v}$ que satisfaça o invariante $\mathit{I}$.
+
+Um exemplo da aplicação dessa obrigação de prova na máquina da
+figura~\ref{fig:maquina_kernel} seria: 
+
+$$\exists\mathit{tasks}.(\mathit{tasks} \in \pow(\mathit{TASK}) \land 
+\card(\mathit{tasks})\leq 10\\)$$
+
+O que pode ser provado como verdadeiro instanciando $\mathit{tasks}$ com
+$\emptyset $, por exemplo.
+
+
+\subsection{Obrigação de prova da inicialização}
+
+Outra obrigação de prova necessária na análise estática da máquina abstrata é a
+obrigação de prova da inicialização. Nela, é analisado se os estados iniciais da
+máquina satisfazem seu invariante. Isso significa verificar se os estados
+iniciais da máquina são estados válidos. Assim, essa obrigação de prova é
+definida da seguinte maneira:
+
+$$[\mathit{T}]\mathit{I}$$
+
+Nesta, $[\mathit{T}]$ indica as substituições realizadas na inicialização da
+máquina e $\mathit{I}$ indica as restrições definidas no invariante. Com isso, a
+obrigação de prova da inicialização da máquina da figura~\ref{fig:maquina_kernel}
+é:
+
+$$[\mathit{task}:= \emptyset] (\mathit{tasks} \in \pow(\mathit{TASK}) \land
+\card(\mathit{tasks})\leq 10) \quad \Rightarrow\quad \emptyset \in
+\pow(\mathit{TASK}) \land \card(\emptyset)\leq 10$$
+
+O que pode ser facilmente provado como válido.
+
+\subsection{Obrigação de prova das operações}
+
+Na obrigação de prova das operações deve ser analisado se, quando satisfeita a
+sua pré-condição, a execução da operação, a partir de um estado válido, levará a
+máquina a um estado válido. Assim a definição dessa obrigação de prova pode ser
+vista da seguinte maneira:
+
+$$\mathit{I} \land \mathit{P} \Rightarrow [\mathit{S}]I$$
+
+Na definição acima, $\mathit{I}$ representa o invariante da máquina,
+$\mathit{P}$ representa a pré-condição da operação analisada e $\mathit{S}$ indica as
+substituições realizadas no corpo da operação. Uma explicação mais precisa
+dessa definição seria: quando a máquina estiver em um estado válido e a
+pré-condição da operação for satisfeita, a execução da operação deve manter a
+máquina em um estado válido. Nota-se com isso, que esta obrigação de prova não
+é necessária nas operações que não alteram o estado da máquina, chamadas de
+operações de consulta, como a da figura~\ref{fig:query_task}, pois, nessas
+operações, apenas o valor do parâmetro de retorno é alterado.
+
+Um exemplo de uma obrigação de prova da operação $\mathit{task\_add}$ da máquina
+da figura~\ref{fig:addtask} pode ser visto a seguir:
+
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+(\mathit{tasks} \in \pow(\mathit{TASK}) \land
+\card(\mathit{tasks})\leq 10) \land \\
+(\mathit{task}\in \mathit{TASK} \land \mathit{task}\not\in \mathit{tasks}\land \card(\mathit{tasks}\le 10))
+\Rightarrow \\
+\quad \quad \quad ([\mathit{tasks}:=\mathit{tasks}\land\{\mathit{task}\}]((\mathit{tasks}
+\in \pow(\mathit{TASK}) \cup \card(\mathit{tasks})\leq 10))))
+\end{array}
+\end{array}
+$$
+ 
+
+\section{Refinamento}
+\label{sec:refinamento}
+A linguagem abstrata demonstrada até agora é usada principalmente para criar uma
+modelagem funcional de sistemas e componentes. Nesta, o principal objetivo é
+descrever o comportamento do sistema sem se preocupar com detalhes de como tal
+comportamento será implementado ou de como os dados serão manipulados pelo
+computador. Entretanto, para realizar uma modelagem mais concreta e passível de
+implementação, é necessário que notações matemáticas abstratas utilizadas na
+modelagem do sistema, como conjuntos e substituições não determinística, sejam
+descritas de forma mais concreta, o que é possível através do refinamento. Além
+disso, o refinamento pode ser usado para construir um modelo abstrato de forma
+incremental com a adição sucessiva de formalizações dos
+requisitos\cite{schneider06}.
+
+Através da técnica de refinamento, o método B possibilita um desenvolvimento
+gradativo do sistema. Nele, um sistema é especificado em estágios que vão da
+modelagem abstrata até um nível algorítmico denominado de implementação. Entre
+esses níveis de abstração existem modelos intermediários chamados de
+refinamentos, que combina especificações abstratas com detalhes de
+implementação.
+
+Mais precisamente, refinamentos são decisões de projeto, nas quais estruturas abstratas são detalhadas em um nível mais concreto (refinamento vertical), ou extenções da especificação para adicionar novos requisitos(refinamento horizontal). Com isso, um refinamento deve obrigatoriamente estar ligado a um modelo abstrato anterior e possuir seu comportamento delimitado pelo modelo a qual está relacionado. Para garantir que
+essa relação entre módulos seja feita de forma coerente, existem mecanismos de análise estática denominados obrigações de prova do refinamento, os quais seráo detalhados na seção~\ref{subsec:obrigacao_de_prova_refinamento}.
+
+A construção de um refinamento é muito parecida com a construção de uma máquina
+abstrata. Assim, como na máquina abstrata, é dividido em seções onde são
+especificadas as informações do sistema. Um refinamento possui basicamente as
+mesmas seções de uma máquina abstrata, a diferença está nas seções, $\REFINEMENT$
+e $\REFINES$, onde são colocados respectivamente o nome do refinamento e o módulo
+que será refinado.
+
+Como ocorreu na seção de máquina abstrata \ref{sec:maquina_abstrata}, para um 
+melhor entendimento, a especificação de um refinamento será dividida basicamente 
+em duas partes principais: refinamento do estado da máquina abstrata e 
+refinamento das operações da máquina abstrata. Em seguida, tem-se o delineamento
+dessas duas partes principais.
+
+\subsection{Refinamento do Estado}
+
+No refinamento de dados, como é reconhecido o refinamento do estado, tem-se o objetivo de especificar o estado de uma máquina em uma forma mais concreta, ou seja, mais próxima a utilizada pelo computador. Para isso, estruturas abstratas, como conjuntos e relações, são substituídas por estruturas de dados como vetores e sequências.
+
+Como foi dito anteriormente, um refinamento necessita estar relacionado com um
+nível abstrato. No refinamento de dados, essa relação é
+feita através de um mecanismo denominado \textit{relação de refinamento}. Assim,
+a \textit{relação de refinamento}, nada mais é do que formulações lógicas que ligam
+o estado do refinamento ao estado do módulo refinado por ele.
+
+Um exemplo de refinamento de dados pode ser visto na figura~\ref{fig:refinamento_kernelR}. Nela, é feito o refinamento da máquina $\mathit{Kernel}$ (figura~\ref{fig:maquina_kernel}), a qual possui o estado $\mathit{task}$ especificado como sendo um conjunto de tarefas. Entretanto, conjuntos são representações abstratas de dados. Assim, no refinamento $\mathit{Kernel\_r}$, o estado $\mathit{task}$ é refinado por $\mathit{task\_r}$, uma sequência de tarefas ($\mathit{tasks\_r} \in \mathbf{seq}(\mathit{TASK})$), estrutura mais concreta que um conjunto. A relação de refinamento entre os dois estados é feita através da igualdade $\mathbf{ran}(\mathit{tasks\_r})=\mathit{tasks}$.
+
+
+\begin{figure}[!ht]
+\begin{small}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\mathbf{REFINEMENT}\\
+\quad \mathit{Kernel\_r}\\
+   
+\REFINES\\
+\quad \mathit{Kernel}\\
+   
+\VARIABLES\\
+\quad \mathit{tasks\_r}\\
+\end{array}
+
+    
+
+\begin{array}[t]{l}
+\INVARIANT\\
+\quad \mathit{tasks\_r} \in \mathbf{seq}(\mathit{TASK}) \land \\
+\quad \mathbf{ran}(\mathit{tasks\_r})=\mathit{tasks}\\
+    
+\INITIALISATION\\
+\quad \mathit{tasks\_r}:=[]\\
+\end{array}
+
+
+\begin{array}[t]{l}
+\OPERATIONS\\
+\mathit{task\_add}(\mathit{task}) = \\
+\quad \BEGIN\\
+\quad \quad \mathit{tasks\_r}:=\\
+\quad\quad\quad\quad\mathit{task} \to \mathit{tasks\_r}\\
+\quad \END\\
+    
+\END
+\end{array}
+
+\end{array}
+$$
+\end{small}
+\caption{Refinamento da maquina abstrata de $\mathit{Kernel}$.}
+\label{fig:refinamento_kernelR}
+\end{figure}
+
+
+\subsection{Refinamento das operações}
+
+Após o refinamento do estado da máquina, é necessário especificar o refinamento
+das suas operações. Nesse processo, as operações abstratas são reescritas de
+forma mais concreta, podendo manipular o estado da máquina refinada e o novo
+estado criado no refinamento. Além disso, as operações refinadas devem possuir
+o mesmo comportamento das operações abstratas, garantindo assim uma coerência com
+a especificação inicial.
+
+As operações de um refinamento devem possuir a mesma assinatura das operações do
+módulo relacionado a ele, ou seja, ter os mesmo nomes e parâmetros de entrada e
+saída. Entretanto, nas operações de um refinamento, não é necessária a declaração
+da pré condição ($\PRE$), uma vez que essa foi definida em um nível mais abstrato
+e é suficiente para garantir que o tipo do parâmetro de entrada permaneça o
+mesmo.
+
+Um exemplo do refinamento de uma operação pode ser visto na operação $\mathit{task\_add}$ do refinamento $\mathit{Kernel_r}$ (figura~\ref{fig:refinamento_kernelR}). Nela, percebe-se a ausência da pré-condição e que a assinatura da operação permanece a mesma. A parte alterada foi apenas o corpo da operação, que foi adaptada para trabalhar com o estado $\mathit{taskR}$. Assim, na operação da figura~\ref{fig:addtask}, a operações $\mathit{task\_add}$ adicionava um novo elemento a um conjunto de tarefas e, nessa nova operação, da figura~\ref{fig:refinamento_kernelR}, uma nova tarefa é adicionada no início de uma sequência de tarefa pela atribuição $\mathit{tasks\_r}:=\mathit{task} \to \mathit{tasks\_r}$.
+
+
+\subsection{Obrigação de prova do refinamento}
+\label{subsec:obrigacao_de_prova_refinamento}
+A análise estática, que confere se um refinamento é consistente com o nível
+abstrato acima dele, é feita através de obrigações de prova e pode ser dividida em
+duas partes, obrigação de prova da inicialização e obrigação de prova das
+operações. Entretanto, na obrigação de prova das operações, são possíveis ainda
+dois tratamentos diferentes, obrigações de prova para as operações sem parâmetros
+de retorno e a obrigação de prova para as operações com parâmetros de retorno. A
+seguir é demonstrado como é realizada cada uma dessas obrigações de prova do
+refinamento.
+
+\subsubsection{Obrigação de prova da inicialização}
+
+Em geral, a inicialização da máquina abstrata, nomeada de $\mathit{T}$, e a
+inicialização do refinamento, nomeada de  $\mathit{T1}$, possuem um conjunto de
+execuções possíveis que levam a um conjunto de diferentes estados. Assim, em um
+refinamento, é necessário que cada execução de $\mathit{T1}$ possua uma execução
+correspondente em $\mathit{T}$. Em outras palavras, todo estado encontrado em
+$\mathit{T1}$ deve possuir, via \textit{relação de refinamento}, denominada
+$\mathit{J}$, um estado gerado por $\mathit{T}$.
+
+A \textit{relação de refinamento} é um predicado entre variáveis abstratas e
+variáveis de refinamento. Com isso, $\mathit{T}$ deve possuir pelo menos uma
+transição que satisfaça esse predicado, ou seja, nem todas as transições de
+$\mathit{T}$ levará $\mathit{J}$ a falsidade. Essa afirmativa pode ser traduzida
+na expressão abaixo:
+
+$$ \neg[\mathit{T}] \neg \mathit{J} $$
+
+O predicado $\neg \mathit{J}$ indica que $\mathit{J}$ é falso e o predicado
+$[\mathit{T}] \neg \mathit{J}$ representa que toda transformação de $\mathit{T}$
+levará $\mathit{J}$ a um estado falso. Assim, a negação dessa afirmação
+$\neg[\mathit{T}] \neg \mathit{J}$ indica que existe uma transição de
+$\mathit{T}$ que não levará $\mathit{J}$ é falsidade, ou seja, nem todas
+transições de $\mathit{T}$ levará $\mathit{J}$ a falsidade.
+
+Para encerrar a obrigação de prova da inicialização do refinamento, é
+necessário que para toda transformação de $\mathit{T1}$ o predicado
+$\neg[\mathit{T}] \neg \mathit{J}$ seja estabelecido. Essa afirmação pode ser
+traduzida na expressão abaixo, a qual representa a obrigação de prova do
+refinamento.
+
+$$ [\mathit{T1}]\neg [\mathit{T}] \neg \mathit{J} $$
+
+Um exemplo de uma obrigação de prova da inicialização do refinamento pode ser
+visto entre as máquina $\mathit{Kernel}$ e a máquina $\mathit{Kernel\_r}$. Nela, a
+inicialização dos estados das duas máquinas gera a seguinte obrigação de prova:
+
+$$
+[\mathit{tasks\_r}:=[]]\neg[\mathit{tasks}:=\emptyset]\neg(\mathbf{ran}(\mathit{tasks\_r})=\mathit{tasks})
+$$
+
+\subsubsection{Obrigação de prova da operação sem parâmetro de retorno}
+Geralmente, uma operação é definida como $\PRE \mathit{P} \THEN \mathit{S} \END$,
+sendo o seu refinamento $\PRE \mathit{P1} \THEN \mathit{S1} \END$, onde, na
+maioria da vezes, $\mathit{P1}$ reduz-se a $\TRUE$. Com isso, do mesmo modo que na
+inicialização, tem-se que as transições geradas por $\mathit{S1}$ devem estar
+relacionadas com alguma transição de $\mathit{S}$, o que é definido pela
+expressão abaixo:
+ 
+$$[\mathit{S1}] \neg [\mathit{S}] \neg \mathit{J}$$
+
+Entretanto, diferente da inicialização, a execução de uma operação deve levar em
+consideração o estado da máquina anterior a sua execução. Assim, o estado da
+máquina abstrata junto com o estado do seu refinamento devem ser estados válidos.
+Uma relevante ligação entre esse estados é o invariante $\mathit{I}$ e a sua
+relação de refinamento $\mathit{J}$. Além disso, para a correta execução da
+operação, a pré-condição da mesma deve ser estabelecida. Assim, levando em
+consideração que uma operação só pode ser executada corretamente quando a máquina
+estiver em um estado válido e quando a sua pré-condição for estabelecida, a
+obrigação de prova de uma operação é feita da seguinte forma:
+
+$$\mathit{I} \land \mathit{J} \land \mathit{P} \Rightarrow [\mathit{S1}] \neg
+[\mathit{S}] \neg \mathit{J}$$
+
+Por exemplo, a obrigação de prova do refinamento da operação $\mathit{task\_add}$
+da máquina $\mathit{Kernel}$ é :
+
+
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+(\mathit{tasks} \in \pow(\mathit{TASK}) \land \card(\mathit{tasks})\leq10)\land \\ 
+\ran(\mathit{tasks\_r})=\mathit{tasks}  \land \\
+\mathit{task}\in \mathit{TASK} \land \\
+\mathit{task}\not\in \mathit{tasks} \land\\
+(\card(\mathit{tasks})<10) \Rightarrow 
+[\mathit{tasks}:=\mathit{tasks}\cup \{\mathit{task}\}] \\
+\neg[\mathit{tasks\_r}:= \mathit{task} \to \mathit{tasks\_r}] \\
+\neg (\mathit{tasks\_r})=\mathit{tasks})
+\end{array}
+\end{array}
+$$
+
+\subsubsection{Obrigação de prova da operação com parâmetro de saída}
+
+No refinamento de uma operação com saídas, cada saída do refinamento da operação
+deve estar ligada a uma saída da operação refinada, sendo necessário assim que a
+operação do refinamento tenha a mesma quantidade de parâmetros de saída da
+operação refinada.  Além disso, renomeando $\mathit{out'}$ como o conjunto de
+parâmetros de saída do refinamento e deixando $\mathit{out}$ como o conjunto
+dos parâmetros de saída da operação refinada, cada valor de $\mathit{out'}$ deve
+possuir um correspondente em $\mathit{out}$. Em outra palavra, cada execução de
+$\mathit{S1}$ deve encontrar uma execução $\mathit{S}$, na qual $\mathit{out'}$
+produzido por $\mathit{S1}$ seja igual ao $\mathit{out}$ produzido por
+$\mathit{S}$.
+
+Além da ligação entre os parâmetros de saída, no refinamento de uma operação com
+retorno, deve-se obedecer todas as restrições impostas no refinamento das
+operações sem parâmetro de saída, ficando obrigação de prova para as operações
+com retorno da seguinte forma:
+
+$$\mathit{I} \land \mathit{J} \land \mathit{P} \Rightarrow
+\mathit{S1}[\mathit{out'}/\mathit{out}] \neg \mathit{S} \neg (\mathit{J} \land
+\mathit{out'} = \mathit{out})$$
+
+Nela, $\mathit{S1}[\mathit{out'} / \mathit{out}]$ significa que, nas atribuições
+de $\mathit{S1}$, cada ocorrência de $\mathit{out}$ deve ser substituída por
+$\mathit{out'}$ e, antes dessa substituição, a máquina deve possuir um estado
+válido e sua pré-condição deve ser alcançada, $\mathit{I} \land \mathit{J} \land
+\mathit{P}$. As demais verificações são similares à obrigações de prova das
+operações sem parâmetros de saída.
+
+\paragraph{}
+Através desse capítulo pode-se perceber como é feita uma especificação em B e principalmente a sua organização em módulos bem definidos. Além disso, como o mecanismo de refinamento é possível chegar-se em níveis de especificação próximo às linguagens de programação imperativas, nos quais o modelo criado é passível de transformação para uma linguagem executável. 
+
+Entretanto, devido ao seu rigor matemático, a linguagem possui limitações que dificutam o trabalho do especificador. Entre elas está o fato de que uma operação não poder ser reaproveitada na mesma máquina. Por exemplo, a operação $\mathit{task\_delete}$ da máquina $\mathit{Kernel}$(figura~\ref{fig:maquina_kernel}) não poderia ser reaproveitada na operação na mesma máquina se essa nova operação necessitasse excluir uma tarefa, impedindo assim a reutilização de código.
+
+
+%\begin{itemize}
+%  \item Explicar o que à o método B
+%  \item Explicar a base teórica de B (AMN e as substituições)
+%  \item Explicar como à especificado um sistema em B (como à criado um módulo)
+%  \item Falar das obrigações de prova
+%  \item Falar dos mecanismo de composição e refinamento
+%  \item Dizer que o refinamento pode chegar em um nível concreto que pode ser
+%  sintetizado para algumas linguagens de programação.
+%  \item Falar do uso de ferramentas
+%  \item Falar do projeto B2ASM
+%\end{itemize}

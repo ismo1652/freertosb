@@ -1,0 +1,79 @@
+\mychapter{Considerações Finais}
+\label{Cap:consideracoes_finais}
+Esse trabalho baseia-se em dois grandes desafios da computação, desenvolvimento de sistemas fidedignos e, principalmente, o projeto do software verificado, no qual se encontra a proposta de especificar formalmente o sistema operacional de tempo real FreeRTOS, objetivo principal desse trabalho. 
+
+Para esta especificação desse sistema, devido a sua proximidade com as linguagens de programação atual,  o formalismo escolhido foi o Método B.  Entretanto, no decorre dessa especificação notou-se algumas limitações proporcionada por esse formalismo, o que será discutido na seção~\ref{sec:limitacoes}.
+
+Devido a extensão do sistema, as limitações do método B e para torna possível a realização desse trabalho, dentro do prazo de conclusão, algumas características do sistema foram abstraídas. Ao final, as entidades tarefa, fila de mensagens, semáforos e mutexes foram tratadas de forma abstrata.
+
+Como decisão de projeto uma modelagem inicial, mais genérica, foi criada inicialmente para verificar a viabilidade da especificação e constatar novas limitações de escopo. Com essa especificação, percebeu-se que para a extensão dessa especificação era necessário realizar alterações na mesma. Essas alterações foram realizadas através de uma nova modelagem que, além de tornar a anterior mais facilmente expansível, adicionou novas abstrações e junto com elas, novas propriedades. Após isso, como objetivo comprovar o refinamento do modelo criado, um nível de abstração a mais foi desenvolvido na nova especificação.
+
+Ao final, o trabalho aqui desenvolvido, além de ser um esforço inicial para a verificação e especificação do FreeRTOS, representa uma documentação do sistema do ponto de vista forma, diferente da documenta atualmente disponível. Em adição, a especificação aqui criada pode ser usada para verificação de aplicações criadas com o FreeRTOS, como será comentando na seção~\ref{sec:trabalhos_futuros}. Por último a extensão desse trabalho pode proporcionar a criação de um sistema formalmente verificado baseado no FreeRTOS
+.
+
+\section{Trabalhos futuros}
+\label{sec:trabalhos_futuros}
+Devido à natureza pioneira desse trabalho, uma variedade de esforços podem ser iniciados a partir dele, com o objetivo de complementa a especificação e validação do FreeRTOS. Assim, alguns trabalhos futuros de suplemento a este são sugeridos a seguir.
+
+Nesse trabalho, para tornar possível a sua especificação, apenas partes especificas do FreeRTOS foram tratadas. Entre as características abstraídas dessa modelagem está a entidade co-rotina e o controle de estouro de tempo proporcionado pelo escalonador. Assim, como trabalhos futuros, pode-se ter a especificação dessas características seguindo a mesma abordagem utilizada nesse trabalho, o que tornaria a modelagem do FreeRTOS mais completa.
+
+Outra possibilidade de extensão desse trabalho está no refinamento da especificação criada. O nível de abstração utilizado nesse trabalho foi relativamente alto. Com isso, como continuidade dessa especificação pode-se complementar, através das técnicas de refinamento do método B, a proximidade dessa especificação com as linguagem de programação, retirando estruturas abstratas, como conjuntos, e colocando estruturas concretas como seqüências e vetores. Parte dessa proposta, já foi iniciada nessa modelagem com o refinamento da máquina \textit{Queue}, demonstrada na seção~\ref{ref:queue}.
+
+Além dos trabalhos listados acima, outro esforço que pode ser iniciado a partir dessa modelagem é a utilização da especificação criada para a verificação da atual implementação. Isso, é possível através de ferramentas como FRAMA-C~\cite{framac} e VCC~\cite{vcc}, sendo necessário adaptar a especificação criada para particularidades específicas de cada ferramenta.
+
+Por fim, um trabalho mais simples, mas que agregar valor à especificação aqui desenvolvida, pode-se ajustar a modelagem para a ferramenta de animação e verificação da especificação em B, o ProB\cite{prob}. Assim, uma animação para a modelagem será desenvolvida e uma nova verificação da especificação pode ser feita utilizando outra ferramenta, podendo analizar outras classes de propriedade através de \textit{model checking}.
+
+\section{Limitações da método B}
+\label{sec:limitacoes}
+
+Grande parte da abstração do sistema a ser especificado foi devido a limitações do método B. Um problema, enfrentado inicialmente na especificação foi a impossibilidade de verificar problemas conhecidos dos sistemas operacionais como o \textit{deadlock}, que causa bloqueio entre tarefas que aguardam os recursos retidos entre elas. Isso ocorre, devido ao método B não ter mecanismo para verificar situações de concorrência, o que é suprido por outros formalismos como Circus e CSP~\cite{csp}.
+
+Além disso, a implementação das atividades realizadas pelas operações também não é possível pelo método B. Para isso, é necessário relacionar uma função a uma tarefa como, por exemplo, a função da figura~\ref{fig:funcao_tarefa} pode ser relacionada a uma nova tarefa criada. Essa técnica é específica das linguagens de programação como C e C++, o que torna difícil a sua especificação. Consequentemente, a estrutura na qual a função de uma tarefa deve obedecer também não pode ser verificada utilizando o método B.
+
+
+\begin{figure}[!h] \centering
+\begin{small}
+\begin{verbatim}
+void functionName( void *vParameters ) 
+{
+      for( ;; )
+      {
+          -- Task application code here. --
+      }
+}
+\end{verbatim}
+\end{small}
+\caption{Função executada quando a tarefa associada a ela entrar em execução}
+\label{fig:funcao_tarefa}
+\end{figure}
+ 
+
+Outro problema encontrado durante o desenvolvimento do trabalho, foi a natureza paralela de execução das substituições que compõem uma operação e o não reaproveitamento, na mesma máquina, das operações especificadas.
+
+No método B, as atribuições de uma operação ocorrem em paralelo, assim se em uma operação eu tiver as seguintes seqüências, nessa mesma ordem, $\mathit{a}:=\mathit{a+1}$ e $\mathit{b}:= \mathit{a}$, o valor das variável $\mathit{b}$ será o valor da variável $\mathit{a}$ antes do incremento $\mathit{a+1}$. Isso dificulta a especificação de um sistema, no qual, diferente do paralelismo, suas atividades ocorrem em seqüência.
+
+Uma forma de contornar a limitação acima, que foi muito utilizada nesse trabalho, seria declarar variáveis com os futuros estados da operação após a sua execução, como demonstra a figura~\ref{fig:limitacao},o que torna a especificação mais extensa. Assim para a variável $\mathit{b}$ do parágrafo anterior assumir o valor incrementado de $\mathit{a}$ é criada uma variável $\mathit{t}$ para representar o valor de $\mathit{a+1}$
+
+\begin{figure}[!h]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\ANY\\
+\quad\mathit{t}\\
+\WHERE \\
+\quad\mathit{t} = \mathit{a} + 1\\
+\THEN \\
+\quad\mathit{a}=t \parallel\\
+\quad\mathit{b}=t\\
+\END\\     
+\end{array}
+$$
+\end{footnotesize}
+\caption{Técnica que contorla as atribuições paralelas em B.}
+\label{fig:limitacao}
+\end{figure}
+
+O não reaproveitamento das operações especificadas na mesma máquina, força a especificação ficar com partes iguais da modelagem distribuídas por todas as operações, enquanto que, poder-se-ia juntar partes repetidas de código em operações separadas e estas serem reaproveitadas por toda a máquina.
+
+Por último, devido ao método B ser direcionado à aplicações críticas, onde a alocação de memória dinâmica é proibida torna difícil a especificação de estruturas como ponteiros, bastante utilizada no FreeRTOS e não tratada nesse trabalho.
+

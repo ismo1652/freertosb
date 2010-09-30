@@ -1,0 +1,104 @@
+%%
+%% Capítulo 1: Modelo de Capítulo
+%%
+
+% Está sendo usando o comando \mychapter, que foi definido no arquivo
+% comandos.tex. Este comando \mychapter é essencialmente o mesmo que o
+% comando \chapter, com a diferença que acrescenta um \thispagestyle{empty}
+% após o \chapter. Isto é necessário para corrigir um erro de LaTeX, que
+% coloca um número de página no rodapé de todas as páginas iniciais dos
+% capítulos, mesmo quando o estilo de numeração escolhido é outro.
+\mychapter{Introdução}
+\label{Cap:introducao}
+
+A Ciência da Computação é uma área relativamente jovem, mas com grande impacto na sociedade atual. Através dela, é possível acelerar-se anos de desenvolvimento e pesquisas das demais áreas da ciência, como ocorreu com o mapeamento do genoma humano. Devido a isso, em \cite{USAReport} ela chegou a ser citada como um dos
+pilares da ciência, considerada também como um fator crucial para a economia, tecnologia e desenvolvimento de um pais.
+
+Ciente dessa importância, pesquisadores de todo mundo tem buscado reunir esforços em torno de objetivos comuns, definindo diretrizes a serem seguidas pela computação ao longo dos próximos anos. Essas diretrizes são estabelecidas visando suprir as necessidades mais relevantes da sociedade atual, as quais, em geral,
+são obstáculos ainda não vencidos pela computação, e, por isso, denominados como ``Grandes Desafios da Computação''
+
+Seguindo esse contexto, a Sociedade Brasileira de Computação (SBC) listou, em \cite{GDSBC}, alguns desses principais desafios, dentre os quais está o desafio de \textit{desenvolvimento tecnológico de qualidade: sistemas disponíveis, corretos, seguros, escaláveis, persistentes e ubíquos}. Esse desafio visa a pesquisa de métodos, técnicas, modelos, dispositivos e padrões de projeto capazes de auxiliar os projetistas e desenvolvedores de grandes sistemas de software e hardware a criarem produtos mais previsíveis, escalonáveis e seguros.
+
+A inspiração para o desenvolvimento tecnológico de qualidade veio principalmente da crescente utilização de sistemas de computação no cotidiano em eletrodomésticos, celulares, carros, metrôs, aviões e salas de cirurgia. Alguns desses são sistemas relativamente simples e não causam grandes problemas em caso de falhas, outros são críticos e uma falha pode levar à consequências catastróficas. Para esses últimos, o desenvolvimento de sistemas fidedignos é de extrema importância.  
+
+Entre as abordagens de construção de sistemas fidedignos, os métodos formais tem sido um caso de sucesso. Métodos formais são técnicas matemáticas usadas para desenvolver sistemas de \textit{software} e \textit{hardware} com rigor matemático. Eles permitem ao usuário analisar e verificar seus modelos em todas as partes do ciclo de vida de desenvolvimento: requisitos, especificação, modelagem, implementação, teste e manutenção. Atualmente, esses métodos têm sido utilizados, de forma auspiciosa, pela indústria para a construção de aplicações pequenas, mas significantes \cite{Jim09}. Pontualmente, sistemas de grande porte foram analisados usando técnicas formais no projeto astrée\footnote{http://www.astree.ens.fr/}.
+
+Entretanto, a comunidade de métodos formais também possui seus desafios, entre eles está o projeto do ``Software Verificado''\cite{bicarregui06}. O Software Verificado é um conjunto de teorias, ferramentas e experiências usadas para verificação e validação de software. Ele tem como objetivo aplicar técnicas existentes a exemplos significativos para identificar limites, comparar as capacidades e acelerar o amadurecimento 
+das tecnologias de verificação de software. Para isso, foi criado um repositório onde são armazenadas a utilização de diferentes abordagens de verificação aplicadas estudos de casos sugeridos pelo projeto, dos quais encontra-se o sistema operacional de tempo real FreeRTOS\cite{Hoare05}\cite{Jim09}.
+
+O FreeRTOS \cite{Barry09}\cite{Barry092} é um sistema operacional de tempo real popular, simples e portável. Atualmente, o seu repositório\cite{freertoskernel} possui uma taxa maior que 6.000 downloads por mês; o seu núcleo é acessível, aberto e pequeno. São aproximadamente 2.200 linhas de código, com funções comuns a maioria dos sistemas operacionais. Ele oficialmente suporta 17 arquiteturas de microcontroladores diferentes. Devido a essas características, a especificação desse sistema seria uma contribuição para a comunidade de métodos formais.
+
+Entre as possíveis abordagens formais para a especificação do FreeRTOS está o método B \cite{schneider06}\cite{abrial96}. O método B é uma abordagem de especificação, validação e construção de sistemas. Nele o sistema é inicialmente especificado em uma linguagem matemática parecida com uma linguagem de programação e, em seguida, são geradas várias obrigações de prova para comprovar a coerência dessa especificação. Além disso, para facilitar o desenvolvimento de sistemas, ele dispõe dos mecanismos de modularização e refinamento, sendo esse último capaz de refinar uma especificação até um nível algoritmo, passível de transformação para as linguagens de programação imperativas. Por último, o método B é apoiado por um pacote de ferramentas que suportam todos os seus ciclos de desenvolvimento, o que tornou essa abordagem a escolhida para a especificação do FreeRTOS nesse trabalho.
+
+Em suma, a especificação formal do FreeRTOS através do método B, além ser um esforço para a resolução dos desafios apresentados, é uma grande contribuição para a computação, principalmente a comunidade de métodos formais. Tal especificação poderá ainda agregar valor ao sistema, servindo como documentação e entrada para técnicas de teste de sistemas construídos utilizando o Sistema Operacional em questão \cite{jaffuel07}. Além disso, devido a utilização do método B em um caso de uso real, esse trabalho pode apresentar problemas de limitações do método B, para o aperfeiçoamento do mesmo.
+
+%Prosseguindo nesta introdução, tem-se, na seção~\ref{sec:objetivo}, o objetivo a
+%ser atingido com esse trabalho, na seção~\ref{sec:metodologia}, a metodologia
+%para atingir tal objetivo, e, na seção~\ref{sec:trabalhos}, os trabalhos
+%relacionados a essa proposta. Na continuação do trabalho, as fundamentações
+%teóricas referentes ao FreeRTOS e ao método B são apresentada, respectivamente,
+%nos capítulos~\ref{cap:freertos} e~\ref{cap:metodob}. Em seguida, a parte do
+%trabalho já realizada é demonstrada no capítulo~\ref{cap:primeiros_passos} e a
+%proposta, junto com as atividades e o cronograma de trabalho, são exibidos no
+%capítulo~\ref{cap:proposta}. Por último, tem-se a conclusão no
+%capítulo~\ref{cap:conclusao}.
+
+\section{Objetivo}\label{sec:objetivo}
+O objetivo desse trabalho é, através da especificação do FreeRTOS em B, contribuir para os desafios do software verificado e da construção de software fidedigno. A especificação desenvolvida modelará funcionalmente, de acordo com a documentação, algumas das principais funcionalidades que compõem o FreeRTOS, sendo capaz de analisar propriedades estáticas e levantar questionamentos sobre o funcionamento das mesma. Além disso, com a continuação desse trabalho será possível desenvolver um sistema operacional de tempo real, fundamentado na documentação do FreeRTOS, criado por uma especificação em B.
+
+\section{Metodologia}\label{sec:metodologia}
+A metodologia utilizada no desenvolvimento desse trabalho pode ser sucintamente resumida pelos itens abaixo, os quais serão comentados nos parágrafos seguintes:
+
+\begin{itemize}
+  \item Estudo do método B;
+  \item Estudo da documentação e código fonte do FreeRTOS;
+  \item Elaboração de um plano para a modelagem funcional do FreeRTOS;
+  \item Modelagem funcional do FreeRTOS considerando apenas as entidades Tarefa e Fila de Mensagens;
+  \item Refinamento da modelagem desenvolvida para adicionar a característica de prioridade de uma tarefa e tamanho da fila de mensagens;
+  \item Amadurecimento da modelagem desenvolvida;
+  \item Acréscimo das entidades mutex e semáforo à especificação; e 
+  \item Refimento da modelagem;   
+  
+\end{itemize}
+
+Pelo fato do método B ser o formalismo escolhido para o desenvolvimento da modelagem proposta, o primeiro passo desse trabalho foi a pesquisa sobre essa abordagem. Durante essa pesquisa, vários estudos de caso foram desenvolvidos, entre eles uma especificação do microcontrolador $8051$ (melhor detalhada em \cite{ermac}). Além disso, com o conhecimento adquirido, foi possível colaborar com os seguintes trabalhos \cite{dantas08} e \cite{dantas08-2}.
+
+O estudo sobre o FreeRTOS foi divido em duas partes principais: a pesquisa na documentação do sistema e a análise do código fonte do mesmo. Essas partes serão detalhadas nos parágrafos seguintes.
+
+No estudo da documentação do sistema, os principais requisitos, funcionalidades e características do FreeRTOS puderam ser identificados e classificados de acordo com sua importância. Esse trabalho serviu como base para a análise do código fonte e para a elaboração do plano de desenvolvimento de uma modelagem funcional do sistema.
+
+Durante a análise do código fonte, foi possível identificar a arquitetura do sistema e como suas principais abstrações de hardware e funcionalidades são implementadas. Nessa análise, percebeu-se que muita vezes o sistema possui detalhes em níveis de assemblagem, o que segundo Dantas, em \cite{dantas08-2}, também podem ser tratados utilizando o método B. 
+
+Através da análise do FreeRTOS descobriu-se que, apesar dele ser um sistema simples e pequeno, a sua modelagem é um trabalho que levará muito tempo e esforço. Além disso, limitações existentes no método B impedem a sua completa especificação. Assim, para o melhor aproveitamento do modelo desenvolvido, foi elaborado um plano para identificar quais elementos e funcionalidades que devem fazer parte dessa especificação. 
+
+No plano de modelagem, determinou-se que a especificação do sistema será feita em etapas. Desse modo, entidades do FreeRTOS escolhidas e suas características foram acrescentadas de forma incremental, amadurecendo a especificação. Devido a isso, na modelagem inicial, foram especificadas apenas as entidades tarefa e fila de mensagens, sendo as demais entidades escolhidas (semáforo e mutex) tratadas nas etapas seguintes da especificação.
+
+Com a modelagem inicial do sistema, foi iniciada a especificação das funcionalidades eleitas do FreeRTOS. Assim, utilizando-se do mecanismo composicional do método B, definiu-se a arquitetura da especificação. Nela, o sistema foi divido em sete módulos principais, organizados de acordo com a figura~\ref{fig:arquitetura_i}. Nesta figura os módulos mais abaixo fornecem operações e implementam elementos para os módulos superiores realizarem suas funções, sendo o módulo $\mathit{FreeRTOS}$ responsável por especificar as funcionalidades do sistema.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=1.4]{figuras/modulos_freertos.jpg}
+\caption{Esboço da arquitetura da especificação.}
+\label{fig:arquitetura_i}
+\end{figure}
+
+
+Entretanto, por tratar-se de um modelo funcional, a modelagem inicial abstraiu muitas características importantes do FreeRTOS, entre elas a característica de prioridade de uma tarefa e tamanho de uma fila de mensagens. A adição dessas características ao modelo foi feita em seguida, utilizando o mecanismo de refinamento do método B, no qual uma especificação abstrata é refinada para um modelo mais concreto. Nessa etapa foram criados dois novos módulos, um para a prioridade de uma tarefa e outro para o tamanho de uma fila de mensagens.
+
+Ao total, nessa especificação desenvolvida pela primeira etapa de refinamento, foram criadas 1.974 linhas, as quais geraram 538 obrigações de prova (seções~\ref{subsec:obrigacao_de_prova}). Entre essas obrigações de prova, somente 49 necessitaram da interação humana para sua resolução, sendo as demais provadas automaticamente pela ferramenta adotada pelo projeto\cite{david09}.
+
+Dando continuidade na metodologia do trabalho, as próximas etapas são: amadurecimento da modelagem desenvolvida; acréscimo das entidades mutex e semáforo à especificação; refinamento da modelagem; e amadurecimento e encerramento da especificação.
+
+Após o refinamento das etapas anteriores, a especificação atingiu um nível razoavelmente maduro, mas devido a dificuldades de obrigações de prova a especificação foi criada com abstrações sobre as características dos elementos especificados. Para uma modelagem mais completa desses elementos, foi necessário, nessa etapa, reformular toda a especificação deixando-a mais madura, mas seguindo a mesma arquitetura.
+
+Com o amadurecimento das entidades tarefas e fila de mensagens, iniciou-se a especificação dos demais elementos na etapa de acréscimo das entidades mutex e semáforo à especificação. Nessa etapa, devido à proximidade dessas entidades com a fila de mensagens, os novos elementos foram adicionados ao módulo dessa entidade, necessitando reformulá-lo.
+  
+Terminada a adição das entidades escolhidas para a especificação foi feito o refinamento dos novos elementos e, em seguida, a adição de suas características, tornando a modelagem mais concreta e madura. Nessa etapa, a especificação encontrava-se bastante sólida evitando grandes reformulações da especificação para abrigar os novos requisitos. 
+
+Ao final, criou-se uma especificação, concreta do FreeRTOS, na qual funcionalidades do sistema puderam ser testadas. Além disso, a especificação aqui desenvolvida servirá como material de apoio ao FreeRTOS, gerando uma documentação do sistema no ponto de vista formal e poderá ser incrementada para o nível algorítmico, criando um sistema operacional de tempo real especificado em B.
+
+\paragraph{}
+Continuando essa introdução, a dissertação está organizada da seguinte forma. No capítulo seguinte, encontra-se alguns trabalhos importantes que serviram como base para este. Em seguida, uma introdução sobre o FreeRTOS e o Método B são mostradas nos capítulos \ref{cap:freertos} e \ref{cap:metodob}, respectivamente. Após isso, a especificação iniciamente desenvolvida do FreeRTOS é demonstrada no capítulo~\ref{Cap:modelagem_inicial} e a continuação da mesma é expandinda no capítulo~\ref{Cap:modelagem_atual}. Por fim, tem-se as lições aprendidas e as conclusões no capítulo \ref{Cap:consideracoes_finais}.
+
+
+

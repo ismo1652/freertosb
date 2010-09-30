@@ -1,0 +1,207 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{1.50 }
+
+\bibitem{USAReport}
+\abntrefinfo{Committee}{COMMITTEE}{2005}
+{COMMITTEE, P. I. T.~A. \emph{Computational Science: Ensuring America's
+  Competitiveness}. 2005.
+URL:http://www.nitrd.gov/pitac/reports/20050609computational/computational.pdf%
+.}
+
+\bibitem{GDSBC}
+\abntrefinfo{SBC}{SBC}{2006}
+{SBC. \emph{Grandes Desafios da Pesquisa em Computa{c}\~ao no Brasil 2006}.
+[S.l.], 2006.}
+
+\bibitem{Jim09}
+\abntrefinfo{{Jim Woodcock} et al.}{{Jim Woodcock} et al.}{2009}
+{{Jim Woodcock} et al. Formal methods: Practice and experience. In:  ACM (Ed.).
+  \emph{ACM Computing Surveys}. [S.l.: s.n.], 2009. v.~5, p. 1--40.}
+
+\bibitem{bicarregui06}
+\abntrefinfo{{J.C. Bicarregui}, {C.A.R. Hoare} e {J.C.P. Woodcock}}{{J.C.
+  Bicarregui}; {C.A.R. Hoare}; {J.C.P. Woodcock}}{2008}
+{{J.C. Bicarregui}; {C.A.R. Hoare}; {J.C.P. Woodcock}. The verified software
+  repository:a step towards the verifying compiler. In:  \emph{Formal Aspects
+  of Computing}. [S.l.]: Springer, 2008. v.~1, p. 277--280.}
+
+\bibitem{Hoare05}
+\abntrefinfo{{Tony Hoare} e {Jay Misra}}{{Tony Hoare}; {Jay Misra}}{2005}
+{{Tony Hoare}; {Jay Misra}. \emph{Verified software: theories, tools,
+  experiments}. 2005.
+URL:http://vstte.ethz.ch/pdfs/vstte-hoare-misra.pdf.}
+
+\bibitem{Barry09}
+\abntrefinfo{{Richard Barry}}{{Richard Barry}}{2009a}
+{{Richard Barry}. \emph{Using the FreeRTOS Real Time Kernel - A Pratical
+  Guide}. [S.l.]: FreeRTOS.org, 2009.}
+
+\bibitem{Barry092}
+\abntrefinfo{{Richard Barry}}{{Richard Barry}}{2009b}
+{{Richard Barry}. \emph{FreeRTOS Reference Manual - A Pratical Guide}. [S.l.]:
+  FreeRTOS.org, 2009.}
+
+\bibitem{freertoskernel}
+\abntrefinfo{Barry}{BARRY}{2010}
+{BARRY, R. \emph{FreeRTOS Real Time Kernel}. 2010.
+URL:http://sourceforge.net/projects/freertos/files/FreeRTOS/.}
+
+\bibitem{schneider06}
+\abntrefinfo{Schneider}{SCHNEIDER}{2001}
+{SCHNEIDER, S. \emph{The b-method: an introdution}. [S.l.]: Palgrave, 2001.}
+
+\bibitem{abrial96}
+\abntrefinfo{Abrial}{ABRIAL}{1996}
+{ABRIAL, J.~R. \emph{The B-book: assigning programs to meanings}. [S.l.]:
+  Cambridge University Press, 1996.}
+
+\bibitem{jaffuel07}
+\abntrefinfo{{E. Jaffuel} e {B. Legeard}}{{E. Jaffuel}; {B. Legeard}}{2007}
+{{E. Jaffuel}; {B. Legeard}. Leirios test generator: Automated test generation
+  from b models. In:  \emph{The 7th International B Conference}. [S.l.: s.n.],
+  2007. p. 277--280.}
+
+\bibitem{ermac}
+\abntrefinfo{{Val\'erio Medeiros Jr.} e {Stephenson Galv\~ao}}{{Val\'erio
+  Medeiros Jr.}; {Stephenson Galv\~ao}}{2008}
+{{Val\'erio Medeiros Jr.}; {Stephenson Galv\~ao}. Modelagem de micro
+  controladores em b. In:  \emph{Anais do VIII Encontro Regional de
+  Matem\'atica Aplicada e Computacional (ERMAC)}. [S.l.]: EUFRN, 2008. v.~1.}
+
+\bibitem{dantas08}
+\abntrefinfo{{Bartira Dantas} et al.}{{Bartira Dantas} et al.}{2008a}
+{{Bartira Dantas} et al. Proposta e avaliacao de uma abordagem de
+  desenvolvimento de software fidedigno por construcao com o m\'etodo b. In:
+  \emph{Anais do XXVIII Congresso da SBC}. [S.l.: s.n.], 2008.}
+
+\bibitem{dantas08-2}
+\abntrefinfo{{Bartira Dantas} et al.}{{Bartira Dantas} et al.}{2008b}
+{{Bartira Dantas} et al. Applying the b method to take on the grand challenge
+  of verified compilation. In:  \emph{Brazilian Symposium on Formal Methods
+  (SBMF2008) - Proceedings}. [S.l.]: Editora Gr\'afica da UFBA - EDUFBA, 2008.
+  v.~1.}
+
+\bibitem{david09}
+\abntrefinfo{{David D\'eharbe}, {Stephenson Galv\~ao} e {Anamaria
+  Moreira}}{{David D\'eharbe}; {Stephenson Galv\~ao}; {Anamaria Moreira}}{2009}
+{{David D\'eharbe}; {Stephenson Galv\~ao}; {Anamaria Moreira}. Formalizing
+  freertos: First steps. In:  \emph{Brazilian Symposium on Formal Methods
+  (SBMF2009) - Proceedings}. [S.l.]: Editora Gr\'afica da UFRGS - EDUFRGS,
+  2009. v.~1.}
+
+\bibitem{Popek79}
+\abntrefinfo{Popek et al.}{POPEK et al.}{1979}
+{POPEK, G.~J. et al. Ucla secure unix.
+\emph{Managing Requirements Knowledge, International Workshop on}, IEEE
+  Computer Society, Los Alamitos, CA, USA, v.~0, p.~355, 1979.}
+
+\bibitem{Feiertag79}
+\abntrefinfo{Feiertag e Neumann}{FEIERTAG; NEUMANN}{1979}
+{FEIERTAG, R.~J.; NEUMANN, P.~G. The foundations of a provably secure operating
+  system (psos). In:  \emph{IN PROCEEDINGS OF THE NATIONAL COMPUTER
+  CONFERENCE}. [S.l.]: AFIPS Press, 1979. p. 329--334.}
+
+\bibitem{Bevier89}
+\abntrefinfo{Bevier}{BEVIER}{1989}
+{BEVIER, W.~R. \emph{Kit: A Study in Operating System Verification}. 1989.}
+
+\bibitem{Roever}
+\abntrefinfo{Roever e Engelhardt}{ROEVER; ENGELHARDT}{2008}
+{ROEVER, W.-P.~d.; ENGELHARDT, K. \emph{Data Refinement: Model-Oriented Proof
+  Methods and their Comparison}. New York, NY, USA: Cambridge University Press,
+  2008.
+ISBN 9780521103503.}
+
+\bibitem{Klein09}
+\abntrefinfo{Klein}{KLEIN}{2009}
+{KLEIN, G. Operating system verification --- an overview.
+\emph{S\={a}dhan\={a}}, Springer, v.~34, n.~1, p. 27--69, fev. 2009.}
+
+\bibitem{Hohmuth}
+\abntrefinfo{Hohmuth, Tews e Stephens}{HOHMUTH; TEWS; STEPHENS}{2002}
+{HOHMUTH, M.; TEWS, H.; STEPHENS, S.~G. Applying source-code verification to a
+  microkernel: the vfiasco project. In:  \emph{EW 10: Proceedings of the 10th
+  workshop on ACM SIGOPS European workshop}. New York, NY, USA: ACM, 2002. p.
+  165--169.}
+
+\bibitem{coyotos}
+\abntrefinfo{Shapiro et al.}{SHAPIRO et al.}{2004}
+{SHAPIRO, J. et al. Towards a verified, general-purpose operating system
+  kernel. In:  \emph{In Klein [10}. [S.l.: s.n.], 2004. p. 1--19.}
+
+\bibitem{KolanskiK-06}
+\abntrefinfo{Kolanski e Klein}{KOLANSKI; KLEIN}{2006}
+{KOLANSKI, R.; KLEIN, G. Formalising the {L4} microkernel {API}. In:  JAY, B.;
+  GUDMUNDSSON, J. (Ed.). \emph{Computing: The Australasian Theory Symposium
+  (CATS 06)}. Hobart, Australia: [s.n.], 2006.  (Conferences in Research and
+  Practice in Information Technology, v.~51), p. 53--68.}
+
+\bibitem{kleine09}
+\abntrefinfo{{Moritz Kleine} e {Steffen Helke}}{{Moritz Kleine}; {Steffen
+  Helke}}{1999}
+{{Moritz Kleine}; {Steffen Helke}. M\'et\'eor: A successful application of b in
+  a large project. In:  \emph{World Congress on Formal Methods}. [S.l.]:
+  Springer, 1999. v.~1708.}
+
+\bibitem{Craig06}
+\abntrefinfo{{Iain D. Craig}}{{Iain D. Craig}}{2006}
+{{Iain D. Craig}. \emph{Formal Models of Operating System Kernels}. 1. ed.
+  [S.l.]: Springer, 2006.}
+
+\bibitem{Kalinsky03}
+\abntrefinfo{{David Kalinsky}}{{David Kalinsky}}{2003}
+{{David Kalinsky}. \emph{Basic concepts of real-time operating systems}. 2003.}
+
+\bibitem{Li03}
+\abntrefinfo{{Qing Li} e {Carolyn Yao}}{{Qing Li}; {Carolyn Yao}}{2003}
+{{Qing Li}; {Carolyn Yao}. \emph{Real-Time Concepts for Embedded Systems}.
+  [S.l.]: CMP Books, 2003.}
+
+\bibitem{honeywell03}
+\abntrefinfo{{Honeywell}}{{Honeywell}}{2005}
+{{Honeywell}. \emph{Formal Method: analysis of complex systems to ensure
+  correctenes and reduce cost}.
+[S.l.], 2005.}
+
+\bibitem{atelierb}
+\abntrefinfo{{ClearSY}}{{ClearSY}}{2002}
+{{ClearSY}. \emph{atelieb manuel-reference}. 2002.
+URL:http://www.atelierb.eu.}
+
+\bibitem{behm99}
+\abntrefinfo{{P. Behm} et al.}{{P. Behm} et al.}{2009}
+{{P. Behm} et al. Low-level code verification based on csp models. In:
+  \emph{Brazilian Symposium on Formal Methods (SBMF2009) - Proceedings}.
+  [S.l.]: Editora Gr\'afica da UFRGS - EDUFRGS, 2009. v.~1.}
+
+\bibitem{clearsy09}
+\abntrefinfo{{ClearSY}}{{ClearSY}}{2009}
+{{ClearSY}. \emph{Atelier B 4.0}. 2009.
+URL:http://www.atelierb.eu.}
+
+\bibitem{framac}
+\abntrefinfo{{CEA LIST}}{{CEA LIST}}{2009}
+{{CEA LIST}. \emph{Frama-C value analysis plug-in}. 2009.
+URL:http://frama-c.cea.fr/.}
+
+\bibitem{vcc}
+\abntrefinfo{{Markus Dahlweid} {Michael Moskal}}{{Markus Dahlweid} {Michael
+  Moskal}}{2008}
+{{Markus Dahlweid} {Michael Moskal}, T.~S. \emph{VCC: Contract-based Modular
+  Verification of Concurrent C}.
+[S.l.], 2008.}
+
+\bibitem{prob}
+\abntrefinfo{Leuscheland e Butler1}{LEUSCHELAND; BUTLER1}{2003}
+{LEUSCHELAND, M.; BUTLER1, M. Prob: A model checker for b. In:  \emph{FME 2003:
+  Formal Methods}. [S.l.]: Springer, 2003. p. 855--874.}
+
+\bibitem{csp}
+\abntrefinfo{Hoare}{HOARE}{2004}
+{HOARE, C. A.~R. \emph{Communicating Sequential Processes}. 2004.}
+
+\end{thebibliography}

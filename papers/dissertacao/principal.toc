@@ -1,0 +1,87 @@
+\select@language {brazil}
+\contentsline {chapter}{Sum\'ario}{i}
+\contentsline {chapter}{Lista de Figuras}{iii}
+\contentsline {chapter}{Lista de Tabelas}{v}
+\contentsline {chapter}{\numberline {1}Introdu\c c\~ao}{1}
+\contentsline {section}{\numberline {1.1}Objetivo}{3}
+\contentsline {section}{\numberline {1.2}Metodologia}{3}
+\contentsline {paragraph}{}{5}
+\contentsline {chapter}{Lista de S\IeC {\'\i }mbolos e Abreviaturas}{1}
+\contentsline {chapter}{\numberline {2}Trabalhos Relacionados}{7}
+\contentsline {section}{\numberline {2.1}Trabalhos Anteriores}{7}
+\contentsline {section}{\numberline {2.2}Trabalhos Recentes}{9}
+\contentsline {section}{\numberline {2.3}Outros trabalhos}{11}
+\contentsline {paragraph}{}{11}
+\contentsline {chapter}{\numberline {3}FreeRTOS}{13}
+\contentsline {section}{\numberline {3.1}Gerenciamento de Tarefas e Co-Rotinas}{14}
+\contentsline {subsection}{\numberline {3.1.1}Tarefa}{14}
+\contentsline {subsubsection}{Tarefa Ociosa}{15}
+\contentsline {subsection}{\numberline {3.1.2}Co-rotinas}{16}
+\contentsline {subsection}{\numberline {3.1.3}Escalonador de Tarefas}{17}
+\contentsline {subsection}{\numberline {3.1.4}Bibliotecas}{18}
+\contentsline {subsubsection}{Cria\c c\~ao de Tarefas}{19}
+\contentsline {subsubsection}{Controle de tarefas}{19}
+\contentsline {subsubsection}{Utilit\'arios de tarefas}{20}
+\contentsline {subsubsection}{Controle do Escalonador}{20}
+\contentsline {subsubsection}{Co-rotina}{21}
+\contentsline {section}{\numberline {3.2}Comunica\c c\~ao e sincroniza\c c\~ao entre tarefas}{21}
+\contentsline {subsection}{\numberline {3.2.1}Fila de Mensagens}{22}
+\contentsline {subsection}{\numberline {3.2.2}Sem\'aforo}{22}
+\contentsline {subsection}{\numberline {3.2.3}Mutex}{23}
+\contentsline {subsection}{\numberline {3.2.4}Biblioteca}{24}
+\contentsline {subsubsection}{Gerenciamente de fila de Mensagens}{24}
+\contentsline {subsubsection}{Sem\'aforo/Mutex}{25}
+\contentsline {section}{\numberline {3.3}Utiliza\c c\~ao pr\'atica dos elementos FreeRTOS}{25}
+\contentsline {subsection}{\numberline {3.3.1}Utiliza\c c\~ao da entidade tarefa}{26}
+\contentsline {subsection}{\numberline {3.3.2}Utiliza\c c\~ao da fila de mensagens}{27}
+\contentsline {subsection}{\numberline {3.3.3}Utiliza\c c\~ao do sem\'aforo}{29}
+\contentsline {subsection}{\numberline {3.3.4}Utiliza\c c\~ao das co-rotinas}{29}
+\contentsline {paragraph}{}{31}
+\contentsline {chapter}{\numberline {4}O m\'etodo B}{33}
+\contentsline {section}{\numberline {4.1}Etapas do desenvolvimento em B}{33}
+\contentsline {section}{\numberline {4.2}M\'aquina abstrata}{35}
+\contentsline {subsection}{\numberline {4.2.1}Especifica\c c\~ao do estado da m\'aquina}{36}
+\contentsline {subsection}{\numberline {4.2.2}Especifica\c c\~ao das opera\c c\~oes da m\'aquina}{37}
+\contentsline {subsubsection}{Substitui\c c\~ao simples}{38}
+\contentsline {subsubsection}{Substitui\c c\~ao m\'ultipla}{38}
+\contentsline {subsubsection}{Substitui\c c\~ao condicional}{39}
+\contentsline {subsubsection}{Substitui\c c\~ao n\~ao determin\IeC {\'\i }stica $\ANY $}{39}
+\contentsline {section}{\numberline {4.3}Obriga\c c\~oes de prova}{40}
+\contentsline {subsection}{\numberline {4.3.1}Consist\^encia do Invariante}{41}
+\contentsline {subsection}{\numberline {4.3.2}Obriga\c c\~ao de prova da inicializa\c c\~ao}{42}
+\contentsline {subsection}{\numberline {4.3.3}Obriga\c c\~ao de prova das opera\c c\~oes}{42}
+\contentsline {section}{\numberline {4.4}Refinamento}{43}
+\contentsline {subsection}{\numberline {4.4.1}Refinamento do Estado}{44}
+\contentsline {subsection}{\numberline {4.4.2}Refinamento das opera\c c\~oes}{44}
+\contentsline {subsection}{\numberline {4.4.3}Obriga\c c\~ao de prova do refinamento}{45}
+\contentsline {subsubsection}{Obriga\c c\~ao de prova da inicializa\c c\~ao}{45}
+\contentsline {subsubsection}{Obriga\c c\~ao de prova da opera\c c\~ao sem par\^ametro de retorno}{46}
+\contentsline {subsubsection}{Obriga\c c\~ao de prova da opera\c c\~ao com par\^ametro de sa\IeC {\'\i }da}{46}
+\contentsline {paragraph}{}{47}
+\contentsline {chapter}{\numberline {5}Escopo da especifica\c c\~ao}{49}
+\contentsline {section}{\numberline {5.1}Escopo da especifica\c c\~ao}{49}
+\contentsline {chapter}{\numberline {6}Modelagem Inicial}{53}
+\contentsline {subsection}{\numberline {6.0.1}Tarefa}{53}
+\contentsline {subsection}{\numberline {6.0.2}Fila de mensagens}{54}
+\contentsline {section}{\numberline {6.1}A modelagem funcional}{54}
+\contentsline {subsection}{\numberline {6.1.1}Tarefa}{55}
+\contentsline {subsection}{\numberline {6.1.2}Fila de mensagens}{59}
+\contentsline {section}{\numberline {6.2}Refinando a especifica\c c\~ao inicial}{63}
+\contentsline {section}{\numberline {6.3}Considera\c c\~oes finais}{65}
+\contentsline {chapter}{\numberline {7}Modelagem Atual}{67}
+\contentsline {section}{\numberline {7.1}Simplifica\c c\~ao da modelagem anterior}{67}
+\contentsline {subsection}{\numberline {7.1.1}Especifica\c c\~ao das opera\c c\~oes}{68}
+\contentsline {section}{\numberline {7.2}Adi\c c\~ao dos novos elementos}{70}
+\contentsline {subsection}{\numberline {7.2.1}Invariante da m\'aquina \textit {Queue}}{71}
+\contentsline {subsection}{\numberline {7.2.2}Especifica\c c\~ao das opera\c c\~oes}{72}
+\contentsline {subsubsection}{Opera\c c\~oes da fila de mensagens}{73}
+\contentsline {subsubsection}{Opera\c c\~oes do sem\'aforo}{75}
+\contentsline {subsubsection}{Opera\c c\~oes do mutex}{76}
+\contentsline {subsubsection}{Opera\c c\~oes de prop\'osito geral}{77}
+\contentsline {section}{\numberline {7.3}Refinamento da especifica\c c\~ao}{78}
+\contentsline {subsection}{\numberline {7.3.1}Refinamento da m\'aquina $\mathit {Task}$}{78}
+\contentsline {subsection}{\numberline {7.3.2}Refinamento da m\'aquina $\mathit {Queue}$}{79}
+\contentsline {chapter}{\numberline {8}Considera\c c\~oes Finais}{83}
+\contentsline {section}{\numberline {8.1}Trabalhos futuros}{83}
+\contentsline {section}{\numberline {8.2}Limita\c c\~oes da m\'etodo B}{84}
+\contentsline {chapter}{Refer\^encias bibliogr\'aficas}{86}

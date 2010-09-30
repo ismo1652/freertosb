@@ -1,0 +1,93 @@
+\mychapter{Trabalhos Relacionados}
+\label{Cap:trabalhos}
+
+Vários foram os trabalhos que tiveram como objetivo especificar e verificar sistemas operacionais (SO), mais especificamente micronúcleo (ou \textit{microkernel}) de SO, parte do sistema operacional que implementa suas funcionalidades, classificação na qual encontra-se o FreeRTOS também. Desses trabalhos, pode-se tirar proveito em técnicas e estratégias que foram úteis nessa dissertação. Assim, para o melhor entendimento, os trabalhos relacionados, serão organizados inicialmente por ordem cronológica (trabalhos anteriores e trabalhos recentes) e, em seguida, será mostrado na seção~\ref{sec:outrostrabalhos}, alguns esforços que são relevantes.
+
+\section{Trabalhos Anteriores}
+Os esforços para especificação e verificação de sistemas operacionais não são recentes, entre os anos 70 e 80 surgiram três trabalhos pioneiros relacionados a esse tema. São eles: \cite{Popek79}, \cite{Feiertag79} e \cite{Bevier89}. 
+
+Em \cite{Popek79}, Popek documenta a especificação e validação do UCLA Secure Data Unix, sistema operacional utilizado pelas aplicações do computador DEC PDP-11/45. Nesse trabalho, os esforços de verificação foram focados no núcleo do sistema, que provê serviços semelhantes aos atuais \textit{microkernels}, como tarefas e paginação. Além disso, o projeto foi um dos primeiros a separar política do sistema operacional do mecanismo do núcleo do sistema, o que facilitou a verificação do sistema. 
+
+No trabalho de Popek, alguns pontos importantes foram utilizados nessa dissertação. Inicialmente, ele dividiu a sua especificação em camadas iguais a figura~\ref{fig:ucla}, na qual a única diferença entre elas está no nível de abstração. Assim, cada camada provê todos os detalhes do sistema em níveis de abstrações diferente. Por exemplo, o nível de código possui todas as variáveis usadas nas chamadas de funções do sistema, mas usa menos estruturas abstratas que as camadas superiores da especificação, como listas e conjuntos.
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[scale=1.4]{figuras/UCLA.jpg}
+\caption{Camadas da especificação do UCLA.}
+\label{fig:ucla}
+\end{center}
+\end{figure}
+
+A prova da coerência entre as camadas do UCLA foi feita como demonstra a figura~\ref{fig:uclastates}, através do mapeamento de estados. Nesta, cada camada possui uma máquina de estado, um conjunto de estados e suas transições, sendo que cada máquina deve simular as demais. Com isso, deve existir uma função que mapeie os estados do nível concreto com os estados do nível abstrato. Apesar de não ser classificada como esse termo por seus autores, a técnica utilizada por Popek foi o refinamento formal \cite{Roever}.
+
+
+
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[scale=1.4]{figuras/UCLA_states.jpg}
+\caption{Mapeamento de estado entre o níveis de abstração.}
+\label{fig:uclastates}
+\end{center}
+\end{figure}
+
+
+
+
+No \cite{Feiertag79}, o sistema PSOS foi projetado. Esse foi um trabalho maior que o UCLA, pois, diferente de focar somente no núcleo, as regras particulares do sistema operacional também foram consideradas. A grande contribuição desse trabalho foi a diferente divisão de camadas do projeto do sistema. As camadas mais baixas oferecem funcionalidades para as camadas superiores. Ao total, foram desenvolvidas 17 camadas, como demonstra a figura~\ref{fig:psos}, sendo as 6 inferiores projetadas para serem implementadas no hardware.
+
+Para projetar o PSOS, inicialmente foi criada uma linguagem de especificação e sentenças chamada SPECIAL. Essa linguagem foi utilizada para especificar formalmente os módulos do sistema, que formavam as suas camadas. SPECIAL também permitia o mapeamento de funções e implementações abstratas, relacionando módulos entre níveis.
+
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[scale=1.4]{figuras/PSOS.jpg}
+\caption{Camadas da especificação do PSOS. }
+\end{center}
+\label{fig:psos}
+\end{figure}
+
+Vale ressaltar que, apesar das várias tentativas, os trabalhos anteriores foram dificultados pelo número de mecanismos e ferramentas apropriadas disponíveis na época. Assim, enquanto o projeto era formalizado, a completa verificação de prova não era desenvolvida. De acordo com Klein, em \cite{Klein09}, apenas vinte por cento do UCLA foi provado e projeto PSOS não foi provado. 
+
+Diferente dos trabalhos anteriores, \cite{Bevier89} se destaca por ser o primeiro trabalho a especificar e provar formalmente o \textit{microkernel} de um Sistema Operacional. O sistema especificado foi o KIT, um micronúcleo simples e com menos abstrações de hardware que os \textit{microkernels} modernos. Em seu trabalho, Bevier conseguiu a taxa de cem por cento de verificação e prova da especificação.
+
+\section{Trabalhos Recentes}
+Entre os trabalhos recentes de especificação de sistemas operacionais tem-se os projetos VFiasco, o Coyotos, o Verisoft e o Verificação do L4.
+
+VFiasco\cite{Hohmuth} é um projeto de especificação formal do Fiasco, uma implementação mais simples do \textit{microkernel} L4. Um trabalho importante desse projeto foi listar alguns dos problemas cruciais da verificação dos modernos \textit{microkernels}. Entre esses problemas, está a semântica formal da linguagem de implementação e a complexidade da memória de execução do núcleo, pois é ele quem implementa os mecanismos de gerenciamento de memória como paginação. 
+
+Além disso, outra contribuição do projeto VFiasco foi o desenvolvimento de uma memória virtual de comportamento bem definido, sobre a qual o sistema será executado, pois as memórias de hardware não possuem comportamento especificada, o que dificuta a verificação do sistema. Assim, tal solução poderá ser aproveitada na especificação formal dos demais sistemas operacionais, que também são executados em memórias de comportamento não previsível. 
+
+No projeto Coyotos \cite{coyotos} foi desenvolvida uma implementação formal para o sucessor do \textit{microkernel} ERO, o Coyoto. Uma das características centrais desse projeto foi a criação de uma nova linguagem de programação para a implementação do núcleo a BitC. Essa linguagem teve como objetivos ser segura, clara e passível de verificação e foi desenvolvidas agrupando características das pesquisas existentes.
+
+Em seguida, tem-se o projeto Verisoft que é um esforço para verificação de toda uma pilha de sistemas, a qual varia de hardwares até aplicações, passando por compiladores e \textit{microkernels}. Nesse projeto, encontra-se a especificação formal do \textit{microkernel} simplificado VAMOS.
+
+Por último e mais interessante está o projeto de especificação verificação do L4, um \textit{microkernel} simples e pequeno. Nesse projeto, encontra-se o trabalho de Kolanski \cite{KolanskiK-06}, que bastante se parece com essa dissertação. Nesse trabalho, é feita a especificação da Interface de Programação de Aplicação ( API - Application Programming Interface) do \textit{microkernel} no ponto de vista do sistema, onde as chamadas as funções do núcleo são formadas por alterações nos estados do núcleo que gerencia as abstrações por ele criadas.
+
+Os pontos comuns entre \cite{KolanskiK-06} e a especificação do FreeRTOS começa com a semelhança dos sistemas, os quais são sistemas usados pela indústria, e continua no objetivo, que é especificar formalmente um \textit{microkernel}, classificação na qual está também o FreeRTOS, no ponto de vista interno do sistema. Além disso, Kolanski também escolheu o método B como formalismo para a especificação e organizou o seu trabalho em módulos responsáveis pelas abstrações de hardware do sistema, os quais estão relacionados pelo mecanismo de inclusão de B, como demonstra a figura \ref{esp_l4}. 
+
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[scale=1.4]{figuras/l4.jpg}
+\caption{Módulos da especificação do L4.}
+\end{center}
+\label{esp_l4}
+\end{figure}
+
+A diferença do trabalho de Kolanski e a especificação do FreeRTOS está na estratégias de especificação. No seu trabalho, Kolanski especificou de forma abstrata a API do microkernel L4, enquanto que na especificação do FreeRTOS, além de especificação abstrata, níveis de refinamentos foram criados para dar um nível mais concreto ao modelo criado.
+
+\section{Outros trabalhos}
+\label{sec:outrostrabalhos}
+
+Um trabalho que está mais preocupado com concorrência entre processos de uma aplicação, mas que deve ser comentado é \cite{kleine09}. Nesse trabalho, a validação de uma aplicação concorrente é feita através da transformação da linguagem intermediária do compilador LLVM para uma modelagem de baixo nível em CSP. Esse modelo é dividido em três partes: Aplicação, onde o comportamento dos processos do sistema são descritos; Domínio, onde os aspectos comuns do domínio da aplicação são especificados; e Plataforma, onde os detalhes da plataforma utilizada são formalizados. Um fator positivo dessa divisão é que essa especificação pode disponibilizar diversas visões do sistema e as partes de domínio e plataforma
+podem ser parametrizáveis, podendo assim ser reutilizadas em várias aplicações.
+
+Após a criação do modelo CSP, este é analisada através das ferramentas de verificação para CSP, como FDR2 e ProB, que verificam situações de \textit{deadlock} e condições de corrida do sistema. Além disso, com a geração do modelo CSP, as atividades implementadas no sistema são abstraídas para um ponto de vista mais prático e abstrato, permitindo assim uma melhor análise do sistema.
+
+Por fim, tem \cite{Craig06}, que é um guia para a especificação de sistemas operacionais. Nesse trabalho, Craig começa afirmando que a parte mais importante de um sistema é o sistema operacional, que gerencia os recursos usados pela aplicação. Após isso, ele certifica que os métodos formais há tempos estão relacionados com os sistemas operacionais e que, na maioria das vezes, foram utilizados para especificar as operações de fila dos sistemas. De posse dessas afirmações, Craig defende a especificação formal como uma prática de suma importância a ser realizada antes da codificação, pois através dela o sistema pode ser analisado de forma abstrata, como uma entidade matemática. Assim, propriedades importantes do sistema podem ser provadas antes mesmo de sua codificação, o que diminui os riscos do projeto.
+
+Continuando o trabalho, Craig demonstra a divisão em camadas de um sistema operacional convencional, sendo essas: a camada das primitivas de  \textit{hardware}, localizada acima do \textit{hardware}; a camada responsável  pelo gerenciamento de disco e interrupções de \textit{hardware} (Relógio do  sistema); a camada de gerenciamentos de arquivos e controle de interfaces; e a  camada de chamadas do sistema utilizada pelas aplicações. Essa divisão proporciona uma modelagem incremental de um SO, na qual os elementos mais abstratos e importantes são tratados inicialmente.
+
+\paragraph{}
+Finalmente, através dos trabalhos aqui relacionados, percebe-se que, devido à importância do correto funcionamento dos sistemas operacionais, vários trabalhos de especificação e verificação destes tem sido desenvolvidos. Nesses trabalhos, várias foram as estratégias, mas uma observação comum a todas elas foi a simplificação e modularização dos sistemas desenvolvidos, criando camadas e focando em partes específicas dos sistemas. Essas estratégias foram o marco inicial para a especificação do FreeRTOS.

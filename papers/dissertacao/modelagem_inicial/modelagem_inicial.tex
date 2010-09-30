@@ -1,0 +1,758 @@
+\mychapter{Modelagem Inicial}
+\label{Cap:modelagem_inicial}
+
+Após a definição do escopo do trabalho, foi criada uma modelagem funcional que possuía um núcleo das funcionalidades listadas no capítulo anterior. Essa especificação utilizou-se principalmente das técnicas de modularização e desenvolvimento incremental do método B, as quais são explicadas a seguir:
+
+\begin{itemize}
+\item Parte dos requisitos funcionais do sistema podem ser abstraídos em sua modelagem inicial. Assim, tais requisitos são tratados posteriormente através de refinamentos horizontais ou extensões da especificação, o que proporciona uma especificação incremental do sistema. O planejamento incremental dessa especificação será explicado nas seções~\ref{sub:requisitotarefas} e
+~\ref{sec:model_queue}.
+\item Quando os requisitos do sistema não apresentarem dependências entre si, eles podem ser especificados em diferentes módulos. Esses módulos comunicam entre si utilizando os mecanismos de composição proporcionados pelo método B (visão, inclusão, etc). A divisão da especificação em módulos será detalhada na seção~\ref{sec:modelagem}.
+\end{itemize}
+
+Por serem as entidades base do FreeRTOS, nesse modelo funcional, foram tratadas somente as abstrações tarefa e fila de mensagens. Essas foram especificadas conforma a explicação abaixo:
+
+\subsection{Tarefa}
+\label{sub:requisitotarefas}
+Na entidade tarefa apenas a característica de estado de uma tarefa foi formalizada inicialmente. Através dessa formalização, propriedades importantes do sistema puderam ser especificadas. São essas: 
+\begin{enumerate}
+\item Todas as tarefas manipuladas pelo sistema devem ser armazenadas. \label{r:armazenar}
+\item A troca de estado das tarefas devem ocorrer como demonstra a figura~\ref{fig:task_states}. \label{r:estados}
+\item Uma tarefa deve possuir somente um estado em determinado momento. \label{r:unicidadeestado}
+\item \label{r:pronto} Quando o escalonador estiver ativo, todas as tarefas devem estar no estado pronta. 
+\item Quando o escalonador estiver ativo, a tarefa ociosa deve estar no estado pronta ou em execução.\label{r:tarefaociosa}
+\item Deve existir somente uma tarefa em execução. \label{r:execucao}
+\end{enumerate}
+A especificação da entidade tarefa foi planejada de forma incremental. Previamente, foram criados os estados necessários para modelar tal entidade no nível de abstração sugerido. Após isso, algumas das funcionalidades do sistema, relacionadas a essa entidade, foram formalizadas a cada etapa de criação do modelo. Ao final, as seguintes funcionalidades foram abrangidas de forma abstrata por essa especificação inicial:
+
+\begin{itemize}
+  \item Criação de tarefas: \textit{xTaskHandle}, \textit{xTaskCreate},
+  \textit{vTaskDelete}.
+  \item Controle de tarefas:  \textit{vTaskDelay}, \textit{vTaskDelayUntil},
+  \textit{uxTaskPriorityGet}, \textit{vTaskPrioritySet}, \textit{vTaskSuspend},
+  \textit{vTaskResume}.
+  \item Utilitários de tarefas:\textit{xTaskGetCurrentTaskHandle},
+  \textit{uxTaskGetNumberOfTasks},
+  \textit{xTaskGetTickCount},
+  \textit{xTaskGetSchedulerState}.
+  \item Controle do escalonador: \textit{vTaskStartScheduler},
+  \textit{vTaskEndScheduler}, \textit{vTaskSuspendAll},
+  \textit{xTaskResumeAll}. 
+\end{itemize}
+ 
+\subsection{Fila de mensagens}
+\label{sec:model_queue}
+ 
+Para a entidade fila de mensagens, a principal característica especificada foi a quantidade de mensagens que esta pode armazenar. Como ocorreu com a entidade Tarefa, a formalização desta, junto com suas funcionalidades, foi distribuída entre as várias etapas de desenvolvimento da modelagem inicial. Com essa especificação, as seguintes propriedades do sistemas foram tratadas pela modelagem:  
+\begin{enumerate}
+\item \label{armazenarfila} Todas as filas de mensagens manipuladas pelo sistema devem ser armazenadas.
+\item \label{controleitens} Gerenciar os itens armazenados pela fila. 
+\item \label{bloqueioleitura} Gerenciar as tarefas bloqueadas por leitura na fila.
+\item \label{bloqueioescrita} Gerenciar as tarefas bloqueadas por escrita na fila.
+\end{enumerate}
+
+As funcionalidades relacionadas à fila de mensagens tratadas nessa especificação foram: \textit{xQueueCreate}, \textit{vQueueDelete}, \textit{xQueueSend}, \textit{xQueueSendToBack}, \textit{xQueueSendToFront}, \textit{xQueueReceive}, \textit{xQueuePeek}.
+
+\section{A modelagem funcional}\label{sec:modelagem}
+A modelagem discutida nas seções anteriores foi construída e verifica utilizando a ferramenta AtelierB 4.0\cite{clearsy09}. Tal especificação foi estruturada através de sete módulos, os quais serão explicados a seguir:
+
+\begin{description}
+  \item{\textbf{Módulo Config:}} Nesse módulo foram tratadas as configurações do comportamento do sistema. Por exemplo, a prioridade máxima que uma tarefa pode possuir é um parâmetro de configuração desse módulo.
+  \item{\textbf{Módulo Types:}} Esse módulo é responsável por definir os tipos utilizados na especificação do FreeRTOS. Um exemplo de um tipo especificado nesse módulo é a prioridade de uma tarefa, que só pode assumir valores de um subconjunto finito dos naturais.
+  \item{\textbf{Módulo Task:}} Nesse módulo são definidos os estados e operações responsáveis por formalizar a entidade tarefa.
+  \item{\textbf{módulo Queue:}} Esse módulo é similar ao módulo Task, só que nele a entidade especificada é a fila de mensagens.
+  \item{\textbf{Módulo Scheduler:}} Esse módulo simplesmente mantém e manipula o estado do escalonador.
+  \item{\textbf{Módulo FreeRTOSBasic:}} Esse módulo funciona como uma camada
+  abstrata entre o módulo $\mathit{FreeRTOS}$ e os demais módulos básicos. Nele,
+  as operações implementadas pelos módulos $\mathit{Task}$, $\mathit{Queue}$ e
+  $\mathit{Scheduler}$ são agrupadas em funções mais abstratas, que servem como
+  base para especificar as funcionalidades do $\mathit{FreeRTOS}$.
+  \item{\textbf{Módulo FreeRTOS:}} Finalmente, no módulo $\mathit{FreeRTOS}$ são
+  especificadas as funcionalidades das bibliotecas do FreeRTOS.
+\end{description}
+
+A organização desses módulos pode ser vista na figura~\ref{fig:arquitetura}. Nela, resumidamente os módulos inferiores servem de base para a especificação dos módulos superiores, restando os módulos \textit{Config} e \textit{Types}, que servem de apoio para toda a especificação. Nas seções seguintes tem-se em detalhe como foi o desenvolvimento dessa especificação inicial.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.6]{figuras/class_diagram.jpg}
+\caption{Esbouço da arquitetura da especificação.}
+\label{fig:arquitetura}
+\end{figure}
+
+\subsection{Tarefa}
+\label{sec:especificacao_tarefa}
+Para representar o elemento tarefa existem diversas abordagens, funções de mapeamento, sequências e conjuntos. A abordagem escolhida nesse trabalho inicial foi a representação através de conjuntos, o que facilita a verificação da especificação pelo provador de teoremas. Assim, a modelagem da entidade tarefa e suas propriedades foram feitas de acordo com a figura~\ref{fig:task_state}. Nela, a variável $\mathit{active}$ informa quando o sistema está ativo. A variável $\mathit{tasks}$ armazena todas as tarefas criadas no sistema (propriedade~\ref{r:armazenar} da seção~\ref{sub:requisitotarefas}). Em seguida, as variáveis $\mathit{ready}$, $\mathit{blocked}$, $\mathit{running}$ e $\mathit{suspended}$ armazenam as tarefas dos estados em execução, pronta, bloqueada e suspensa, respectivamente. Por fim, a variável $\mathit{idle}$ representa a tarefa ociosa.
+
+Um exemplo do funcionamento da especificação da figura~\ref{fig:task_state} seria o seguinte. Enquanto o sistema estiver inativo, o valor da variável $\mathit{active}$ deve ser falso. As novas tarefas criadas no sistema serão armazenadas na variável $\mathit{tasks}$ e na variável de seu respectivo estado, sendo a tarefa ociosa armazenada em $\mathit{idle}$. Por fim, ao iniciar-se a execução do sistema, a variável $\mathit{active}$ receberá o valor verdadeiro.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}{l}
+  \MACHINE\\
+  \quad \mathit{Task}\\
+  \VARIABLES \\
+  \quad   \mathit{active}, \tasks, \blocked, \running, \ready, \suspended, \mathit{idle} \\
+  \INVARIANT \\
+  \quad \mathit{active} \in \BOOL \land \tasks \in \fin(\TASK) \land \running \in \TASK \land \mathit{idle} \in \TASK \\
+  \quad \land \blocked \in \fin(\TASK) \land \ready \in \fin(\TASK) \land \suspended \in \fin(\TASK)
+\end{array}
+  $$
+\end{footnotesize}
+\caption{Especificação do estado do módulo $\mathit{Task}$.}
+\label{fig:task_state}
+\end{figure}
+
+Estendendo o módulo $\mathit{Task}$, tem-se, na figura~\ref{fig:task_invariant}, a continuação do invariante da máquina. Nele, a maioria das propriedades listadas na seção~\ref{sub:requisitotarefas} foram tratadas. A propriedade \ref{r:unicidadeestado} foi modelada com as seguintes asserções: 
+\begin{itemize}
+\item $\tasks = \mathit{\{running\}} \cup \suspended \cup \blocked \cup \ready$;
+\item $\ready \cap \blocked = \emptyset \land \blocked \cap \suspended = \emptyset 
+\land \suspended \cap \ready = \emptyset$; e 
+\item $\running \not\in (\blocked \cup \ready \cup \suspended)$. 
+\end{itemize}
+A primeira informa que toda tarefa deve possuir um estado e as demais garantem que nenhuma tarefa deve ter mais de um estado ao mesmo tempo. Por fim, as propriedades~\ref{r:pronto} e~\ref{r:tarefaociosa} são tratadas em $(\mathit{active} = \FALSE \Rightarrow \tasks = \ready)$ e $(\mathit{active} = \TRUE \Rightarrow (\idle = \running \lor \idle \in \ready))$, respectivamente.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\ldots\\
+  \quad \blocked \subseteq \tasks \land \ready \subseteq \tasks \land  \suspended \subseteq \tasks \land \\
+  \quad \ready \cap \blocked = \emptyset \land \blocked \cap \suspended = \emptyset \land \suspended \cap \ready = \emptyset \land \\
+\quad (\mathit{active} = \FALSE \Rightarrow \tasks = \ready) \land \\
+  \quad (\mathit{active} = \TRUE \Rightarrow
+    \begin{array}[t]{l}
+      (\idle = \running \lor \idle \in \ready) \land \\
+      \running \not\in (\blocked \cup \ready \cup \suspended) \land \\
+      \tasks = \mathit{\{running\}} \cup \suspended \cup \blocked \cup \ready)
+    \end{array}
+    \\
+    \ldots
+\end{array}
+$$
+\end{footnotesize}
+\caption{Continuação do invariante da máquina $\mathit{Task}$.}
+\label{fig:task_invariant}
+\end{figure}
+
+Continuando com a especificação do módulo $\mathit{Task}$, foram criadas as operações básicas para manipular as variáveis de estado da máquina. Essas operações serviram como base para a modelagem das funcionalidades do FreeRTOS relacionadas à entidade Tarefa. Ao total, doze operações elementares foram desenvolvidas, das quais quatro delas são apresentadas pelas figuras~\ref{fig:t_create}, \ref{fig:t_startScheduler}, \ref{fig:t_resume} e~\ref{fig:t_delayTask}. As demais operações e suas obrigações de prova podem ser consultadas no repositório do projeto\footnote{Página do repositório do projeto: http://code.google.com/p/freertosb/}.
+
+\begin{figure}[!htb]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+  \begin{array}[t]{l}
+    \mathit{result} \longleftarrow \mathit{t\_create} (\mathit{priority}) = \\
+    \PRE \\
+    \quad \mathit{priority} \in \mathit{PRIORITY} \land \\ 
+    \quad \mathit{active} = \mathit{FALSE}\\
+    \THEN \\
+    \quad \ANY \task \quad \WHERE\\
+    \quad\quad \task \in \TASK \land \task \not\in \tasks
+  \end{array}
+ &&
+  \begin{array}[t]{l}
+    \quad \THEN \\    	    
+    \quad\quad \tasks := \{ task \} \cup \tasks \parallel\\
+    \quad\quad \ready := \{ task \} \cup \ready \parallel \\
+    \quad\quad \mathit{result} := \task\\
+    \quad \END\\      
+    \END;\\
+  \end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação da operação $\mathit{t\_create}$.}
+\label{fig:t_create}
+\end{figure}
+
+Na figura~\ref{fig:t_create}, tem-se a operação $\mathit{t\_create}$, que é responsável por criar um nova tarefa. Essa operação pode ser utilizada somente quando o escalonador não estiver acionado, como indica a sua pré-condição $\mathit{active} = \mathit{FALSE}$. Seu parâmetro de entrada, $\mathit{priority}$, informa a prioridade da tarefa que será criada. Entretanto, esse parâmetro só será utilizado no refinamento da operação. 
+Para criar uma nova tarefa, representada por $\mathit{task}$, é usada a substituição $\ANY$ . Em seguida, a nova tarefa é adicionada no conjunto de tarefas manuseadas pelo FreeRTOS ($\tasks := \{ task \} \cup \tasks $), colocada no estado pronta ($\ready := \{ task \} \cup \ready$) e indicada como parâmetro de retorno ($ \mathit{result} := \task$).
+
+\begin{figure}[!htb]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{t\_startScheduler} = \\
+\PRE \\
+\quad \mathit{active} = \mathit{FALSE} \\
+\THEN \\
+\quad \mathit{active} := \mathit{TRUE} \parallel \\
+\quad \blocked, \suspended := \emptyset, \emptyset \parallel \\
+\quad \ANY \mathit{idle\_task} \WHERE\\
+\quad\quad \mathit{idle\_task} \in \TASK \land \\
+\quad\quad \mathit{idle\_task} \not\in \tasks \\ 
+\quad \THEN \\    	    
+\end{array}
+& &
+\begin{array}[t]{l}
+\quad\quad \tasks := \{ \mathit{idle\_task} \} \cup \tasks \parallel\\
+\quad\quad \mathit{idle} := \mathit{idle\_task} \parallel \\
+\quad\quad \ANY \task \WHERE \\
+\quad\quad\quad \task \in \ready \cup \{ \mathit{idle\_task} \} \\
+\quad\quad \THEN \\
+\quad\quad\quad \running := \task \parallel\\
+\quad\quad\quad \ready := (\ready \cup \{\mathit{idle\_task}\}) - \{ \task \}\\
+\quad \quad \END\\      
+\quad \END\\      
+\END;
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação da operação $\mathit{t\_startScheduler}$.}
+\label{fig:t_startScheduler}
+\end{figure}
+
+A segunda operação a ser explicada é a $\mathit{t\_startScheduler}$, figura~\ref{fig:t_startScheduler}, responsável por iniciar o funcionamento do sistema. Nessa operação, a tarefa ociosa, representada por $\mathit{idle\_task}$, é criada na substituição $\ANY$ e, em seguida, armazenada no conjunto de tarefas do sistema e atribuida a variável responsável por especificar a tarefa ociosa. Após isso, na segunda substituição $\ANY$, uma tarefa, representada por $\mathit{task}$ é escolhida entre o conjunto de tarefas prontas união com a tarefa ociosa ($\task \in \ready \cup \{ \mathit{idle\_task} \}$). Essa tarefa é colocada no estado em execução e retirada do estado pronta, para a iniciação do sistema.
+
+Com as operações demonstradas anteriormente, percebe-se que a propriedade~\ref{r:estados} da seção~\ref{sub:requisitotarefas} é especificada no decorrer das operações da máquina $\mathit{Task}$. Um exemplo mais claro disso ocorre nas operações das figuras~\ref{fig:t_delayTask} e~\ref{fig:t_resume} responsáveis por colocar uma tarefa no estado bloqueada e retornar uma tarefa do estado suspensa, respectivamente.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{t\_delayTask} (\mathit{ticks})=\\
+\PRE\\
+\quad \mathit{active} = \TRUE \land \\ 
+\quad \mathit{running} \not= \mathit{idle} \land \\
+\quad \mathit{ticks} \in \mathit{TICK} \land \\ 
+\quad \mathit{ticks} \not= 0 \\
+\THEN \\ 
+\quad \mathit{blocked} := \mathit{blocked} \cup \{ \mathit{running} \} \parallel \\
+\end{array}
+& &
+\begin{array}[t]{l}
+\quad \ANY \\
+\quad \quad \mathit{task}\\
+\quad \WHERE\\
+\quad \quad \mathit{task} \in \mathit{TASK} \land \\
+\quad \quad \mathit{task} \in \mathit{ready} \\
+\quad \THEN\\
+\quad \quad \mathit{ready} := \mathit{ready} - \{ \mathit{task} \} \parallel\\
+\quad \quad \mathit{running} := \mathit{task}\\
+\quad \END\\
+\END;\\
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação da operação $\mathit{t\_delayTask}$.}
+\label{fig:t_delayTask}
+\end{figure}
+
+Na operação $\mathit{t\_delayTask}$ da figura~\ref{fig:t_delayTask}, é informado no parâmentro $\mathit{ticks}$ o tempo no qual a tarefa deve permanecer no estado bloqueada, sendo este definido como $\mathit{ticks} \in \mathit{TICK}$. Em seguida, a tarefa em execução é colocada no estado bloqueado pela asserção $\mathit{blocked} := \mathit{blocked} \cup \{ \mathit{running} \}$. Por fim, uma nova tarefa de estado pronta, representada por $\mathit{task}$, é escolhida para entrar em execução, utilizando a substituição $\ANY$. Consequentemente, essa tarefa é retirada do estado pronta e colocada no estado em execução através da das substituições $\mathit{ready} := \mathit{ready} - \{ \mathit{task} \}$ e $\mathit{running} := \mathit{task}$.
+
+\begin{figure}[!ht]
+\begin{center}
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{\mathit{t\_resume}(\mathit{atask})} = \\
+\PRE \\
+\quad \mathit{active} = \mathit{FALSE} \land \\
+\quad \mathit{active} = \mathit{TRUE} \land \\ 
+\quad \mathit{atask} \in \mathit{TASK} \land \\ 
+\quad \mathit{atask} \in \mathit{suspended}\\
+\THEN \\
+\end{array}
+& &
+\begin{array}[t]{l}
+\quad \CHOICE\\
+\quad\quad \mathit{ready} := \mathit{ready} \cup \{ \mathit{running} \} \parallel \\
+\quad\quad \mathit{running} := \mathit{atask}\\
+\quad \OR \\
+\quad\quad \mathit{ready} := \mathit{ready} \cup \{ \mathit{atask} \} \\
+\quad \END \parallel\\
+\quad \mathit{suspended} := \mathit{suspended} - \{ \mathit{atask} \}	\\
+\END;
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\end{center}
+\caption{Especificação da operação $\mathit{t\_resume}$.}
+\label{fig:t_resume}
+\end{figure}
+
+A operação responsável por retornar uma tarefa do estado suspensa, figura~\ref{fig:t_resume}, tem como parâmentro de entrada a tarefa $\mathit{atask}$, que deve estar no estado suspensa ($\mathit{atask} \in \mathit{suspended}$). Em seguida, essa tarefa é retirada do conjunto de tarefas suspensas e colocada no conjunto de tarefas prontas, respectivamente, pelas seguintes asserções: $\mathit{suspended} := \mathit{suspended} - \{ \mathit{atask} \}$ e $\mathit{ready} := \mathit{ready} \cup \{ \mathit{atask} \}$.
+
+\subsubsection*{Especificação das funcionalidades da API}
+Após criação das operações básicas para manipulação das tarefas, a especificação das funcionalidades da API relacionadas a esta entidade tornou-se mais simples. Isso porque, para modelar uma funcionalidade especifica dessa abstração, basta apenas utilizar a operação básica responsável pelo requisito da funcionalidade. 
+
+Um exemplo da especificação de uma funcionalidade pode ser visto na figura~\ref{fig:xTaskCreate}. Nela, a funcionalidade $\mathit{xTaskCreate}$, responsável por criar uma nova tarefa, é demonstrada. O seu comportamento pode ocorrer de duas formas: ou uma nova tarefa do sistema é criada e passada como retorno da função; ou nenhuma tarefa é criada e uma mensagem de erro é retornada. Com isso, para criar uma nova tarefa, essa funcionalidade apenas utiliza-se da função $\mathit{t\_create}$ demonstrada na figura~\ref{fig:t_create}.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+  $$
+  \begin{array}[t]{ccc}
+    \begin{array}[t]{l}
+      \mathit{result}, \mathit{handle} \longleftarrow \\ 
+      \quad\quad\quad \mathit{xTaskCreate} (\begin{array}[t]{l}
+        \mathit{code},\mathit{name},\\
+        \mathit{stackSize}, \mathit{params}, \\
+        \mathit{priority}) =
+      \end{array} \\
+      \PRE\\ 
+      \quad \mathit{code} \in \mathit{TASK\_CODE} \land \\ 
+      \quad \mathit{name} \in \mathit{NAME} \land \\ 
+      \quad \mathit{stackSize} \in \mathit{NATURAL} \land \\  
+      \quad \mathit{params} \subset \mathit{PARAMETER} \land \\ 
+      \quad \mathit{priority} \in \mathit{PRIORITY} \land \\
+      \quad \mathit{scheduler} = \mathit{NOT\_STARTED} \land \\
+      \THEN
+    \end{array}
+    & &
+
+    \begin{array}[t]{l}
+      \quad \CHOICE\\ 
+      \quad \quad \mathit{handle} \leftarrow \\
+      \quad \quad\quad \quad\mathbf{t\_create} (\mathit{priority}) \parallel\\ 
+      \quad \quad \mathit{result} := \mathit{pdPASS}\\
+      \quad	\OR \\
+      \quad \quad
+      \mathit{result}:=\mathit{errMEMORY} \parallel \\ 
+      \quad \quad 
+      \mathit{handle} :\in \TASK \\
+      \quad \END\\
+      \END
+    \end{array}
+
+  \end{array}
+  $$
+\end{footnotesize}
+\caption{Especificação da operação $\mathit{xTaskCreate}$.}
+\label{fig:xTaskCreate}
+\end{figure}
+
+Outro exemplo mais simples pode ser visto na especificação da funcionalidade \textit{vTaskResume} na figura~\ref{fig:vTaskResume}. Essa funcionalidade é reponsável por colocar uma tarefa suspensa no estado pronta. Para isso, ela utiliza-se da operação \textit{t\_resume} da máquina $\mathit{Task}$, demonstada na figura~\ref{fig:t_resume}.
+
+\begin{figure}[!htb]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{vTaskResume}(\mathit{pxTaskToResume}) =\\
+\PRE \\
+\quad \quad \mathit{scheduler} = \mathit{taskSCHEDULER\_RUNNING} \land \\
+\quad \quad \mathit{INCLUDE\_vTaskSuspend} = 1 \land \\
+\quad \quad \mathit{suspended} \not=  \emptyset \land \\ 
+\quad \quad \mathit{pxTaskToResume} \in \mathit{TASK} \land \\ 
+\quad \quad \mathit{pxTaskToResume} \in \mathit{suspended} \\
+\THEN \\
+\quad \quad \mathbf{t\_resume}(\mathit{pxTaskToResume})\\	
+\END;
+\end{array}    
+$$
+\end{footnotesize}
+\caption{Especificação da operação $\mathit{vTaskResume}$.}
+\label{fig:vTaskResume}
+\end{figure}
+
+\subsection{Fila de mensagens}
+A especificação da parte responsável pela abstração fila de mensagens seguiu o mesmo raciocínio da entidade tarefa. A abordagem escolhida para sua representação foi os conjuntos e uma máquina, denominada \textit{Queue}, ficou responsável por tratar das suas características.
+
+O estado da máquina $\mathit{Queue}$ pode ser visto na figura~\ref{fig:module_queue}. Nela, foram criadas as variáveis $\mathit{queues}$, $\mathit{items}$, $\mathit{receiving}$, e $\mathit{sending}$.
+A variável $\mathit{queues}$ é responsável por armazenar todas as filas de mensagens criadas pelo sistema (propriedade~\ref{armazenarfila} da seção~\ref{sec:model_queue}). A variável $\mathit{items}$ relaciona uma fila de mensagens a um conjunto de itens (propriedade~\ref{controleitens} da seção~\ref{sec:model_queue}). Por último, as variáveis $\mathit{receiving}$ e $\mathit{sending}$ relacionam, respectivamente, uma fila de mensagens a um conjunto de tarefas bloqueadas aguardando a chegada de uma mensagem na fila (propriedade~\ref{bloqueioleitura} da seção~\ref{sec:model_queue}) e um conjunto de tarefas bloqueadas aguardando para enviar uma mensagem para a fila (propriedade~\ref{bloqueioescrita} da seção~\ref{sec:model_queue}).
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\MACHINE\\
+\quad \mathit{Queue}\\
+\VARIABLES \\
+\quad \mathit{queues},\\
+\quad \mathit{items},\\
+\quad \mathit{receiving},\\
+\quad \mathit{sending}
+\end{array}
+&
+&
+\begin{array}[t]{l}
+\INVARIANT \\
+\quad \mathit{queues} \in \pow(\mathit{QUEUE}) \land \\
+\quad \mathit{items} \in \mathit{QUEUE} \rightarrow\mkern-22mu+ \pow (\mathit{ITEM})\land  \dom(\mathit{items}) = \mathit{queues} \land \\
+\quad \mathit{receiving} \in \mathit{QUEUE} \rightarrow\mkern-22mu+
+\pow(\TASK) \land \dom(\mathit{receiving}) = \mathit{queues} \land \\
+\quad \mathit{sending} \in \mathit{QUEUE}\rightarrow\mkern-22mu+
+\pow(\TASK) \land  \dom(\mathit{sending}) = \mathit{queues} \\
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Estado da máquina $\mathit{Queue}$}
+\label{fig:module_queue}
+\end{figure}
+
+Na máquina $\textit{Queue}$, também foram criadas operações básicas para manipular os estados anteriormente descritos. Ao total, seis operações foram desenvolvidas, entre elas as operações $\mathit{xQueueCreate}$,
+$\mathit{sendItem}$, e $\mathit{insertTaskWaitingToRecived}$, as quais serão explicadas a seguir.
+
+
+\begin{figure}[!htb]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{xQueueHandle} \longleftarrow \mathit{xQueueCreate}(\mathit{uxQueueLength},\mathit{uxItemSize}) =\\
+\PRE\\
+\quad \mathit{uxQueueLength} \in \nat \land \\
+\quad \mathit{uxItemSize} \in \nat \\
+\THEN    \\
+\quad \ANY\\
+\quad\quad \mathit{queue}\\
+\quad \WHERE\\
+\quad\quad \mathit{queue} \in \mathit{QUEUE} \land \\ 
+\quad\quad \mathit{queue} \not\in \mathit{queues}\\
+\quad \THEN\\
+\quad\quad \mathit{queues} := \mathit{queues} \cup \{\mathit{queue}\}\parallel\\
+\quad\quad \mathit{queue\_items} := \mathit{queue\_items} \cup  \{\mathit{queue} \mapsto \emptyset \} \parallel\\
+\quad\quad \mathit{queue\_receiving} := \mathit{queue\_receiving} \cup 
+													\{\mathit{queue} \mapsto \emptyset \} \parallel \\
+\quad\quad \mathit{queue\_sending} := \mathit{queue\_sending} \cup 
+													\{ \mathit{queue} \mapsto \emptyset \} \parallel \\
+\quad\quad \mathit{xQueueHandle} := \mathit{queue}\\
+\quad \END \\
+\END;
+\end{array}
+$$
+\end{footnotesize}
+\caption{Operação $\mathit{xQueueCreate}$.}
+\label{fig:xQueueCreate}
+\end{figure}
+A operação responsável por criar um nova fila de mensagens é a $\mathit{xQueueCreate}$, figura~\ref{fig:xQueueCreate}. Nela, os parâmetros de entrada $\mathit{uxQueueLength}$ e $\mathit{uxItemSize}$, representam os tamanho da fila e o tamanho do item da fila, respectivamente. Em seguida, a nova fila de mensagens é escolhida em $\ANY$ pela variável $\mathit{queue}$. Para essa nova fila são atribuidos um conjunto vazio de itens ($\mathit{queue\_items} := \mathit{queue\_items} \cup  \{\mathit{queue} \mapsto \emptyset \}$), um conjunto vazio de tarefas bloqueadas por leitura ($\mathit{queue\_receiving} := \mathit{queue\_receiving} \cup \{\mathit{queue} \mapsto \emptyset \}$) e um conjunto vazio de tarefas bloqueadas por escrita ($ \mathit{queue\_sending} := \mathit{queue\_sending} \cup  \{ \mathit{queue} \mapsto \emptyset \}$). Por último, a nova fila criada é retornada pela a operação ($\mathit{xQueueHandle} := \mathit{queue}$).
+
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{cc}
+\begin{array}[t]{l}
+\mathit{sendItem}( \mathit{queue}, \mathit{item}, \task,\mathit{pos}) =\\
+\PRE\\ 
+\quad  \mathit{queue} \in \mathit{queues} \land \\ 
+\quad  \mathit{item} \in \mathit{ITEM} \land \\ 
+\quad  \task \in \TASK \land \\ 
+\quad  \mathit{pos} \in \mathit{COPY\_POSITION} \land\\    
+\quad  \task \in \mathit{receiving}(\mathit{queue})\\
+\end{array}
+\hspace*{5mm}
+\begin{array}[t]{l}
+\THEN \\
+\quad  \mathit{items}(\mathit{queue}):=\\
+\quad\quad\mathit{items}(\mathit{queue}) \cup
+\{\mathit{item}\}\parallel\\ 
+\quad  \mathit{receiving}(\mathit{queue}) := \\
+\quad\quad \mathit{receiving}(\mathit{queue}) - \{\task\} \\
+\END
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação da função $\mathit{sendIten}$.}
+\label{fig:sendIten}
+\end{figure}
+
+Na figura~\ref{fig:sendIten}, tem-se a operação responsável por adicionar um item em uma fila de mensagens. Nela, os parâmetros de entrada $\mathit{queue}$, $\mathit{item}$ e $\mathit{task}$ representam a fila que será manipulada, o item que será adicionado à fila e a tarefa que será retirada do conjunto de tarefas bloqueadas aguardando a chegada de uma mensagem na fila. Por fim, devido aos conjuntos não possuírem posições, o parâmetro $\mathit{pos}$, que representa a posição de entrada do item na fila (final ou começo), não é utilizado.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{insertTaskWaitingToRecived}(\mathit{pxQueue}, \mathit{pxTask}) =\\
+\PRE\\
+\quad \mathit{pxQueue} \in  \mathit{queues} \land \\
+\quad \mathit{pxTask} \in \mathit{TASK}\\
+\THEN\\
+\quad \mathit{queue\_receiving}(\mathit{pxQueue}) := 
+		\mathit{queue\_receiving}(\mathit{pxQueue}) \cup \{ \mathit{pxTask}\}\\
+\END;\\
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação da operação $\mathit{insertTaskWaitingToRecived}$.}
+\label{fig:insertTaskWaitingToRecived}
+\end{figure}
+
+Por último, a operação $\mathit{insertTaskWaitingToRecived}$ da figura~\ref{fig:insertTaskWaitingToRecived} adiciona uma tarefa no conjunto de tarefas bloqueadas por leitura em uma fila. Assim, a operação recebe a tarfa que será adicionada, $ \mathit{pxTask}$, e a fila na qual a tarefa será adicionada ao conjunto, $\mathit{pxTask}$. Em seguida, a tarefa informada é adicionada ao conjunto de tarefas bloqueadas por leitura
+($\mathit{queue\_receiving}(\mathit{pxQueue}):= \mathit{queue\_receiving}(\mathit{pxQueue}) \cup \{ \mathit{pxTask}\}$).
+
+\subsubsection*{A máquina FreeRTOSBasic}
+
+Prosseguindo na especificação, percebeu-se que as funcionalidades relacionadas à entidade fila de mensagens possuem um comportamento muito parecido. Além disso, para a especificação dessas funcionalidades, é necessário ter uma ligação com a entidade tarefa e fila de mensagens, pois uma fila é capaz de bloquear e desbloquear uma tarefa.
+
+Nesse contexto, para especificar os comportamentos comuns das funcionalidades da fila de mensagens e fazer a ligação dessas funcionalidades com a entidade tarefa, foram criadas, na máquina $\mathit{FreeRTOSBasic}$, as seguinte funções intermediárias: $\mathit{xQueueGenericSend}$ e $\mathit{xQueueGenericReceive}$.
+Essas funções são responsáveis respectivamente por: enviar um elemento para fila ou bloquear a tarefa remetente se a fila estiver cheia; receber um elemento da fila ou bloquear a tarefa receptora se a fila estiver vazia. A seguir, tem-se a especificação da operação $\mathit{xQueueGenericSend}$, podendo o leitor interessado verificar a especificação da operação $\mathit{xQueueGenericReceived}$ no repositório do projeto.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+  $$
+  \begin{array}[t]{cc}
+    \begin{array}[t]{l}
+      res \leftarrow \mathit{xQueueGenericSend}(q,i,wait,pos) = \\ 
+      \quad \PRE \\
+      \quad\quad \mathit{q} \in \mathit{queues} \land i \in \mathit{ITEM} \land  \mathit{wait} \in \mathit{TICK} \land \\
+      \quad\quad \mathit{pos} \in \mathit{COPY\_POSITION} \land \\
+      \quad \quad \mathit{active} = \mathit{TRUE} \land \running \neq \mathit{idle} \\
+      \quad \THEN \\
+      \quad \quad \CHOICE \\
+      \quad \quad \quad \IF \mathit{wait} > 0 \THEN \\
+      \quad \quad \quad \quad \mathit{q\_insertTaskWaitingToSend}(\mathit{q}, \running) \parallel \\
+      \quad \quad \quad \quad \mathit{t\_delayTask}(\mathit{wait}) \parallel \\
+      \quad \quad \quad \quad \mathit{res} := \mathit{pdTRUE} \\
+      \quad \quad \quad \ELSE \\
+      \quad \quad \quad \quad \mathit{res} := \mathit{errQUEUE\_FULL} \\
+      \quad \quad \quad \END \\
+    \end{array}
+    &
+    \begin{array}[t]{l}
+      \quad \OR \\
+      \quad \quad \ANY t \WHERE \\
+      \quad \quad \quad t \in \TASK \land \\
+      \quad \quad \quad t \in \blocked \land \\ 
+      \quad \quad \quad t \in \mathit{receiving}(\mathit{q}) \\
+      \quad \quad \THEN \\
+      \quad \quad \quad \mathit{q\_sendItem}(q,i,t,\mathit{pos}) \parallel \\
+      \quad \quad \quad \mathit{t\_unblock}(t) \parallel \\
+      \quad \quad \quad \mathit{res} := \mathit{pdPASS} \\
+      \quad \quad \END \\
+      \quad \END \\
+      \END
+    \end{array}
+  \end{array}
+  $$
+\end{footnotesize}
+\caption{Especificação da função $\mathit{xQueueGenericSend}$.}
+\label{fig:xQueueGenericSend}
+\end{figure}
+
+Na função $\mathit{xQueueGenericSend}$, apresentada na figura~\ref{fig:xQueueGenericSend}, tem-se como parâmetros de entrada: a fila onde será enviada a mensagem, $\mathit{q}$ ; o item que será enviado para a fila,
+$\mathit{i}$ ; a quantidade de tempo que a tarefa remetente poderá ficar esperando pela fila, $\mathit{wait}$; e a posição que o item será colocado na fila, $\mathit{pos}$. Essa função possui dois comportamentos possíveis. No primeiro, representando uma fila cheia, ela bloqueia a tarefa remetente, através da operação $\mathit{t\_delayTask}$, e, com o método $\mathit{q\_insertTaskWaitingToSend}$, coloca-a no conjunto de tarefas que esperam para enviar um item para fila. No segundo, o item é enviado para a fila, através do método $\mathit{q\_sendItem}$, e uma tarefa que aguarda por um item da fila é desbloqueada com a operação $\mathit{t\_unblock}$.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+  $$
+  \begin{array}[t]{c}
+    \begin{array}[t]{l}  
+      \mathit{res} \longleftarrow \mathit{xQueueSend}(\mathit{q},
+      \mathit{i}, \mathit{w})=\\
+      \PRE \\
+      \quad \mathit{q}\in \mathit{queues}  \land \mathit{i} \in \mathit{ITEM}  \land \mathit{w} \in \mathit{TICK} \land\\
+      \quad \mathit{active} = TRUE \land \running \neq \mathit{idle} \\
+      \THEN \\
+      \quad \mathit{res} \gets \mathit{xQueueGenericSend}(\mathit{q}, \mathit{i}, \mathit{w}, \mathit{queueSEND\_TO\_BACK})\\ 
+      \quad \END \\
+      \END
+    \end{array}
+  \end{array}
+  $$
+\end{footnotesize}
+\caption{Especificação da função $\mathit{xQueueSend}$.}
+\label{fig:xQueueSend}
+\end{figure}
+
+Finalmente, para finalizar essa especificação inicial, a funcionalidade de enviar
+um item para a fila de mensagens, modelada na máquina $\mathit{FreeRTOS}$, é
+apresentada pela figura~\ref{fig:xQueueSend}. Nela, basicamente, ocorre uma
+chamada à função $\mathit{xQueueGenericSend}$, da
+figura~\ref{fig:xQueueGenericSend}.
+
+\section{Refinando a especificação inicial}
+\label{sec:ref_esp}
+
+Para tratar dos requisitos do FreeRTOS ligados à prioridade de uma tarefa, é
+necessário acrescentar tal característica à modelagem inicial. Esse acréscimo
+está relacionado principalmente à máquina $\mathit{Task}$ e pode ser feito de
+duas formas: escrevendo uma nova versão para essa máquina ou refinando-a. Aqui,
+a última forma foi escolhida como a mais adequada.
+
+O refinamento da máquina $\mathit{Task}$ é feito pelo módulo $\mathit{Task\_r}$,
+cujas variáveis e invariantes são exibidos na figura~\ref{fig:task_r_state}.
+Nela, o tipo $\PRIORITY$ representa a prioridade que uma tarefa pode assumir e a
+variável $\mathit{prio}$ representa a ligação de uma tarefa a sua prioridade. Com
+esse refinamento, foi possível, através do seu invariante, especificar o seguinte
+requisito: uma vez inicializado o escalonador, a tarefa em execução deve ter
+prioridade maior ou igual a das tarefas de estado pronta ($\forall \mathit{t}.(\mathit{t} \in \ready \Rightarrow \mathit{prio}(t) \leq \mathit{prio}(\running))$).
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{cc}
+\begin{array}[t]{l}
+\REFINEMENT \\
+\quad \mathit{Task\_r}\\
+\CONSTANTS \\
+\quad \mathit{MAX\_PRIO}, \mathit{IDLE\_P} \\
+\PROPERTIES\\
+\quad \mathit{PRIORITY} =  0..(\mathit{MAX\_PRIO-1}) \land \\
+\quad \mathit{MAX\_PRIO} > 0 \land \mathit{IDLE\_P} = 0 \\
+\VARIABLES \\
+\quad \mathit{prio}\\
+\end{array}
+\begin{array}[t]{l}
+\INVARIANT\\
+\quad \mathit{prio} \in \TASK \pfun \mathit{PRIORITY} \land \\ 
+\quad \dom(\mathit{prio})=\tasks \land \\
+\quad (\mathit{active} = \mathit{TRUE} \Rightarrow \\
+\quad \quad \mathit{prio}(\mathit{idle}) = \mathit{IDLE\_P} \land \\
+\quad \quad \forall \mathit{t}.(\mathit{t} \in \ready \Rightarrow \mathit{prio}(t) \leq \mathit{prio}(\running)) \land\\
+\quad \quad \forall \mathit{t}.(\mathit{t} \in \ready \Rightarrow \mathit{IDLE\_P} \leq \mathit{prio}(t)))
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação do estado do módulo $\mathit{Task\_r}$.}
+\label{fig:task_r_state}
+\end{figure}
+
+Feita as alterações para tratar a prioridade de uma tarefa, é necessário agora refinar as operações da máquina $\mathit{Task}$. No entanto, para facilitar e modularizar o refinamento dessas operações, foi criada
+previamente a função auxiliar $\mathit{scheduler\_p}$ no refinamento $\mathit{Task\_r}$, que recebe como entradas um conjunto de tarefas e uma função que mapeia essas tarefas as suas prioridades. Ao final, essa função auxiliar retorna um conjunto de tarefas de maior prioridade. A especificação de $\mathit{scheduler\_p}$ pode ser vista na figura~\ref{fig:scheduler_p}.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\ldots\\
+\CONSTANTS \\
+\quad \mathit{schedule\_p} \\
+\PROPERTIES \\
+\quad \mathit{schedule\_p}: (\fin(\mathit{TASK}) \times (\mathit{TASK} \pfun \mathit{PRIORITY})) \pfun \fin(\mathit{TASK}) \land \\
+\quad \mathit{schedule\_p} = \lambda (\mathit{tasks}, \mathit{prio}) \bullet \\
+\quad \quad (\mathit{tasks} : \fin(\mathit{TASK}) \land \mathit{prio} : \mathit{TASK} \pfun \mathit{PRIORITY} \land
+\mathit{tasks} \neq \emptyset \land \mathit{tasks} \subseteq \dom(\mathit{prio}) \\
+\quad \quad \quad \mid \quad \mathit{tasks} \cap \mathit{prio}^{-1} (\max(\mathit{prio}\lbrack\mathit{tasks}\rbrack))))\\
+\ldots\\
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação da função auxiliar $\mathit{schedule\_p}$.}
+\label{fig:scheduler_p}
+\end{figure}
+
+Finalmente, os refinamentos das operações previamente demonstradas, $\mathit{t\_create}$ (figura~\ref{fig:t_create}) e $\mathit{t\_startScheduler}$(figura~\ref{fig:t_startScheduler}), são exibidos, respectivamente, pelas figuras~\ref{fig:t_create_refinament} e \ref{fig:t_startScheduler_refinament}. 
+
+\begin{figure}[!h]
+\begin{footnotesize}
+  $$
+  	\begin{array}[t]{cc}
+    \begin{array}[t]{l}
+      \mathit{result} \longleftarrow \mathit{t\_create}(\mathit{priority}) = \\
+      \PRE \\
+      \quad \mathit{priority} \in \mathit{PRIORITY} \land \\ 
+      \quad \running=\mathit{TASK\_NULL}\\
+      \THEN \\
+      \quad \ANY \\
+      \quad \quad \task \\
+      \quad \WHERE \\
+      \quad\quad \task \in \TASK \land\\
+      \quad\quad \task \not\in \tasks
+    \end{array}
+    \begin{array}[t]{l}
+      \quad \THEN \\    	    
+      \quad\quad \tasks := \tasks \cup \{ task \} \parallel\\
+      \quad\quad \mathit{prio}:= \mathit{prio} \cup
+      \{\task\mapsto \mathit{priority}\}\parallel\\ 
+      \quad\quad \ready := \ready \cup \{ \task \} \parallel \\ 
+      \quad\quad \mathit{result} :=\task\\ 
+      \quad \END\\      
+      \END\\
+    \end{array}
+	\end{array}
+  $$
+\end{footnotesize}
+\caption{Especificação do refinamento da operação $\mathit{t\_create}$.}
+\label{fig:t_create_refinament}
+\end{figure}
+
+Na operação $\mathit{t\_create}$ da figura~\ref{fig:t_create_refinament}, assim como na operação $\mathit{t\_create}$ da figura~\ref{fig:t_create}, uma nova tarefa é criada através da substituição $\ANY$ e é representada pela variável $\mathit{task}$. A particularidade desta operação está na asserção $\mathit{prio}:= \mathit{prio} \cup \{\task\mapsto \mathit{priority}\}$ que atribui uma prioridade para a nova tarefa criada.
+
+\begin{figure}[!h]
+\begin{footnotesize}
+  $$
+  \begin{array}[t]{cc}
+    \begin{array}[t]{l}
+      \mathit{t\_startScheduler} = \\
+      \quad \BEGIN \\
+      \quad \quad \mathit{active} := \mathit{TRUE} \parallel \\
+      \quad \quad \blocked, \suspended := \emptyset, \emptyset \parallel \\
+      \quad \quad \ANY \\
+      \quad \quad \quad \mathit{i}\\ 
+      \quad \quad \WHERE \\
+      \quad \quad \quad \mathit{i} \in \TASK \land \\ 
+      \quad \quad \quad \mathit{i} \not \in \tasks \\
+      \quad \quad \THEN \\
+      \quad \quad \quad  \tasks := \tasks \cup \{ \mathit{i} \} \parallel \\
+      \quad \quad \quad \mathit{prio} := \mathit{prio} \cup \{ \mathit{i} \mapsto \mathit{IDLE\_P} \}\parallel \\
+      \quad \quad \quad \mathit{idle} := \mathit{i} \parallel
+    \end{array}
+    \begin{array}[t]{l}
+      \quad \quad \ANY \quad t \quad \WHERE \\
+      \quad \quad \quad t \in \TASK \land \\
+      \quad \quad \quad (\ready = \emptyset \Rightarrow t = \mathit{i}) \land \\
+      \quad \quad \quad (\ready \neq \emptyset \Rightarrow t \in \ready \land \\
+      \quad \quad \quad \quad t \in \mathit{schedule\_p}(\ready, \mathit{prio}) \\
+      \quad \quad \THEN \\
+      \quad \quad \quad \running := t \parallel \\
+      \quad \quad \quad \ready := (\ready \cup \{ \mathit{i} \}) - \{ t \} \\
+      \quad \quad \END \\
+      \quad \END \\
+      \END
+    \end{array}
+  \end{array}
+  $$
+\end{footnotesize}
+\caption{Especificação do refinamento da operação $\mathit{t\_startScheduler}$.}
+\label{fig:t_startScheduler_refinament}
+\end{figure}
+
+Por último, o refinamento da operação $\mathit{t\_startScheduler}$, na figura~\ref{fig:t_startScheduler_refinament}, cria uma tarefa ociosa na substituição $\ANY$, representada pela variável \mathit{i}. Após isso, para essa tarefa, é adicionada uma prioridade pré-definida pela constante $\mathit{IDLE\_P}$ em $\mathit{prio} := \mathit{prio} \cup \{ \mathit{i} \mapsto \mathit{IDLE\_P} \}$.
+
+\section{Considerações finais}
+
+O objetivo principal dessa especificação foi demonstrar que a modelagem do FreeRTOS através do método B é uma abordagem viável. Desse modo, apesar da sua simplicidade, propriedades importantes do sistema foram constatadas, sendo as principais: a mudança de estado de uma tarefa e o gerenciamento de mensagens em uma fila de mensagens.
+
+Para fazer essa modelagem, foram criadas 1974 linhas de códigos dividas em 8 módulos, gerando 538 obrigações de prova, nas quais 489 foram provadas automaticamente pela ferramenta utilizada, Atelier B, e as restantes, 49, necessitaram da intervessão do especificador para serem provadas. Os número de linhas de código, operações e obrigações de prova de cada módulo podem ser vistos na tabela~\ref{tab:proofs}.
+
+
+
+\begin{table}[!ht]
+  \begin{footnotesize}
+    \begin{center}
+      \begin{tabular}{|l|c|c|c|c|c|c|}
+        \hline
+        Módulos & \multicolumn{2}{c|}{Tamanho} & \multicolumn{3}{c|}{Obrigações de prova} & Provas  \\
+        \cline{2-6}
+        & Operações & Linhas &  B.D. & Teor. & Total &  Interativas \\
+        \hline\hline
+        Config         &      0 &   89 &      0 &     0 &     0 &       0 \\
+        \hline
+        Types          &      0 &  103 &      1 &     1 &     2 &       1 \\
+        \hline
+        Scheduler      &      5 &   90 &      0 &     0 &     0 &       0 \\
+        \hline
+        Task           &     12 &  467 &      1 &   219 &   220 &      28 \\
+        \hline
+        Queue          &      7 &  231 &     12 &    33 &    45 &       0 \\
+        \hline
+        FreeRTOSBasic  &     19 &  562 &     37 &    46 &    83 &       2 \\
+        \hline
+        FreeRTOS       &     19 &  562 &     43 &     3 &    49 &       0 \\
+        \hline
+        Task\_r        &     12 &  432 &     42 &   100 &   142 &      18 \\
+        \hline
+        \hline
+        \textbf{Total} &     55 & 1974 &   136 &    402 &   538 &      49 \\
+        \hline
+      \end{tabular}
+    \end{center}
+    \caption{A tabela apresenta, para cada módulo, o número de operações definidas no módulo, o total de número 			de linhas(incluindo comentários), o número de obrigações de prova
+      (lemas de boa definição, teoremas, e total), e
+      o número of provas interativas requeridas para garantir a veracidade dos teoremas.}
+    \label{tab:proofs}
+  \end{footnotesize}
+\end{table}
+
+

@@ -1,0 +1,837 @@
+\mychapter{Modelagem Atual}
+\label{Cap:modelagem_atual}
+A modelagem do capítulo anterior serviu como base para o ínicio da especificação do FreeRTOS, mas, para um trabalho mais completo e passível de incrementação, foi necessário realizar alterações na especificação desenvolvida. Essas alterações visaram simplificar a especificação, para facilitar futuros refinamento, especificar as entidades inicialmente abstraídas, semáforo e mutex, e refinar a especificação desenvolvida.
+
+Seguindo esse raciocíno, a especificação atual do FreeRTOS pode ser divida em seções organizadas da seguinte forma: simplificação da modelagem anterior, seção~\ref{sec:simplificação}; adição de novas entidades seção~\ref{sec:adicao_entidades}; e refinamento da especificação~\ref{sec:refinamento_modelagem}.
+
+\section{Simplificação da modelagem anterior}
+\label{sec:simplificação}
+Na especificação anterior, as tarefas foram organizadas nos estados em execução, pronta, bloqueada e suspensa. A modelagem desses estados foi demonstrada na seção~\ref{sec:especificacao_tarefa}. Dessa forma, para garantir a propriedade de que a tarefa em execução deve ter prioridade maior que as tarefas prontas, um futuro refinamento dessa especificação deve verificar a prioridade da tarefa em execução e comparar com as prioridades das tarefas de estado pronta. Além disso, com essa especificação, a cada troca da tarefa em execução, é necessário retirar a nova tarefa do conjunto de tarefas pronta.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\MACHINE\\
+\quad \mathit{Task}\\
+\VARIABLES\\
+\quad  \ldots\\
+\quad \mathit{tasks},\\
+\quad \mathit{blocked},\\
+\quad \mathit{runable},\\
+\quad \mathit{suspended},\\
+\quad \mathit{running},\\
+\quad \ldots\\
+\end{array}
+& &
+\begin{array}[t]{l}
+\INVARIANT\\
+\quad \ldots\\ 
+\quad \mathit{blocked} \subset \mathit{tasks} \land \\
+\quad \mathit{runable} \subset \mathit{tasks} \land \\  
+\quad \mathit{suspended} \subset \mathit{tasks} \land \\  
+ 
+\quad \mathit{runable} \cap \mathit{blocked} = \emptyset \land \\
+\quad \mathit{blocked} \cap \mathit{suspended} = \emptyset \land \\   
+\quad \mathit{suspended} \cap \mathit{runable} = \emptyset \land \\
+
+\quad \mathit{tasks}=\mathit{suspended} \cup \mathit{blocked} \cup \mathit{runable} \land \\
+
+\quad (\mathit{active}= \TRUE \Rightarrow \\
+\quad\quad    \mathit{runable} \not= \emptyset \land \\
+\quad\quad    \mathit{running} \in \mathit{runable}  \land \\
+\quad\quad    \mathit{idle} \in \mathit{runable}  \land \\
+\quad\quad    \mathit{TASK\_NULL} \not\in \mathit{tasks}) 
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação nova do estado da máquina $\mathit{Task}$.}
+\label{fig:estado_task_n}
+\end{figure}
+
+O novo modelo criado, simplifica o gerenciamento do estado de uma tarefa abstraindo o conjunto de tarefas pronta e criando apenas um conjunto formado pela união da tarefa em execução com as tarefas de estado pronta. Assim, na especificação do estado da máquina $\mathit{Task}$, retirou-se a variével $\mathit{ready}$ e criou-se a variável $\mathit{runable}$, para representar as tarefas de estado pronta e a tarefa em execução, como demonstra a figura~\ref{fig:estado_task_n}.
+
+A vantagem dessa nova especifição pode ser vista na própria figura~\ref{fig:estado_task_n}, que especifica que a tarefa ociosa deve estar no estado pronto ou em execução da seguinte forma $ \mathit{idle} \in \mathit{runable}$, diferente da $(\idle = \running \lor \idle \in \ready)$ na figura~\ref{fig:task_invariant}, da especificação anterior. Além disso, nos futuros refinamentos, para garantir que a tarefa em execução tenha prioridade maior ou igual que as do estado pronta, basta solicitar a tarefa de maior prioridade ao conjunto $\mathit{runable}$. Também não é necessário, na troca da tarefa em execução, retirar a tarefa do estado $\mathit{runable}$, o que era feito anteriormente com o estado $\mathit{ready}$.
+
+\subsection{Especificação das operações}
+Com as alterações no estado da máquina, foi necessário também realizar as modificações necessárias nas operações, que manuseam seus estados. Desse modo, as operações $\mathit{t\_create}$, $\mathit{t\_startScheduler}$ $\mathit{t\_delayTask}$ e $\mathit{t\_resume}$ foram alteradas como demonstra as figuras~\ref{fig:n_t_create}, \ref{fig:n_t_startScheduler}, \ref{fig:n_t_delayTask} e \ref{fig:n_t_resume} .
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{result}  \longleftarrow \mathit{t\_create} (\mathit{priority})=\\
+\PRE \\
+\quad \mathit{priority} \in \mathit{PRIORITY} \land \\
+\quad \mathit{active} = \TRUE \\
+\THEN \\	
+\quad \ANY \\
+\quad \quad \mathit{task}, \mathit{n\_runable} \\
+\quad \WHERE \\
+\quad \quad \mathit{task} \in \mathit{TASK} \land \\
+\quad \quad \mathit{task} \not \in  \mathit{tasks} \land \\
+\quad \quad \mathit{n\_runable} \subset \mathit{tasks} \land \\
+\quad \quad \mathit{n\_runable} = \mathit{runable} \cup \{\mathit{task}\} \land \\
+\quad \quad \mathit{task} \not= \mathit{TASK\_NULL}\\
+\end{array}
+& &
+\begin{array}[t]{l}
+\quad \THEN\\
+\quad \quad \mathit{tasks} := \mathit{tasks} \cup \{\mathit{task}\} \parallel \\
+\quad \quad \mathit{runable} := \mathit{n\_runable} \parallel \\
+\quad \quad \CHOICE \\
+\quad \quad \quad \mathit{skip}\\
+\quad \quad \OR\\
+\quad \quad \quad \mathit{running}::\mathit{n\_runable}\\
+\quad \quad \END \parallel \\
+\quad \quad \mathit{result} := \mathit{task}\\
+\quad \END\\
+\END;
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação nova da operação $\mathit{t\_create}$.}
+\label{fig:n_t_create}
+\end{figure}
+
+Na operação $\mathit{t\_create}$ da figura~\ref{fig:n_t_create}, a prioridade da nova tarefa é passada pelo argumento $\mathit{priority}$. Em seguida, uma tarefa que não esta sendo manuseada pelo sistema é escolhida pela variável $task$ e adicionada ao conjunto $\mathit{runable}$. Ao final, através da substituição $\CHOICE$, a operação pode decidir em manter a tarefa em execução ou  selecionar uma nova tarefa do conjunto $\mathit{runable}$ para entrar em execução ($\mathit{running}::\mathit{n\_runable}$), o que não era feito pela antiga $\mathit{t\_create}$ da figura~\ref{fig:t_create}.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+
+\mathit{t\_startScheduler} =\\ 
+\PRE \\
+\quad \mathit{active} = \mathit{FALSE}\\
+\THEN\\
+\quad \mathit{active} := \mathit{TRUE} \parallel \\
+\quad \ANY\\
+\quad \quad \mathit{idle\_task},\\
+\quad \quad \mathit{n_runable} \\
+\quad \WHERE\\
+\quad\quad \mathit{idle\_task} \in \mathit{TASK} \land \\ 
+\quad\quad \mathit{idle\_task} \not \in \mathit{tasks} \land \\
+\quad\quad \mathit{n\_runable} \subset \mathit{tasks} \land \\
+\quad\quad \mathit{n\_runable} = \mathit{runable}\cup \{\mathit{idle\_task}\}\\
+\end{array}
+\begin{array}[t]{l}
+\quad \THEN \\
+\quad\quad \mathit{idle} := \mathit{idle\_task} \land \\
+\quad\quad \mathit{tasks} := \mathit{tasks} \cup \{ \mathit{idle\_task}\}\parallel \\
+\quad\quad \mathit{runable}:= \mathit{n\_runable} \\
+\quad\quad \mathit{running}::\mathit{n\_runable}\\
+\quad \END\\
+\END;
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação nova da operação $\mathit{t\_startScheduler}$.}
+\label{fig:n_t_startScheduler}
+\end{figure}
+
+A nova operação $\mathit{t\_startScheduler}$ da figura~\ref{fig:n_t_startScheduler}, responsável por iniciar o sistema, criar a tarefa ociosa, através da variável $\mathit{idle\_task}$ na substituição $\ANY$, acrescentando esta ao conjunto de tarefas gerenciadas pelo FreeRTOS, $\mathit{tasks} := \mathit{tasks} \cup \{ \mathit{idle\_task}\}$. Em seguida, o conjunto $\mathit{runable}$ é atualizado em $\mathit{runable}:= \mathit{n\_runable}$ pela variável $\mathit{n\_runable}$, definida como o conjunto $\mathit{runable}$ mais a variável $\mathit{idle\_task}$. Por último, $\mathit{running}::\mathit{n\_runable}$ define uma nova tarefa a entrar em execução. Observa-se que, nesse momento, não é necessário subtrair a tarefa $\mathit{running}$ do conjunto $\mathit{runable}$, como ocorreu na antiga especificação na figura~\ref{fig:t_startScheduler}.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{t\_delayTask}(\mathit{ticks},\mathit{task})=\\
+\PRE\\
+\quad \mathit{task} \in \mathit{TASK} \land \\
+\quad \mathit{active}=\TRUE \land \\
+\quad \mathit{running} \not= \mathit{idle} \land \\
+\quad \mathit{ticks} \in \mathit{TICK}\\
+\THEN \\ 
+\end{array}
+& &
+\begin{array}[t]{l}
+\quad \ANY\\
+\quad\quad \mathit{n\_runable}\\
+\quad \WHERE\\
+\quad\quad \mathit{n\_runable} \subset \mathit{tasks} \land \\
+\quad\quad \mathit{n\_runable} = \mathit{runable}-\{\mathit{running}\}\\
+\quad \THEN\\
+\quad\quad \mathit{runable}:=\mathit{n\_runable} \parallel \\
+\quad\quad \mathit{running}::\mathit{n\_runable}\\
+\quad  \END \parallel \\
+\quad  \mathit{blocked} := \mathit{blocked} \cup \{\mathit{running}\}\\
+\END;
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação nova da operação $\mathit{t\_delayTask}$.}
+\label{fig:n_t_delayTask}
+\end{figure}
+
+Para a operação $\mathit{t\_delayTask}$ da figura~\ref{fig:n_t_delayTask}, a tarefa em execução é colocada no estado bloqueada ($\mathit{blocked} := \mathit{blocked} \cup \{\mathit{running}\}$) e retirado do conjunto $\mathit{runable}$ ($\mathit{n\_runable} = \mathit{runable}-\{\mathit{running}\}$). Em seguida, uma nova tarefa é colocada em execução através da afirmação $\mathit{running}::\mathit{n\_runable}$, finalizando o objetivo da operação de bloquear a tarefa em execução.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\mathit{t\_resume} (\mathit{rtask}) =\\
+\PRE \\
+\quad \mathit{rtask} \in \mathit{TASK} \land \\ 
+\quad \mathit{rtask} \in \mathit{suspended} \land \\
+\quad \mathit{active} = \mathit{TRUE}\\
+\THEN  \\
+\quad \ANY\\
+\quad\quad \mathit{n\_runable}\\
+\quad \WHERE\\
+\quad\quad \mathit{n\_runable} \subset \mathit{tasks} \land \\
+\quad\quad \mathit{n\_runable} = \mathit{runable} \cup \{\mathit{rtask}\}\\
+\quad \THEN\\
+\end{array}
+& &
+\begin{array}[t]{l}
+\quad\quad \mathit{runable} := \mathit{n\_runable} \parallel \\
+\quad\quad \CHOICE\\
+\quad\quad\quad \mathit{running} :: \mathit{n\_runable}\\
+\quad\quad \OR\\
+\quad\quad\quad \mathit{skip}\\
+\quad\quad \END\\ 
+\quad \END \parallel \\        
+\quad \mathit{suspended} := \mathit{suspended} - \{\mathit{rtask}\}\\
+\END;
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Especificação nova da operação $\mathit{t\_resume}$.}
+\label{fig:n_t_resume}
+\end{figure}
+
+Na nova modelagem da $\mathit{t\_resume}$ na figura~\ref{fig:n_t_resume}, a tarefa a ser retornada do estado suspenso é representada por $\mathit{rtask}$. Essa tarefa é adicionada ao estado pronta quando inserida no conjunto $\mathit{runable}$, consequentemente, a mesma é retirada do conjunto de tarefas suspensas ($\mathit{suspended} := \mathit{suspended} - \{\mathit{rtask}\}$). Após isso, através da substituição $\CHOICE$, uma nova tarefa será colocada em execução ou não. Essa decisão será tratada no refinamento dessa operação, pois, para isso, é necessário saber a prioridade da tarefa retornada, se essa é maior que a tarefa em execução ou não. 
+
+
+\section{Adição dos novos elementos}
+\label{sec:adicao_entidades}
+Na especificação do capítulo~\ref{Cap:modelagem_inicial}, foram abstraídos os elementos semáforos e mutex, os quais são tratados nessa nova especificação. Devido a semelhança dessas entidades como a fila de mensagens, esses elementos foram especificados pela máquina $\mathit{Queue}$, aproveitando estruturas já criadas pelas fila de mensagens, como conjuntos de tarefas bloqueadas por leitura e conjunto de tarefas bloqueadas por escrita. Desse modo, o novo estado da máquina $\mathit{Queue}$ ficou como demonstra a figura~\ref{fig:n_queue}.
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\MACHINE \\
+\quad \mathit{Queue}\\
+\ldots\\  	    
+\VARIABLES\\
+\quad\mathit{queues},\\
+\quad\mathit{queues\_msg},\\
+\quad\mathit{queues\_msg\_full},\\
+\quad\mathit{queues\_msg\_empty},\\
+\quad\mathit{semaphores},\\
+\end{array}
+& &
+\begin{array}[t]{l}
+\quad\mathit{semaphores\_busy},\\
+\quad\mathit{semaphores\_full},\\
+\quad\mathit{mutexes},\\
+\quad\mathit{mutexes\_busy},\\  
+\quad\mathit{queue\_items},\\
+\quad\mathit{queue\_receiving},\\
+\quad\mathit{queue\_sending},\\
+\quad\mathit{mutex\_holder},\\
+\ldots
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Novo estado da máquina $\mathit{Queue}$.}
+\label{fig:n_queue}
+\end{figure}
+
+Nessa nova modelagem da figura~\ref{fig:n_queue}, a variável $\mathit{queues}$ representa o conjunto de todas as filas de mensagens, semáforos e mutexes do sistema. Isso foi feito para abrigar as características comuns à esses três elementos em um só conjunto. Em seguida, tem-se os conjuntos responsáveis pelas filas de mensagens, $\mathit{queues\_msg}$, $\mathit{queues\_msg\_full}$ e $\mathit{queues\_msg\_empty}$. O primeiro conjunto representa todas filas de mensagens do sistema, o segundo representa as filas cheias e o terceiro representa as filas vazias. 
+
+Ainda na figura~\ref{fig:n_queue}, os conjuntos $\mathit{semaphores}$, $\mathit{semaphores\_busy}$ e $\mathit{semaphores\_full}$ servem para armazenar os semáforos manuseados pelo sistema, indicar os semáforos ocupados e os semáforos com o contador cheio, respectivamente. Por último, as variáveis $\mathit{mutexes}$ e $\mathit{mutexes\_busy}$ informam os mutexes dos sistema e os mutex que estão ocupados, nessa ordem. As variáveis $\mathit{queue\_items}$, $\mathit{queue\_receiving}$, $\mathit{queue\_sending}$ e $\mathit{mutex\_holder}$ serão explicadas em seguida, junto com o invariante da máquina \textit{Queue}.
+
+\subsection{Invariante da máquina \textit{Queue}}
+Todos os elementos tratados nessa seção (fila de mensagens, semáforo e mutex) possuem a mesma característica, ter um conjunto de tarefas bloqueadas por tentarem utilizar esses elementos. Desse modo, tal característica deve ser relacionada ao conjunto $\mathit{queues}$, responsável por abrigar os três elementos da máquina. A especificação dessa propriedade é demonstrada na figura~\ref{fig:variavel_queue}. Assim, nessa figura, as asserções 
+$\mathit{queue\_receiving} \in \mathit{QUEUE} \pfun \pow(\mathit{TASK})$ e 
+$\mathit{queue\_sending} \in \mathit{QUEUE} \pfun \pow(\mathit{TASK})$ relacionam um elemento do conjunto abstrato $\mathit{QUEUE}$ como um conjunto de tarefas. Em seguida, as afirmações $\mathit{queues} = \dom(\mathit{queue\_receiving})$ e $\mathit{queues} = \dom(\mathit{queue\_sending})$ garantem que todos os elementos de $\mathit{queues}$ devem possuir essas relações.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\INVARIANT\\
+\quad \ldots\\
+\quad\mathit{queues} \in \pow(\mathit{QUEUE}) \land \\ 
+\quad\mathit{queue\_receiving} \in \mathit{QUEUE} \pfun \pow(\mathit{TASK}) \land \\ 
+\quad\mathit{queue\_sending} \in \mathit{QUEUE} \pfun \pow(\mathit{TASK}) \land \\
+\quad \mathit{queues} = \dom(\mathit{queue\_receiving}) \land \\
+\quad \mathit{queues} = \dom(\mathit{queue\_sending}) \land \\
+\quad \ldots\\
+\end{array}
+$$
+\end{footnotesize}
+\caption{Parte do invariante da máquina $\mathit{Queue}$ responsável pela variável $\mathit{queues}$.}
+\label{fig:variavel_queue}
+\end{figure}
+
+
+Após a definição da característica comum as três entidades na figura~\ref{fig:variavel_queue}, a particularidade das filas de mensagens "possuir um conjunto para armazenar suas mensagens" foi modelada pela figura~\ref{fig:queue_msg}. Nesta, inicialmente é informado, através da afirmação $\mathit{queues\_msg} \subset \mathit{queues}$, que todos elementos de $\mathit{queues\_msg}$ herdam as características de $\mathit{queues}$. Em seguida, é criada a função $\mathit{queue\_items}$ para relacionar um elemento de $\mathit{QUEUE}$ a um conjunto de mensagens e, após isso, em $\mathit{queues\_msg} = \dom(\mathit{queue\_items})$, é sentenciado que todos os elementos de $\mathit{queues\_msg}$ devem possuir essa relação. Por último, os conjuntos de filas vazias e filas cheias são colocados como subconjuntos de filas de mensagens em $\mathit{queues\_msg\_full} \subset \mathit{queues\_msg}$ e $\mathit{queues\_msg\_empty} \subset \mathit{queues\_msg}$.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\INVARIANT\\
+\quad \ldots\\
+\quad \mathit{queues\_msg} \subset \mathit{queues} \land \\
+\quad \mathit{queue\_items} \in \mathit{QUEUE} \pfun \pow(\mathit{ITEM}) \land \\  
+\quad \mathit{queues\_msg} = \dom(\mathit{queue\_items}) \land \\ 
+\quad \mathit{queues\_msg\_full} \subset \mathit{queues\_msg} \land \\
+\quad \mathit{queues\_msg\_empty} \subset \mathit{queues\_msg} \land \\
+\ldots
+\end{array}
+$$
+\end{footnotesize}
+\caption{Parte do invariante da máquina $\mathit{Queue}$ responsável pela fila de mensagens.}
+\label{fig:queue_msg}
+\end{figure}
+
+A parte do invariante da máquina $\mathit{Queue}$ responsável pelo semáforo e mutex é mostrada na figura~\ref{fig:semaphore_mutex}. Nela, inicialmente o conjunto $\mathit{semaphores}$ é dito como subconjunto de $\mathit{queues}$ em $\mathit{semaphores} \subset \mathit{queues}$, para herdar os conjuntos de tarefas bloqueadas pela a entidade. Após isso, os conjuntos $\mathit{semaphores\_busy}$ e $\mathit{semaphores\_full}$ são especificados como subconjuntos de $\mathit{semaphores}$.
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\INVARIANT\\
+\quad \ldots\\
+\quad \mathit{semaphores} \in \pow(\mathit{QUEUE}) \land \\
+\quad \mathit{semaphores} \subset \mathit{queues} \land \\
+\quad \mathit{semaphores\_busy} \subset \mathit{semaphores} \land \\
+\quad \mathit{semaphores\_full} \subset \mathit{semaphores} \land \\
+\end{array}
+& & 
+
+\begin{array}[t]{l}
+\hspace\\
+\hspace\\
+\quad \mathit{mutexes} \subset \mathit{queues} \land \\
+\quad \mathit{mutex\_holder}\in \mathit{QUEUE} \pfun \mathit{TASK} \land \\
+\quad \mathit{mutexes}= \dom( \mathit{mutex\_holder})  \land \\
+\quad \mathit{mutexes\_busy} \subset \mathit{mutexes} \land \\ 
+\ldots
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Parte do invariante da máquina $\mathit{Queue}$ responsável pelas entidades semáforo e mutex.}
+\label{fig:semaphore_mutex}
+\end{figure}
+
+Por último, ainda na figura~\ref{fig:semaphore_mutex}, os elementos mutexes adiquirem os conjuntos de tarefas de $\mathit{queues}$ através da asserção $\mathit{mutexes} \subset \mathit{queues}$. Em seguida, a função ${mutex\_holder}$ é criada para relacionar os elementos do conjunto $\mathit{mutexes}$ a uma tarefa, a tarefa que mantém o mutex. Isso é feito através das afirmações $\mathit{mutex\_holder}\in \mathit{QUEUE} \pfun \mathit{TASK}$ e $\mathit{mutexes}= \dom( \mathit{mutex\_holder})$. Finalmente, o conjunto de mutexes ocupados, $\mathit{mutexes\_busy}$, é colocado como subconjunto dos mutexes do sistema em $\mathit{mutexes\_busy} \subset \mathit{mutexes}$.
+
+\subsection{Especificação das operações}
+
+Nessa nova especificação, as operações da máquina \textit{Queue}, além de controlar as características do elemento fila de mensagens, devem também preocupar-se com os semáforo e mutex. De início, devido às propriedades semelhantes das entidades tratadas pela máquina, tentou-se criar operações comuns que servicem para as três entidades. Entretanto, as operações ficaram muito grandes e o desenvolvimento, como as obrigações de prova delas, tornaram-se complexas. Devido a isso, foi decido que a forma mais viável seria fazer operações individuais para cada entidade. Com isso, ao total foram criadas dezesseis operações, dez a mais que a especificação do capítulo~\ref{Cap:modelagem_inicial}.
+
+\subsubsection{Operações da fila de mensagens}
+Para explicar as novas operações relacionadas a fila de mensagens foram escolhidas $\mathit{q\_queueCreate}$ e $\mathit{q\_sendItem}$. Essas são demonstradas através das figuras~\ref{fig:n_q_queueCreate} e~\ref{fig:n_q_sendItem}.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{xQueueHandle} \longleftarrow \mathit{q\_queueCreate}(\mathit{uxQueueLength},\mathit{uxItemSize}) =\\
+\PRE\\
+\quad \mathit{uxQueueLength} \in \mathit{QUEUE\_LENGTH} \land \\
+\quad \mathit{uxItemSize} \in \nat \\
+\THEN \\
+\quad  \ANY\\
+\quad  \quad \mathit{pxQueue}\\
+\quad  \WHERE\\
+\quad  \quad \mathit{pxQueue} \in \mathit{QUEUE} \land \\ 
+\quad \quad \mathit{pxQueue} \not\in \mathit{queues}\\
+\quad \THEN\\	
+\quad \quad \mathit{queues} := \mathit{queues} \cup \{\mathit{pxQueue}\}\parallel\\
+\quad \quad \mathit{queues\_msg}:= \mathit{queues\_msg} \cup \{\mathit{pxQueue}\}\parallel\\
+\quad \quad \mathit{queue\_items} := \mathit{queue\_items} \cup \{\mathit{pxQueue} \mapsto \emptyset \} \parallel \\
+\quad \quad \mathit{queue\_receiving} := \mathit{queue\_receiving} \cup \{\mathit{pxQueue} \mapsto \emptyset \} \parallel \\
+\quad \quad \mathit{queue\_sending} := \mathit{queue\_sending} \cup \{ \mathit{pxQueue} \mapsto \emptyset \} \parallel \\
+\quad \quad \mathit{queues\_msg\_empty}:=\mathit{queues\_msg\_empty}\cup \{ \mathit{pxQueue} \} \parallel \\
+\quad \quad \mathit{xQueueHandle}:=\mathit{pxQueue}\parallel\\
+\quad \quad  \ldots\\
+\quad \END	\\	    
+\END;
+\end{array}
+$$
+\end{footnotesize}
+\caption{Nova especificação da operação $\mathit{q\_queueCreate}$.}
+\label{fig:n_q_queueCreate}
+\end{figure}
+
+Nessa especificação da figura~\ref{fig:n_q_queueCreate}, a nova fila de mensagens criada é representada pela variável $\mathit{pxQueue}$. Em seguida, esta é adicionada ao conjunto $\mathit{queues}$ e $\mathit{queues\_msg}$. Após isso, à essa fila, são associados um conjuntos de mensagens ($\mathit{queues\_msg}:= \mathit{queues\_msg} \cup \{\mathit{pxQueue}\}$), de fila bloqueadas por leitura ($\mathit{queue\_receiving} := \mathit{queue\_receiving} \cup \{\mathit{pxQueue} \mapsto \emptyset \}$) e de filas bloqueadas por escrita ($\mathit{queue\_sending} := \mathit{queue\_sending} \cup \{ \mathit{pxQueue} \mapsto \emptyset \}$). Ao final, essa nova fila é colocada no conjunto de fila vazia, ${queues\_msg\_empty}$ e retornada pela operação.
+
+
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+
+\begin{array}[t]{l}
+\mathit{q\_sendItem}(\mathit{pxQueue},\\
+\quad \quad \quad  \mathit{pxItem}, \mathit{copy\_position}) =\\
+\PRE \\
+\quad  \mathit{pxQueue} \in \mathit{queues\_msg} \land \\ 
+\quad  \mathit{pxItem} \in \mathit{ITEM} \land \\ 
+\quad  \mathit{pxItem} \not \in \mathit{queue\_items}(\mathit{pxQueue}) \land \\
+\quad  \mathit{copy\_position} \in \mathit{COPY\_POSITION} \land \\	    
+\quad  \mathit{pxQueue} \not \in \mathit{queues\_msg\_full} \\
+\THEN \\
+\quad  \mathit{queue\_items}(\mathit{pxQueue}) := \\
+\quad\quad \quad \quad \mathit{queue\_items}(\mathit{pxQueue}) \cup \{ \mathit{pxItem}\} \parallel \\
+\quad \IF \\
+\quad \quad \mathit{queue\_receiving}(\mathit{pxQueue}) \not = \emptyset\\ 
+\quad \THEN\\
+\quad\quad \ANY \\
+\quad\quad \quad \mathit{n\_receiving},\mathit{n\_first}\\
+\quad \quad \WHERE\\
+\quad\quad\quad \mathit{n\_receiving} \in \pow( \mathit{TASK}) \land \\
+\quad\quad\quad \mathit{n\_first} \in \mathit{TASK} \land \\
+\quad\quad\quad \mathit{n\_receiving} = \\
+\quad\quad\quad\quad\quad (\mathit{queue\_receiving}(\mathit{pxQueue})-\\
+\quad\quad\quad\quad\quad\quad \{\mathit{first\_receiving}(\mathit{pxQueue})\}) \land \\
+\end{array}
+
+\begin{array}[t]{l}
+\quad\quad\quad \ldots\\
+\quad\quad\quad \mathit{n\_first} \in \mathit{n\_receiving}\\
+\quad\quad\THEN\\
+\quad\quad\quad \mathit{queue\_receiving}(\mathit{pxQueue}) := \mathit{n\_receiving}\parallel\\
+\quad\quad\quad \mathit{first\_receiving}(\mathit{pxQueue}):= \mathit{n\_first}\\
+\quad\quad\END\\
+\quad   \END \parallel\\  
+\quad  \IF\\ 
+\quad\quad \mathit{pxQueue} \in \mathit{queues\_msg\_empty}\\ 
+\quad  \THEN\\
+\quad \quad \mathit{queues\_msg\_empty} := \\
+\quad \quad \quad \quad \mathit{queues\_msg\_empty}-\{\mathit{pxQueue}\}\\
+\quad \END \parallel\\
+\quad \CHOICE\\
+\quad \quad \mathit{queues\_msg\_full}:= \mathit{queues\_msg\_full}\cup \{ \mathit{pxQueue}\}\\
+\quad \OR\\
+\quad \quad \mathit{skip}\\
+\quad \END\\
+\END;
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Nova especificação da operação $\mathit{q\_sendItem}$.}
+\label{fig:n_q_sendItem}
+\end{figure}
+
+Uma operação, um pouco mais complexa que a anterior, é a $\mathit{q\_sendItem}$, demonstrada pela figura~\ref{fig:n_q_sendItem}. Nela, os parâmetros de entrada são: $\mathit{pxQueue}$, fila que será enviada a mensagem; $\mathit{pxItem}$, mensagem que será colocada na fila; e $\mathit{copy\_position}$, posição que a mensagem será inserida na fila. Inicialmente, a mensagem passada é colocada no conjunto de mensagens da fila atravé da asserção abaixo .
+$$ \mathit{queue\_items}(\mathit{pxQueue}) := \mathit{queue\_items}(\mathit{pxQueue}) \cup \{ \mathit{pxItem}\}$$.
+
+Após isso, dentro do primeiro $\IF$ da figura~\ref{fig:n_q_sendItem}, é verificado se existem tarefas bloqueadas por leitura da fila. Caso exista, esta é retirada da fila, pois uma nova mensagem será adicionada à fila. Em seguida, no segundo $\IF$, é conferido se $\mathit{pxQueue}$ está no conjunto de fila vazia, sendo verdadeiro, ela é retirada desse conjunto. Por último, o $\CHOICE$ possibilita o fato da fila ser inserida no conjunto de filas cheias ou não. Assim, em refinamentos, se  para $\mathit{pxQueue}$ ficar cheia resta apenas um iten, ela será incluida no conjunto de filas cheias, caso contrário, não será. 
+
+Além das operações aqui demonstradas, outras responsáveis por manusear a abstração fila de tarefas são $\mathit{q\_queueDelete}$, responsável por excluir uma fila do sistema, e $\mathit{q\_receivedItem}$, que retira uma mesagem da fila de mensagens.
+
+\subsubsection{Operações do semáforo}
+
+No elemento semáforo, duas das principais operações são $\mathit{q\_createSemaphore}$, responsável por criar um novo semáforo, e $\mathit{q\_giveSemaphore}$, que preocupa-se com a liberação do semáforo ocupado por uma tarefa. Estas são demonstradas nas figuras~\ref{fig:q_createSemaphore} e~\ref{fig:q_giveSemaphore}.
+
+As especificação da operação $\mathit{q\_createSemaphore}$, figura~\ref{fig:q_createSemaphore}, é parecida com a da operação $\mathit{q\_queueCreate}$, figura~\ref{fig:n_q_queueCreate}. Nela, são passados como parâmetros a quantidade de tarefas que podem reter o semáforo, ou seja, o contador do semáforo, $\mathit{maxCount}$, e o valor inicial do contador, $\mathit{initialCount}$. Assim, essa operação pode criar tanto semáforos com contador como semáforos binários. Para este último, basta atribuir que o contador do semáforo é 1(um) e inicia-lo com zero.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{rSemaphore} \leftarrow \mathit{q\_createSemaphore}(\mathit{maxCount},\mathit{initialCount})=\\
+\PRE\\
+\quad \mathit{maxCount} \in \mathit{QUEUE\_LENGTH} \land \\
+\quad \mathit{initialCount} \in \mathit{QUEUE\_QUANT} \land \\
+\quad \mathit{initialCount}  \le mathit{maxCount}\\
+\THEN\\
+\quad \ANY\\ 
+\quad\quad \mathit{semaphore}\\
+\quad \WHERE\\
+\quad\quad \mathit{semaphore} \in \mathit{QUEUE} \land \\
+\quad\quad \mathit{semaphore} \not\in \mathit{queues}\\
+\quad \THEN\\
+\quad\quad\mathit{queues}:= \mathit{queues} \cup \{\mathit{semaphore}\} \parallel \\
+\quad\quad\mathit{queue\_receiving} := \mathit{queue\_receiving} \cup \{\mathit{semaphore} \mapsto \emptyset \} \parallel \\
+\quad\quad\mathit{queue\_sending} := \mathit{queue\_sending} \cup \{semaphore \mapsto \emptyset\}\parallel\\
+\quad\quad\mathit{semaphores}:=\mathit{semaphores} \cup \{\mathit{semaphore}\} \parallel \\
+\quad\quad\CHOICE\\
+\quad\quad\quad\mathit{semaphores\_busy}:=\mathit{semaphores\_busy}\cup \{\mathit{semaphore}\}\\
+\quad\quad\OR\\
+\quad\quad\quad\mathit{semaphores\_full}:=\mathit{semaphores\_full}\cup \{\mathit{semaphore}\}\\
+\quad\quad\OR\\
+\quad\quad\quad\mathit{skip}\\
+\quad\quad\END \parallel\\
+\quad\quad\quad\mathit{rSemaphore}:=\mathit{semaphore}\\
+\quad  \END\\
+\END;\\
+\end{array}
+$$
+\end{footnotesize}
+\caption{Operação $\mathit{q\_createSemaphore}$.}
+\label{fig:q_createSemaphore}
+\end{figure}
+  
+Ainda na figura~\ref{fig:q_createSemaphore}, o novo semáforo criado é representado por $\mathit{semaphore}$. Esse semáforo é colocado inicialmente no conjunto $\mathit{queues}$ e, em seguida, são atribuidos a ele um conjunto onde serão armazenadas as tarefas bloqueadas por tentar reter o semáforo ($\mathit{queue\_receiving} := \mathit{queue\_receiving} \cup \{\mathit{semaphore} \mapsto \emptyset \}$) e outro conjunto para as tarefas bloqueadas por tentarem liberar o semáforo ($\mathit{queue\_sending} := \mathit{queue\_sending} \cup \{semaphore \mapsto \emptyset\}$). Por último, através da substituição $\CHOICE$, o semáforo pode ser colocado como ocupado ou com o contador cheio.
+
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{q\_giveSemaphore}(\mathit{semaphore})=\\
+\PRE\\
+\quad \mathit{semaphore} \in \mathit{semaphores}\\
+\THEN\\
+\quad \CHOICE\\
+\quad\quad\IF \\
+\quad\quad\quad\mathit{semaphore} \in  \mathit{semaphores\_busy}\\
+\quad\quad\THEN\\
+\quad\quad\quad\mathit{semaphores\_busy} := \mathit{semaphores\_busy} - \{\mathit{semaphore}\}\\
+\quad\quad\END\\
+\quad \OR\\
+\quad\quad\mathit{skip}\\
+\quad \END \parallel\\
+\quad \ANY \\
+\quad\quad\mathit{n\_receiving}, \\
+\quad\quad\mathit{n\_first}\\
+\quad \WHERE\\
+\quad\quad\mathit{n\_receiving} \in \pow(\mathit{TASK}) \land \\
+\quad\quad\mathit{n\_receiving} = \mathit{queue\_receiving}(\mathit{semaphore})-\{\mathit{first\_receiving}(\mathit{semaphore})\}\land \\
+\quad\quad\mathit{n\_first} \in \mathit{TASK} \land \\
+\quad\quad\mathit{n\_first} \in \mathit{n\_receiving} \land \\
+\quad \THEN\\
+\quad\quad\mathit{queue\_receiving}(\mathit{semaphore}):=\mathit{n\_receiving} \parallel\\ 
+\quad\quad\mathit{first\_receiving}(\mathit{semaphore}):=\mathit{n\_first}\\
+\quad \END\\
+\END;\\
+\end{array}
+$$
+\end{footnotesize}
+\caption{Operação $\mathit{q\_giveSemaphore}$.}
+\label{fig:q_giveSemaphore}
+\end{figure}
+
+Na operação $\mathit{q\_giveSemaphore}$ da figura~\ref{fig:q_giveSemaphore}, o semáforo que será liberado é passado como parâmetro. Em seguida, na substituição $\CHOICE$, o semáforo pode ser retirado do conjunto de semáforos ocupados ou não, devido a possibilidade do contador do semáforo estar em zero. Por último, na substituição $\ANY$, se estiver alguma tarefa bloqueada por leitura do semáforo, ela é retirada do conjunto de tarefas bloqueadas por leitura.
+
+As demais operações relacionadas com o elemento semáforo são $\mathit{q\_deleteSemaphore}$ e $\mathit{q\_takeSemaphore}$. Elas são responsáveis por excluir um semáforo e solicitar a retenção de um semáforo, respectivamente.
+
+\subsubsection{Operações do mutex}
+
+Na máquina $\mathit{Queue}$, as operações responsáveis pela entidade mutex são $\mathit{q\_createMutex}$, $\mathit{q\_takeMutex}$ e $\mathit{q\_giveMutex}$. A $\mathit{q\_createMutex}$ cria um novo mutex no sistema. Na $\mathit{q\_takeMutex}$, um mutex é solicitado. Por último, a $\mathit{q\_giveMutex}$ libera o mutex retido.
+As operações $\mathit{q\_createMutex}$ e $\mathit{q\_takeMutex}$ são demonstradas na figuras~\ref{fig:q_createMutex} e~ref{fig:q_takeMutex}.
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{rMutex} \leftarrow \mathit{q\_createMutex} =\\
+\BEGIN\\
+\quad \ANY \\
+\quad\quad\mathit{mutex}\\
+\quad\WHERE\\
+\quad\quad\mathit{mutex}\in \mathit{QUEUE} \land \\
+\quad\quad\mathit{mutex} \not \in \mathit{queues}\\
+\quad \THEN\\
+\quad\quad\mathit{queues}:=\mathit{queues}\cup \{ \mathit{mutex} \} \parallel \\
+\quad\quad\mathit{mutexes}:= \mathit{mutexes}\cup\{\mathit{mutex}\}\parallel\\
+\quad\quad\mathit{queue\_receiving} := \mathit{queue\_receiving }\cup \{\mathit{mutex} \mapsto \emptyset \} \parallel\\
+\quad\quad\mathit{queue\_sending} := \mathit{queue\_sending}\cup \{\mathit{mutex}\mapsto \emptyset \}\parallel\\
+\quad\quad\mathit{mutex\_holder} := \mathit{mutex\_holder}\cup \{\mathit{mutex} \mapsto \mathit{TASK\_NULL}\}\parallel\\
+\quad\quad\mathit{rMutex}:=\mathit{mutex}\\
+\quad \END\\
+\END;
+\end{array}
+$$
+\end{footnotesize}
+\caption{Operação $\mathit{q\_createMutex}$.}
+\label{fig:q_createMutex}
+\end{figure}
+
+Para criar o novo mutex, a operação da figura~\ref{fig:q_createMutex} utiliza-se da substituição $\mathit{ANY}$ e da variável $\mathit{mutex}$. O detalhe dessa operação esta na asserção $\mathit{mutex\_holder} := \mathit{mutex\_holder}\cup \{\mathit{mutex} \mapsto \mathit{TASK\_NULL}\}$ que, como o mutex não está retido, é associada uma tarefa nula ao mutex, representando que nenhuma tarefa retém o mutex. Ao final, o mutex criado é retornado pelo parâmentro de saída.
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{q\_takeMutex}(\mathit{mutex},\mathit{task})=\\
+\PRE\\
+\quad \mathit{mutex} \in \mathit{mutexes} \land \\
+\quad \mathit{mutex} \not \in \mathit{mutexes\_busy} \land \\
+\quad \mathit{task}\in \mathit{TASK} \land \\
+\quad \mathit{task} \not= \mathit{TASK\_NULL}\\
+\THEN\\
+\quad \mathit{mutexes\_busy} := \mathit{mutexes\_busy} \cup \{\mathit{mutex}\}\parallel\\
+\quad \mathit{mutex\_holder}(\mathit{mutex}):=\mathit{task}\\
+\END;
+\end{array}
+$$
+\end{footnotesize}
+\caption{Operação $\mathit{q\_takeMutex}$.}
+\label{fig:q_takeMutex}
+\end{figure}
+  
+A operação $\mathit{q\_takeMutex}$ da figura~\ref{fig:q_takeMutex} é bastante simples. Ela é responsável por atribuir um mutex, $\mathit{mutex}$, à tarefa que obteve sucesso na solicitação deste, $\mathit{task}$. Para isso, ela informa que o mutex está ocupado em $\mathit{mutexes\_busy} := \mathit{mutexes\_busy} \cup \{\mathit{mutex}\}$ e depois associa a tarefa ao mutex, 
+$\mathit{mutex\_holder}(\mathit{mutex}):=\mathit{task}$. 
+
+\subsubsection{Operações de propósito geral}
+Além das operações comentadas nessa seção, a máquina $\mathit{Queue}$ possui operações de propósito geral, que também são utilizadas pelas funcionalidades do FreeRTOS. Um exemplo dessas operações pode ser visto na figura~\ref{fig:q_endScheduler}, usada pela funcionalidade \textit{vTaskEndScheduler} para reiniciar todos os estados da máquina $\mathit{Queue}$, colocando um conjunto vazio em todas as variáveis da máquina.
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{q\_endScheduler}=\\
+\BEGIN\\
+\quad \mathit{queues} := \emptyset \parallel\\
+\quad \mathit{queues\_msg} := \emptyset \parallel\\
+\quad \mathit{queues\_msg\_empty} := \emptyset \parallel\\
+\quad \mathit{queues\_msg\_full} := \emptyset \parallel\\
+\quad \mathit{queue\_items} := \emptyset \parallel\\
+\quad \mathit{queue\_receiving} := \emptyset \parallel\\
+\quad \mathit{queue\_sending} := \emptyset \parallel\\
+\quad \mathit{semaphores} := \emptyset \parallel\\
+\quad \mathit{semaphores\_busy} := \emptyset \parallel\\
+\quad \mathit{mutexes} := \emptyset \parallel\\
+\quad \mathit{mutexes\_busy} := \emptyset \parallel\\
+\quad \mathit{mutex\_holder} := \emptyset \parallel\\
+\quad \mathit{semaphores\_full} := \emptyset \parallel\\
+\quad \ldots\\
+\END;
+\end{array}
+$$
+\end{footnotesize}
+\caption{Operação $\mathit{q\_endScheduler}$.}
+\label{fig:q_endScheduler}
+\end{figure}
+
+\section{Refinamento da especificação}
+\label{sec:refinamento_modelagem}
+O refinamento dessa nova especificação foi feito de dois modos. Para continuar com a propriedade de prioridade de uma tarefa, o refinamento $\mathit{Queue\_r}$ foi adaptados para as novas alterações da máquina $\mathit{Task}$ e, para tornar esse trabalho menos abstrato, o refinamento da máquina $\mathit{Queue}$ foi feito utilizando estruturas de dados mais concretas. Desse modo, o refinamento desse trabalho pode ser divido em refinamento da máquina $\mathit{Task}$ e refinamento da máquina $\mathit{Queue}$.
+
+\subsection{Refinamento da máquina $\mathit{Task}$}
+
+Devido as alterações no conjunto da máquina $\mathit{Task}$ e a adição de novas abstrações, o refinamento da módulo $\mathit{Task}$ ficou mais complexo que o da seção~\ref{sec:ref_esp}. Ele começa relacionando todas as tarefas com uma prioridade atual e, devido ao mecanismo de herança de prioridade do mutex, também associa todas as tarefas a uma prioridade base, que será explicada no decorrer dessa seção. Assim, o novo estado do refinamento $\mathit{Task\_r}$ ficou como demonstra a figura~\ref{fig:n_task_r}.
+
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{ccc}
+\begin{array}[t]{l}
+\REFINEMENT\\
+\quad \mathit{Task\_r}\\
+\mathbf{ABSTRACT\_VARIABLES}\\
+\quad \ldots\\  
+\quad\mathit{tasks},	\\
+\quad\mathit{blocked}, \\
+\quad\mathit{runable}, \\
+\quad\mathit{suspended},\\ 
+\quad\mathit{running}, \\
+\quad\mathit{idle}, \\
+\quad\mathit{t\_priority},\\
+\quad\mathit{t\_bpriority},\\
+\end{array}
+ 
+\begin{array}[t]{l}
+\INVARIANT
+\quad\ldots\\
+\quad\mathit{t\_priority} \in \mathit{TASK} \pfun \mathit{PRIORITY} \land \\ 
+\quad\dom(\mathit{t\_priority}) = \mathit{tasks} \land \\
+\quad \mathit{t\_bpriority} \in \mathit{TASK} \pfun \mathit{PRIORITY} \land \\ 
+\quad \dom(\mathit{t\_bpriority}) = \mathit{tasks} \land \\
+\quad(\mathit{active} = \TRUE \Rightarrow\\
+\quad\quad\mathit{t\_priority}(\mathit{idle}) = \mathit{IDLE\_PRIORITY} \land \\
+\quad\quad\mathit{t\_priority}(\mathit{running}) = \max(\mathit{t\_priority}[\mathit{runable}]) \land \\
+\quad\quad\mathit{IDLE\_PRIORITY} \le \min(\mathit{t\_priority}[\mathit{tasks}])\\
+\quad )\\
+\end{array}
+\end{array}
+$$
+\end{footnotesize}
+\caption{Novo estado do refinamento $\mathit{Task\_r}$.}
+\label{fig:n_task_r}
+\end{figure}
+
+O novo invariante de $\mathit{Task\_r}$ na figura~\ref{fig:n_task_r} começa declarandos as variáveis $\mathit{tasks}$, $\mathit{blocked}$, $\mathit{runable}$, $\mathit{suspended}$, $\mathit{running}$ e $\mathit{idle}$, as quais já foram explicadas na seção~\ref{sec:simplificação}. Após isso, $\mathit{t\_priority}$ e $\mathit{t\_bpriority}$, indicam, respectivamente, as prioridades atual e a prioridade base das tarefas. A associação das tarefas do sistema à uma prioridade atual e feita pelas asserções $\mathit{t\_priority} \in \mathit{TASK} \pfun \mathit{PRIORITY}$ e $\dom(\mathit{t\_priority}) = \mathit{tasks}$, o mesmo é feito em relação a prioridade base utilizando as afirmações $\mathit{t\_bpriority} \in \mathit{TASK} \pfun \mathit{PRIORITY}$ e  $\dom(\mathit{t\_bpriority}) = \mathit{tasks}$.
+
+Com essas alterações, as operações refinadas támbem foram modificadas. Assim o antigo refinamento da operação $\mathit{t\_create}$ mostrado na figura~\ref{fig:t_create_refinament} e modificado para o da figura~\ref{fig:n_t_create_r}. Essa especificação referencia a nova tarefa como $\mathit{task}$ e adiciona ela ao conjunto $\mathit{runable}$ 
+através da variável $\mathit{n\_runable}$. Em seguida, uma prioridade atual é atribuida à tarefa por $\mathit{n\_priority}$ e a prioridade base é atribuida em  $\mathit{t\_bpriority}:= \mathit{t\_bpriority} \cup \{\mathit{task} \mapsto \mathit{priority}\}$. De início as prioridades atual e base tem os mesmos valores, o passado como argumento da operação.
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{result} \leftarrow \mathit{t\_create} (\mathit{priority}) =\\
+\BEGIN\\	
+\quad \ANY
+\quad \mathit{task},
+\quad \mathit{n\_runable}, 
+\quad \mathit{n\_priority}\\
+\quad \WHERE\\
+\quad\quad \mathit{task} \in \mathit{TASK} \land \\
+\quad\quad \mathit{task} \not \in \mathit{tasks} \land \\
+\quad\quad \mathit{n\_runable} \subset \mathit{tasks} \land \\
+\quad\quad \mathit{n\_runable} = \mathit{runable} \cup \{\mathit{task}\} \land \\
+\quad\quad \mathit{task} \not = \mathit{TASK\_NULL} \land \\
+\quad\quad \mathit{n\_priority} \in \mathit{TASK} \pfun \mathit{PRIORITY} \land \\
+\quad\quad \mathit{n\_priority} = \mathit{t\_priority} \cup \{\mathit{task} \mapsto \mathit{priority}\}
+\quad \THEN\\
+\quad\quad \mathit{tasks} := \mathit{tasks} \cup \{\mathit{task}\} \parallel\\
+\quad\quad \mathit{runable} := \mathit{n\_runable} \parallel \\
+\quad\quad \mathit{t\_priority}:= \mathit{n\_priority} \parallel\\
+\quad\quad \mathit{t\_bpriority}:= \mathit{t\_bpriority} \cup \{\mathit{task} \mapsto \mathit{priority}\}\parallel\\
+\quad\quad \IF \mathit{active} = \TRUE \THEN \\
+\quad\quad\quad \IF \mathit{priority} \ge \mathit{t\_priority}(\mathit{running}) \THEN \\
+\quad\quad\quad\quad \mathit{running}::\mathbf{schedule\_p}(\mathit{n\_runable},\mathit{n\_priority})\\ 
+\quad\quad\quad \END\\
+\quad\quad \ELSE\\
+\quad\quad\quad \IF \mathit{runable} = \emptyset \THEN\\
+\quad\quad\quad\quad \mathit{running}:=\mathit{task}\\
+\quad\quad\quad \ELSE\\
+\quad\quad\quad\quad \IF \mathit{priority} \ge \mathit{t\_priority}(\mathit{running}) \THEN\\
+\quad\quad\quad\quad \quad \mathit{running}::\mathbf{schedule\_p}(\mathit{n\_runable},\mathit{n\_priority})\\
+\quad\quad\quad\quad \END\\
+\quad\quad\quad \END\\
+\quad\quad \END \parallel\\
+\quad\quad\mathit{result} := \mathit{task}\\
+\quad\END\\
+\END;
+\end{array}
+$$
+\end{footnotesize}
+\caption{Novo refinamento da operação $\mathit{t\_create}$.}
+\label{fig:n_t_create_r}
+\end{figure}
+
+
+Ainda na operação $\mathit{t\_create}$ da figura~\ref{fig:n_t_create_r}, percebe-se a preocupação com a escolha da tarefa a entrar em execução. Assim, se a prioridade da nova tarefa for maior ou igual que a prioridade da tarefa em execução ($\mathi{priority} \ge \mathit{t\_priority}(\mathit{running})$) a troca de contexto é realizada, $\mathit{running}::\mathbf{schedule\_p}(\mathit{n\_runable},\mathit{n\_priority})$, escolhendo através da função \textit{schedule\_p} uma tarefa dentre as com a maior prioridade do conjunto $n\_runable$. Caso a tarefa criada seja a primeira tarefa do sistema ($\mathit{runable} = \emptyset$), ela assume o escalonador imediatamtente ($\mathit{running}:=\mathit{task}$).
+
+Para demonstrar o mecanismo de herança de prioridade e a utilização da $\mathit{t\_bpriority}$ a operação refinada $t\_priorityInherit$ é demonstrada. Essa operação é utilizada na especificação da funcionalidade $\mahti{xSemaphoreTake}$, responsável por solicitar um mutex. Assim, caso o mutex solicitado esteja ocupado por uma tarefa de menor prioridade, o mecanismo de herança de prioridade é acionado para igualar a prioridade da tarefa que retém o mutex à prioridade da tarefa que solicita o mutex. Ao liberar o mutex, a tarefa retorna a sua prioridade antiga e, para isso, essa prioridade deve ser armazenada na hora da troca.
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{t\_priorityInherit}(\mathit{holderTask},\mathit{xTicksToWait})=\\
+\BEGIN\\
+\quad \ANY \\
+\quad\quad \mathit{n\_runable},\\
+\quad\quad \mathit{n\_priority}\\
+\quad \WHERE\\
+\quad\quad \mathit{n\_runable} \subset \mathit{tasks} \land \\
+\quad\quad \mathit{n\_runable} = \mathit{runable}-\{\mathit{running}\} \land \\ 
+\quad\quad \mathit{n\_runable} \not= \emptyset \land \\
+\quad\quad \mathit{n\_priority} \in \mathit{TASK} \pfun \mathit{PRIORITY} \land \\ 
+\quad\quad \mathit{n\_priority} = \mathit{t\_priority} \ovr \{ \mathit{holderTask} \mapsto \mathit{t\_priority}(\mathit{running})\}\\ 
+\quad \THEN\\
+\quad\quad \mathit{runable} := \mathit{n\_runable} \parallel\\
+\quad\quad \mathit{blocked} := \mathit{blocked} \cup \{\mathit{running}\}\parallel\\
+\quad\quad \IF \mathit{t\_priority}(\mathit{running}) > \mathit{t\_priority}(\mathit{holderTask})\\
+\quad\quad \THEN\\
+\quad\quad\quad \mathit{t\_priority}:= \mathit{n\_priority} \parallel\\
+\quad\quad\quad \mathit{t\_bpriority}(\mathit{holderTask}):= \mathit{t\_priority}(\mathit{holderTask})\parallel\\
+\quad\quad\quad \mathit{running}::\mathbf{schedule\_p}(\mathit{n\_runable},\mathit{n\_priority})\\
+\quad\quad \ELSE\\
+\quad\quad\quad \mathit{running}::\mathbf{schedule\_p}(\mathit{n\_runable},\mathit{t\_priority})\\
+\quad\quad \END\\
+\quad \END\\
+\END;
+\end{array}
+$$
+\end{footnotesize}
+\caption{Refinamento da operação $\mathit{t\_priorityInherit}$.}
+\label{fig:t_priorityInherit}
+\end{figure}
+
+
+A especificação da operação da figura~\ref{fig:t_priorityInherit} inicia passando como parâmetro a tarefa que retém o mutex, $\mathit{holderTask}$. A prioridade dessa tarefa é herdada da tarefa em execução, que solicitou o mutex, através da asserções $\mathit{t\_priority} \ovr \{ \mathit{holderTask} \mapsto \mathit{t\_priority}(\mathit{running})\}$ e $\mathit{t\_priority}:= \mathit{n\_priority}$. Por fim, a real prioridade da tarefa $\mathit{holderTask}$ é armazenada utilizando a asserção $\mathit{t\_bpriority}(\mathit{holderTask}):= \mathit{t\_priority}(\mathit{holderTask})$.
+
+\subsection{Refinamento da máquina $\mathit{Queue}$}
+\label{ref:queue}
+O refinamento da máquina $\mathit{Queue}$, foi feito através de $\mathit{Queue\_r}$ e visou três objetivos: tamanho da fila de mensagens; a quantidade de mensagens que a fila possui; e mudança da especificação do conjunto de itens para uma sequência de itens. Esse refinamento foi iniciado acrescentando as variáveis $\mathit{queue\_size}$, $\mathit{queue\_quant}$ e $\mathit{queue\_items\_r}$. A primeira relaciona uma fila de mensagens a um tamanho, a segunda representa a quantidade de mensagens que a fila possui e a última refina o conjunto $\mathit{queue\_items}$ como uma sequência de mensagens. Desse modo, o invariante do refinamento ficou como demonstra a figura~\ref{fig:n_queue_r}.
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\REFINEMENT\\
+\quad \mathit{Queue\_r}\\
+\INVARIANT\\
+\ldots\\
+\quad \mathit{queue\_size} \in \mathit{QUEUE} \pfun \mathit{QUEUE\_LENGTH} \land \\
+\quad \mathit{queue\_quant} \in \mathit{QUEUE} \pfun \mathit{QUEUE\_QUANT} \land \\
+\quad \mathit{queue\_items\_r} \in \mathit{QUEUE} \pfun \mathit{iseq}(\mathit{ITEM}) \land \\
+\quad \dom(\mathit{queue\_size}) = \mathit{queues} \land \\
+\quad \dom(\mathit{queue\_quant}) = \mathit{queues} \land \\
+\quad \dom(\mathit{queue\_items\_r}) = \dom(\mathit{queue\_items}) \land \\ 
+\ldots\\
+\end{array}
+$$
+\end{footnotesize}
+\caption{Invariante do refinamento $\mathit{Queue\_r}$.}
+\label{fig:n_queue_r}
+\end{figure}
+
+Com as novas propriedades, as operações da maquina $\mathit{Queue\_r}$ tornaram-se diferentes das máquinas $\mathit{Queue}$. Um exemplo dessa alteração pode ser visto na figura~\ref{fig:q_queueCreate_r}. Nela, na criação de uma nova tarefa, são adicionadas as características de quantidade de mensagens e tamanho da fila. Outro detalhe é a relação da nova fila com uma sequência de itens ($\mathit{queue\_items\_r} := \mathit{queue\_items\_r} \cup \{ \mathit{pxQueue} \mapsto \emptyset \}$), diferente do conjunto de itens da figura~\ref{fig:n_q_queueCreate}.
+
+
+
+\begin{figure}[!ht]
+\begin{footnotesize}
+$$
+\begin{array}[t]{l}
+\mathit{xQueueHandle} \leftarrow \mathit{q\_queueCreate}(\mathit{uxQueueLength}, \mathit{uxItemSize}) =\\
+\BEGIN   \\
+\quad \ANY \\
+\quad \quad \mathit{pxQueue}\\
+\quad \WHERE\\
+\quad \quad \mathit{pxQueue} \in \mathit{QUEUE} \land \\ 
+\quad \quad \mathit{pxQueue} \not \in \mathit{queues}\\
+\quad \THEN	\\
+\quad \quad \mathit{queues} := \mathit{queues} \cup \{ \mathit{pxQueue}\}\parallel\\
+\quad \quad \mathit{queues\_msg}:= \mathit{queues\_msg} \cup \{ \mathit{pxQueue}\}\parallel\\
+\quad \quad \mathit{queue\_items\_r} := \mathit{queue\_items\_r} \cup \{ \mathit{pxQueue} \mapsto \emptyset \} \parallel\\
+\quad\quad\mathit{queue\_size}:= \mathit{queue\_size} \cup \{\mathit{pxQueue} \mapsto \mathit{uxQueueLength}\}\parallel\\
+\quad\quad\mathit{queue\_receiving} := \mathit{queue\_receiving} \cup \{ \mathit{pxQueue} \mapsto \emptyset\} \parallel\\
+\quad\quad\mathit{queue\_sending} := \mathit{queue\_sending} \cup \{ \mathit{pxQueue} \mapsto \emptyset \} \parallel \\
+\quad\quad\mathit{queue\_quant}:=\mathit{queue\_quant}\cup \{ \mathit{pxQueue} \mapsto 0 \} \parallel \\
+\quad\quad\mathit{queues\_msg\_empty}:=\mathit{queues\_msg\_empty} \cup \{ \mathit{pxQueue}\}\parallel\\
+\quad\quad\mathit{xQueueHandle}:=\mathit{pxQueue}\parallel\\
+\quad\quad \ldots\\
+\quad \END\\		    
+\END;
+\end{array}
+$$
+\end{footnotesize}
+\caption{Refinamento da operação $\mathit{q\_queueCreate}$.}
+\label{fig:q_queueCreate_r}
+\end{figure}
+
+  
+  

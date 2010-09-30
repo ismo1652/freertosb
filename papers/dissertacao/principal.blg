@@ -1,0 +1,86 @@
+This is BibTeX, Version 0.99c (Web2C 7.5.6)
+The top-level auxiliary file: principal.aux
+The style file: abnt-num.bst.bst
+A level-1 auxiliary file: rosto.aux
+A level-1 auxiliary file: catalograficos.aux
+A level-1 auxiliary file: preambulo.aux
+A level-1 auxiliary file: resumos.aux
+A level-1 auxiliary file: introducao/introducao.aux
+A level-1 auxiliary file: trabalhos/trabalhos.aux
+A level-1 auxiliary file: freertos/freertos.aux
+A level-1 auxiliary file: metodob/metodob.aux
+A level-1 auxiliary file: escopo/escopo.aux
+A level-1 auxiliary file: modelagem_inicial/modelagem_inicial.aux
+A level-1 auxiliary file: modelagem_atual/modelagem_atual.aux
+A level-1 auxiliary file: consideracoes_finais/consideracoes_finais.aux
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Database file #1: bibliografia.bib
+Repeated entry---line 319 of file bibliografia.bib
+ : @misc{vcc
+ :          ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 325 of file bibliografia.bib
+ : @misc{framac
+ :             ,
+I'm skipping whatever remains of this entry
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Too many commas in name 1 of "{Markus Dahlweid},{Michael Moskal},{Thomas Santen},{Stephan Tobies}" for entry vcc
+while executing---line 2129 of file abnt-num.bst.bst
+Too many commas in name 1 of "{Markus Dahlweid},{Michael Moskal},{Thomas Santen},{Stephan Tobies}" for entry vcc
+while executing---line 2129 of file abnt-num.bst.bst
+Too many commas in name 1 of "{Markus Dahlweid},{Michael Moskal},{Thomas Santen},{Stephan Tobies}" for entry vcc
+while executing---line 2129 of file abnt-num.bst.bst
+Too many commas in name 1 of "{Markus Dahlweid},{Michael Moskal},{Thomas Santen},{Stephan Tobies}" for entry vcc
+while executing---line 2129 of file abnt-num.bst.bst
+Too many commas in name 1 of "{Markus Dahlweid},{Michael Moskal},{Thomas Santen},{Stephan Tobies}" for entry vcc
+while executing---line 2129 of file abnt-num.bst.bst
+Too many commas in name 1 of "{Markus Dahlweid},{Michael Moskal},{Thomas Santen},{Stephan Tobies}" for entry vcc
+while executing---line 2184 of file abnt-num.bst.bst
++---------------------------------------------------------+
+| Estilo bibliografico abnt-num.bst versao 1.50           |
+| Implementa a NBR6023, NBR10520 e NBR10523               |
+| Em caso de duvidas ou problemas com este estilo procure |
+| http://abntex.codigolivre.org.br                        |
++---------------------------------------------------------+
+You've used 35 entries,
+            6522 wiz_defined-function locations,
+            1360 strings with 14282 characters,
+and the built_in function-call counts, 25907 in all, are:
+= -- 2032
+> -- 787
+< -- 32
++ -- 343
+- -- 239
+* -- 1752
+:= -- 3363
+add.period$ -- 142
+call.type$ -- 35
+change.case$ -- 338
+chr.to.int$ -- 66
+cite$ -- 35
+duplicate$ -- 1313
+empty$ -- 2242
+format.name$ -- 1244
+if$ -- 6310
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 626
+newline$ -- 160
+num.names$ -- 142
+pop$ -- 876
+preamble$ -- 1
+purify$ -- 132
+quote$ -- 0
+skip$ -- 1473
+stack$ -- 1
+substring$ -- 903
+swap$ -- 613
+text.length$ -- 21
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 14
+warning$ -- 0
+while$ -- 204
+width$ -- 0
+write$ -- 466
+(There were 8 error messages)

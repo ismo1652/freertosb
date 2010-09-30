@@ -1,0 +1,978 @@
+\mychapter{FreeRTOS}\label{cap:freertos}
+
+O FreeRTOS é um \textit{microkernel} sistema de tempo real enxuto, simples e de
+fácil uso. O seu código fonte, em \textit{C} com partes em
+\textit{assembly}, é aberto e possui um pouco mais de 2.200 linhas de código, que
+são essencialmente distribuídas em quatro arquivos: \textit{task.c},
+\textit{queue.c}, \textit{croutine.c} e \textit{list.c}. Outra característica
+marcante desse sistema está na sua portabilidade, sendo o mesmo oficialmente
+portável para 17 arquiteturas mono-processadores diferentes, entre elas a PIC,
+ARM e Zilog Z80, as quais são amplamente difundidas em produtos comerciais
+através de sistemas computacionais embutidos \cite{Barry09}.
+
+Como a maioria dos \textit{microkernel} atuais, o FreeRTOS provê, para os seus
+usuários, acesso facilitado aos recursos de \textit{hardware}, agilizando com
+isso o desenvolvimento de sistemas de tempo real. Desse modo, ele funciona como
+na figura \ref{fig:rtos}, uma camada de abstração, localizada entre a
+aplicação e o hardware, que tem o papel de esconder dos desenvolvedores de
+aplicações detalhes do hardware, no qual as aplicações serão utilizadas\cite{Kalinsky03}.
+
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.5]{figuras/rtos_pt.jpg}
+\caption{Camada abstrata proporcionada pelo FreeRTOS.}
+%\cite{Kalinsky03}
+\label{fig:rtos}
+\end{figure}
+
+Para prover tal abstração, o FreeRTOS possui um conjunto de bibliotecas de tipos
+e funções que devem ser linkeditadas\footnote{Processo que liga o código da
+aplicação ao código das funcionalidades de outras bibliotecas utilizada por ela.}
+com o código da aplicação a ser desenvolvida. Juntas, essas bibliotecas fornecem
+aos desenvolvedores serviços como gerenciamento de tarefa, comunicação e
+sincronização entre tarefas, gerenciamento de memória e controle dos dispositivos
+de entrada e saída\cite{Barry09}.
+
+Devido a sua portabilidade e ao fato de ser usado em ambientes com limitações de
+hardware, o FreeRTOS pode ser pré-configurado antes da sua execução. Essa
+configuração é feita por uma biblioteca de configuração, que, através de
+atributos, armazena as definições de configuração do usuário. Com isso, as aplicações
+desenvolvidas com o FreeRTOS podem ser mais enxutas e moldadas, provendo uma
+melhor utilização dos recursos de hardware.
+
+Nas seções a seguir, será explicado, em maiores detalhes, os principais serviços
+providos pelo FreeRTOS, assim como as bibliotecas e funções que os
+disponibilizam.
+
+
+\section{Gerenciamento de Tarefas e Co-Rotinas}
+
+Sabe-se que uma aplicação é formada por várias rotinas, responsáveis por realizar as funcionalidades da aplicação. No FreeRTOS, as unidades responsáveis por abrigar essas rotinas são as tarefas e co-rotinas. Nessa seção será demonstrado como esses elementos funcionam, suas diferenças e unidade de gerenciamento. Ao final, as funcionalidades responsáveis pelo controle dessas abstrações serão listadas.
+
+\subsection{Tarefa}
+\label{sec:tarefa}
+
+Para entender como funciona o gerenciamento de tarefas do FreeRTOS, é necessário
+primeiramente entender o conceito de tarefa. Tarefa é uma unidade básica de
+execução que compõe os sistemas, os quais, para realizar suas atividades,
+geralmente possuem várias tarefas com diferentes obrigações\cite{Barry09}. Para o
+FreeRTOS, as principais características de uma tarefa são:
+
+\begin{description}
+  \item{\textbf{Estado}}: Demonstra a atual situação da tarefa;
+  \item{\textbf{Prioridade}}: Indica a importância da tarefa para o sistema. Uma
+  prioridade varia de zero até uma constante máxima pré configurada pelo
+  projetista;
+  \item{\textbf{Pilha de execução}}: Local onde uma tarefa armazena informações
+  necessárias para a sua execução;
+  \item{\textbf{Contexto próprio}}: Capacidade de uma tarefa armazenar o
+  ambiente de execução quando suas atividades são suspensas; e
+  \item{\textbf{Tempo de bloqueio}}: Tempo que uma tarefa pode permanecer
+  bloqueada a espera de algum evento.
+\end{description}
+
+Em um sistema, uma tarefa pode assumir vários estados, que variam de acordo com
+a sua situação. O FreeRTOS disponibiliza quatro tipos de estados
+diferentes para uma tarefa, sendo eles:
+
+\begin{description}
+  \item{ \textbf{Em execução}:} Indica que a tarefa está em execução;
+  \item{ \textbf{Ponta}:} Indica que a tarefa está pronta para entrar em
+  execução, mas não está sendo executada;
+  \item{ \textbf{Bloqueada}:} Indica que a tarefa está esperando por algum
+  evento para continuar a sua execução; e
+  \item{ \textbf{Suspensa}:} Indica que a tarefa foi suspensa pelo gerenciador
+  de tarefas através da chamada de uma funcionalidade usada para controlar as
+  tarefas.
+\end{description}
+
+No FreeRTOS, uma tarefa só possui um estado em um determinado instante. Assim,
+as alterações de estado de uma tarefa funcionam como demonstra o diagrama da
+figura~\ref{fig:task_states}. Nela, uma tarefa com o estado em execução pode
+assumir os estados pronta, bloqueada ou suspensa. Uma tarefa com o estado pronta
+pode ser suspensa ou entrar em execução, e as tarefas com o estado bloqueada ou
+suspensa só podem ir para o estado pronta.
+
+Um fator preocupante, observado nas possíveis troca de estados de uma tarefa,
+ocorre quando uma tarefa bloqueada é suspensa e, logo em seguida, reativada. Assim
+o tempo de bloqueio de uma tarefa pode ser ``enganado'' e a tarefa pode retornar
+antes do tempo indicado para o desbloqueio.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.6]{figuras/task_states_pt.jpg}
+\caption{Diagrama de estados de uma tarefa no FreeRTOS.}
+%\cite{Barry09}
+\label{fig:task_states}
+\end{figure}
+
+Por fim, vale enfatizar que, por tratar-se de um sistema operacional para
+arquiteturas mono-processadores, o FreeRTOS não permite que mais de uma tarefa
+seja executada ao mesmo tempo. Assim, em um determinado instante, apenas uma das
+tarefas com estado pronta pode assumir o processador e entrar no estado em
+execução. Com isso, para decidir qual tarefa entrará em execução, o FreeRTOS
+possui um mecanismo denominado escalonador, o qual será detalhado na
+seção~\ref{sec:escalonador}.
+
+
+\subsubsection{Tarefa Ociosa}
+\label{subsubsection:tarefa_ociosa}
+
+No FreeRTOS existe uma tarefa especial, denominada Tarefa Ociosa, que é
+executada, como o nome sugere, quando o processador encontra-se ocioso,
+ou seja, quando nenhuma tarefa estiver em execução. Essa tarefa tem como
+principal funcionalidade liberar área de memórias que não estão sendo mais
+utilizadas pelo sistema. Por exemplo, quando uma aplicação cria uma nova tarefa,
+uma área da memória é reservada a ela. Em seguida, quando essa tarefa é
+excluída do sistema, a memória destinada a ela continua ocupada, sendo esta liberada
+somente quando a tarefa ociosa entra em execução. A tarefa ociosa deve possuir
+prioridade menor que as demais tarefas do sistema e, por isso, ela só é executada
+quando nenhuma tarefa estiver em execução.
+
+
+\subsection{Co-rotinas}
+\label{sec:corotinas}
+Outro conceito importante suportado pelo FreeRTOS é o conceito de Co-rotinas, 
+assim como as tarefas, são unidades de execução independentes que
+formam uma aplicação. Elas também são formadas por uma prioridade e um estado
+responsáveis, respectivamente, pela importância da co-rotina no sistema e pela
+situação da mesma. Para o FreeRTOS, o suporte às co-rotinas é opcional e
+pré-configurável antes da execução, em tempo de compilação \cite{Barry09}.
+
+Uma diferença crucial entre co-rotinas e tarefas está no contexto do
+ambiente de execução. Co-rotinas não possuem contexto de execução próprio.
+Consequentemente, sua pilha de execução é compartilhada com as demais Co-rotinas
+do sistema, diferente das tarefas, que possuem uma pilha própria para o
+armazenamento do seu contexto de execução.
+
+Devido ao fato de co-rotinas compartilharem a mesma pilha de execução, a
+utilização dessa entidade deve ser feita de forma cuidadosa, pois uma informação
+armazenada por uma co-rotina pode ser alterada por outra. 
+%Por exemplo, a
+%co-rotina \textit{A} armazena na pilha de execução o valor dois, outra co-rotina,
+%ao entrar em execução, altera o valor armazenado pela co-rotina \textit{A}.
+%Assim, quando a co-rotina \textit{A} for ler novamente o valor armazenado, este
+%poderá não ser mais dois.
+
+Os estados possíveis para uma co-rotina são:
+
+\begin{description}
+  \item{\textbf{Em execução}:} Indica que uma co-rotina está em execução;
+  \item{\textbf{Pronta}:} Indica que uma co-rotina está pronta para ser
+  executada, mas não está em execução; e
+  \item{\textbf{Bloqueada}:} Indica que a co-rotina está bloqueada esperando por
+  algum evento para continuar a sua execução. 
+\end{description}
+
+Como as tarefas, co-rotinas possuem somente um estado em um determinado instante.
+Assim, as transições entre os estados de uma co-rotina ocorrem como demonstra a
+figura~\ref{fig:croutine_states}. Nessa, uma co-rotina em execução pode ir tanto
+para o estado pronta como para o estado bloqueada. Uma co-rotina de estado
+bloqueada só pode ir para o estado pronta e uma co-rotina de estado pronta só
+pode ir para o estado em execução.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.6]{figuras/croutine_states_pt.jpg}
+\caption{Grafo de estados de uma co-rotina.}
+% \cite{Barry09}
+\label{fig:croutine_states}
+\end{figure}
+
+Assim como nas tarefas, a decisão de qual co-rotina irá entrar em execução é
+feita pelo escalonador, através da chamada a uma funcionalidade específica, esse
+processo será melhor explicado na seção a seguir.
+
+
+\subsection{Escalonador de Tarefas}
+\label{sec:escalonador}
+
+O escalonador é a parte mais importante de um sistema. Ele é responsável por escolher qual
+unidade de execução\footnote{Aqui o termo ``unidade de execução'', as vezes
+citado apenas como unidade, refere-se a todas as tarefas(seção~\ref{sec:tarefa})
+e co-rotinas (seção~\ref{sec:corotinas}) do sistema} irá entrar execução. Além
+disso, é ele que faz a troca entre a unidade em execução e a nova unidade que irá
+entrar em execução. No FreeRTOS, o escalonador pode funcionar de três modos
+diferentes, configuráveis em tempo de compilação:
+
+\begin{itemize}
+  \item \textbf{Preemptivo}: Quando o escalonador interrompe a unidade em
+  execução, alterando assim o seu estado, e ocupa o processador com outra
+  unidade;
+  \item \textbf{Cooperativo}: Quando o escalonador não tem permissão de
+  interromper a unidade em execução. Assim, a interrupção da execução da unidade
+  em processamento e a chamada ao escalonador para decidir quem irá entrar em
+  execução devem ser implementadas pelo projetista; e
+  \item \textbf{Híbrido}:  Quando o escalonador pode comportar-se tanto como
+  preemptivo como cooperativo.
+\end{itemize}
+
+Para as tarefas, o escalonador funciona de forma preemptiva, sendo que a decisão
+de qual tarefa deve entrar em execução é baseada na prioridade e adota a seguinte
+política: a tarefa em execução deve ter prioridade maior ou igual as tarefas de
+maior prioridade de estado pronta. Assim, sempre que uma tarefa, com prioridade
+maior que a tarefa em execução, entrar no estado pronta, ela deve imediatamente
+entrar em execução. Um exemplo claro da política preemptiva pode ser visto na
+figura \ref{fig:scheduler}, onde três tarefas, em ordem crescente de prioridade,
+disputam a execução do processador.
+
+%SG->DD
+%Queria adcionar o texto é figura. é melhor que fazer isso pelo latex ou fazer
+% quando for criar uma figura em portugu?s
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=1.1]{figuras/scheduler_pt.jpg}
+\small{
+\begin{enumerate}
+  \item Tarefa 1 entra no estado pronta, como não há nenhuma tarefa em execução
+  esta assume controle do processador entrando em execução.
+  \item Tarefa 2 entra no estado pronta, como esta tem prioridade maior do que
+  a tarefa 1  ela entra em execução passando a tarefa 1 para o estado pronta.
+  \item Tarefa 3 entra no estado pronta, como está tem prioridade maior do que
+  a tarefa 2  ela entra em execução passando a tarefa 2 para o estado pronta.
+  \item Tarefa 3 encerra a sua execução, sendo a tarefa 2 escolhida para entrar
+  em execução por ser a tarefa de maior prioridade no estado pronta.
+  \item Tarefa 2 encerra a sua execução e o funcionamento do escalonador é
+  passado para a tarefa 1.
+\end{enumerate}
+}
+
+
+
+\caption{Funcionamento de um escalonador preemptivo baseado na prioridade
+\cite{Li03}}
+\label{fig:scheduler}
+\end{figure}
+
+Um fato a adicionar sobre a política de funcionamento do escalonador é que,
+quando duas ou mais tarefas de estado pronta tiverem prioridades iguais e maiores
+que as demais tarefas do mesmo estado, o tempo de execução será divido entre
+essas tarefas. Assim, ao possuir duas tarefas de prioridades máximas e estado
+pronta, essas tarefas irão alternadamente ser executadas pelo processador.
+
+Para as co-rotinas, o escalonador funciona de forma cooperativa e baseada na
+prioridade. Assim, a co-rotina em execução é quem decide o momento da sua
+interrupção e, em seguida, o sistema deve chamar o escalonador através de uma
+funcionalidade específica para decidir qual será a próxima co-rotina que irá
+entrar em execução. A escolha da próxima co-rotina a ser executada também é
+baseada na maior prioridade, assim como ocorre com as tarefas. Um exemplo do
+funcionamento do escalonador pode ser visto na
+seção~\ref{subsec:corotina_utilizacao}.
+
+
+\subsection{Bibliotecas}
+\label{subsection:api_tarefas_corotinas}
+
+Para disponibilizar as características discutidas nesta seção, o FreeRTOS contém uma biblioteca de tipos e funções organizada da  seguinte forma: criação de tarefas, controle de tarefas, utilidades de tarefas, controle do kernel e co-rotinas. A seguir, tem-se em detalhes a descrição de cada uma dessas bibliotecas junto com os tipos e funcionalidades que as compõem.
+
+\subsubsection{Criação de Tarefas}
+\label{sec:criacao_tarefa_api}
+
+Essa parte é responsável pela entidade tarefa e sua criação. Nela, estão
+presentes um tipo, responsável por representar uma tarefa do sistema, e duas
+funcionalidades, uma para a criação e outra para a remoção de tarefas do sistema.
+Em seguida, tem-se o tipo e as funcionalidades que compõem a biblioteca em
+questão.
+
+
+\begin{itemize}
+  \item \textbf{xTaskCreate}: Cria uma nova tarefa para o sistema.
+  \item \textbf{vTaskDelete}: Remove uma tarefa do sistema\footnote{A memória alocada pela tarefa será liberada somente
+  quando a tarefa ociosa entrar em
+  execução(seção~\ref{subsubsection:tarefa_ociosa})}.
+  \item \textbf{xTaskHandle}: Tipo pelo qual uma tarefa e referenciada. Por
+  exemplo, quando uma tarefa é criada através do método \textit{xTaskCreate},
+  este retorna uma referência para nova tarefa através do tipo
+  \textit{xTaskHandle}.
+\end{itemize}
+
+\subsubsection{Controle de tarefas}
+\label{sec:controle_tarefa_api}
+A biblioteca de controle de tarefas realiza operações sobre as tarefas do
+sistema. Ela disponibiliza funcionalidades capazes de bloquear, suspender,
+reativar uma tarefa do sistema, informar e alterar a prioridade de uma tarefa no
+sistema. A lista das principais funcionalidades presentes nessa biblioteca pode
+ser vista a seguir:
+
+\begin{itemize}
+  \item \textbf{vTaskDelay}: Bloqueia uma tarefa por um determinado tempo. Nessa funcionalidade, para calcular o tempo que a tarefa deve permanecer bloqueada, será levado em consideração o instante da chamada à funcionalidade. Devido a isso, essa funcionalidade não é recomendada para a criação de tarefas cíclicas, pois o instante em que ela é chamada pode variar a cada execução da tarefa, por causa das interrupções que uma tarefa pode sofrer.
+  \item \textbf{vTaskDelayUntil}: Bloqueia uma tarefa por um determinado tempo. Essa funcionalidade, diferente da \textit{vTaskDelay}, calcula o tempo que a tarefa deve permanecer bloqueada com base no instante do último desbloqueio da tarefa. Assim, se ocorrer uma interrupção no momento da chamada é funcionalidade, o instante que a tarefa foi desbloqueada não ira mudar. Com isso, esse método torna-se recomendável para a criação de tarefas cíclicas. 
+  \item \textbf{uxTaskPriorityGet}: Informa a prioridade de uma determinada tarefa.
+  \item \textbf{vTaskPrioritySet}: Muda a prioridade de uma determinada tarefa.
+  \item \textbf{vTaskSuspend}: Coloca uma determinda tarefa no estado suspensa.
+  \item \textbf{vTaskResume}: Coloca uma determinada tarefa suspensa no estado pronta.
+  \item \textbf{xTaskResumeFromISR} - Funcionalidade usada pelo tratamento de interrupções do sistema. Ela coloca uma determinada tarefa suspensa para o estado pronta (usada no tratamento de interrupções).
+\end{itemize}
+
+\subsubsection{Utilitários de tarefas}
+\label{sec:utilitarios_tarefa_api}
+Através dessa parte, o FreeRTOS disponibiliza, para o usuário, informações
+importantes a respeito das tarefas e do escalonador de tarefas. Nela, estão
+presentes funcionalidades capazes de retornar uma referência para a atual tarefa
+em execução, retornar o tempo de funcionamento e o estado do escalonador e
+retornar o número de tarefas que estão sendo gerenciadas pelo sistema. Uma lista
+das principais funcionalidades dessa biblioteca é encontrada a seguir:
+
+\begin{itemize}
+  \item \textbf{xTaskGetCurrentTaskHandle}: Retorna uma referência para a atual tarefa em execução.
+  \item \textbf{uxTaskGetStackHighWaterMark}: Retorna a quantidade de espaço restante na pilha de uma tarefa.
+  \item \textbf{xTaskGetTickCount}: Retorna o tempo decorrido desde a inicialização do escalonador.
+  \item \textbf{xTaskGetSchedulerState}: Retorna o estado do escalonador.
+  \item \textbf{uxTaskGetNumberOfTasks}: Retorna o número de
+  tarefas do sistema.
+  \item \textbf{TaskCallApplicationTaskHook}:Chama a função gancho, função associado para preceder a execução de uma tarefa, de uma determinada tarefa.
+  \item \textbf{TaskSetApplicationTag}: Associa uma
+  'tag' a uma tarefa. Essa tag será utilizada principalmente pelas
+  funcionalidades de rastreamento do sistema. Entretanto, é possível usar essa
+  'tag' para associar uma função gancho a uma tarefa. Essa função é executada
+  através da chamada é funcionalidade \textit{TaskCallApplicationTaskHook},
+  informando a tarefa associada.
+\end{itemize}
+
+\subsubsection{Controle do Escalonador}
+\label{sec:controle_escalonador_api}
+Nessa biblioteca estão presentes as funcionalidades responsáveis por controlar
+as atividades do escalonador de tarefas. Nela, encontram-se as funcionalidades
+que iniciam, finalizam, suspendem e reativam as atividades do escalonador. As
+principais funcionalidades presente nessa biblioteca são:
+
+\begin{itemize}
+\item \textbf{vTaskStartScheduler}: Inicia as atividades do escalonador, ou seja, inicializa o sistema.
+\item \textbf{vTaskEndScheduler}: Encerra as atividades do escalonador, ou seja, finaliza o sistema.
+\item \textbf{vTaskSuspendAll}: Suspende as atividades do escalonador.
+\item \textbf{xTaskResumeAll}: Reativa o escalonador quando o mesmo está suspenso.
+\item \textbf{taskYIELD}: Força a troca de contexto\footnote{Troca de contexto é a operação na qual a tarefa em execução é trocada por outra. Para que a troca de contexto sejá realizada, deve existir uma
+tarefa de prioridade igual é da tarefa em execução} entre tarefas.
+\item \textbf{taskENTER\_CRITICAL}: Indica o início de uma região crítica, desabilita temporariamente a característica de preempção
+do escalonador impedindo que a tarefa em execução seja interrompida por outra.
+\item \textbf{taskEXIT\_CRITICAL}: Indica o final de
+uma região crítica, permitindo que ocorrá novamente o escalonamento preemptivo.
+\item \textbf{taskDISABLE\_INTERRUPTS}: Desabilita as
+interrupções do microcontrolador.
+\item \textbf{taskENABLE\_INTERRUPTS}: Habilita as
+interrupções do microcontrolador.
+\end{itemize}
+
+\subsubsection{Co-rotina}
+\label{sec:corotina_api}
+A última biblioteca do serviço de gerenciamento de tarefa e co-rotina é a
+biblioteca co-rotina. Nela, estão presentes as funcionalidades e tipos
+responsáveis por criar e gerenciar o elemento co-rotina. A lista completa das
+funcionalidades presentes nessa biblioteca pode ser vista a seguir:
+
+\begin{itemize}
+\item \textbf{xCoRoutineHandle}: Tipo responsável por representar uma co-rotina.
+\item \textbf{xCoRoutineCreate}: Cria uma nova co-rotina no sistema.
+\item \textbf{crDELAY}: Bloquea uma co-rotina durante uma determinada quantidade de tempo.
+\item \textbf{crQUEUE\_SEND}: Envia uma mensagem para uma fila através de uma co-rotina.
+\item \textbf{crQUEUE\_RECEIVE}: Recebe uma mensagem de uma fila através de uma co-rotina.
+\item \textbf{crQUEUE\_SEND\_FROM\_ISR}: Envia uma mensagem para uma fila, através de uma co-rotina responsável por tratar uma interrupção.
+\item \textbf{crQUEUE\_RECEIVE\_FROM\_ISR}: Recebe uma mensagem de uma fila, através de uma co-rotina responsável por tratar uma interrupção.
+\item \textbf{vCoRoutineSchedule}: Chama o escalonador para escolher e colocar em execução a co-rotina de maior prioridade entre as co-rotinas de estado pronto.
+
+\end{itemize}
+
+\section{Comunicação e sincronização entre tarefas}
+Frequentemente tarefas necessitam comunicar entre si. Por exemplo, a tarefa
+\textit{A} depende da leitura do teclado, feita pela tarefa \textit{B}, para
+disponibilizar em uma tela as teclas digitadas pelo usuário. Para que essa
+comunicação possa ser estruturada e sem interrupções, os sistemas operacionais
+possuem mecanismos específicos de comunicações.
+
+A maioria dos sistemas operacionais oferece vários tipos de comunicação entre as
+tarefas. Geralmente esses tipos são: tarefas trocando informações entre si;
+tarefas utilizando, de forma sincronizada, o mesmo recurso; tarefas dependentes
+dos resultados produzidos por outras.
+
+No FreeRTOS, como nos demais sistemas operacionais, os mecanismos responsáveis
+por realizar a comunicação entre as tarefas são as filas de mensagens, os
+semáforos e o mutexes (\textit{Mutal Exclusion}). Para entender melhor como
+funciona essa comunicação, cada um desses mecanismos será detalhado a seguir.
+
+\subsection{Fila de Mensagens}
+\label{sec:fila}
+
+Filas de mensagens são estruturas primitivas de comunicação entre tarefas. Elas
+funcionam como um túnel, através do qual tarefas enviam e recebem mensagem
+(figura~\ref{fig:fila_de_mensagens}). Assim, quando uma tarefa necessita
+comunicar-se com outra, ela envia uma mensagem para o túnel para que a outra
+tarefa possa ler sua mensagem \cite{Li03}.
+ 
+
+\begin{figure}[!h] \centering \includegraphics[scale=0.9]{figuras/queue_pt.jpg}
+\caption{Funcionamento de uma fila de mensagens.}
+\label{fig:fila_de_mensagens}
+\end{figure} 
+ 
+ 
+No FreeRTOS, uma fila de mensagens é formada por: 
+
+\begin{itemize}
+  \item A lista das mensagens na fila;
+  \item A lista de tarefas que aguardam para enviar uma mensagem para a fila;
+  \item A lista de tarefas que aguardam pela chegada de uma mensagem na fila;
+  \item Uma variável que indica o tamanho das mensagens da fila; e
+  \item Uma variável responsável por indicar o tamanho máximo da fila, quantidade de
+  mensagens que podem ser armazenadas pela fila. 
+\end{itemize}
+
+O funcionamento de uma fila de mensagens no FreeRTOS ocorre da seguinte forma.
+Primeiro a tarefa remetente envia uma mensagem para a fila e, em seguida, a
+tarefa receptora retira a mensagem da fila. Entretanto, se, no momento do envio
+da mensagem, a fila estiver cheia a tarefa remetente é bloqueada e colocada na
+lista de tarefas que aguardam para enviar uma mensagem para a fila. O mesmo
+ocorre quando a tarefa receptora tenta receber uma mensagem de uma fila vazia.
+
+A retirada de uma tarefa das listas de espera de uma fila é feita levando em
+consideração a prioridade das tarefas da lista. Assim, quando uma mensagem é
+retirada de uma fila cheia, a lista de tarefas que aguardam para enviar uma
+mensagem para a fila é percorrida e a tarefa de maior prioridade é retirada da
+fila, sendo consequentemente desbloqueada. Fato parecido ocorre com a fila
+de tarefas bloqueadas em leitura quando uma mensagem chega a uma fila vazia.
+
+No momento de enviar uma mensagem para uma fila, uma tarefa pode especificar o
+tempo máximo que ela deve permanecer bloqueada, aguardando para enviar a
+mensagem. Assim como, ao solicitar uma mensagem para a fila, uma tarefa também
+pode definir o tempo máximo que ela pode ficar bloqueada, esperando pela chegada
+de uma mensagem na fila. As funcionalidades que tornam possível essas
+características seráo demonstradas na seção~\ref{sec:gerenciamento_fila_api}.
+
+
+ 
+%Uma lista de tamanho fixo que armazena as mensagens, também de tamanhos fixos,
+%enviadas para a lista. Assim, quando uma mensagem é envida para uma fila, uma
+%cópia dessa mensagem é armazenada na lista para que posteriormente a outra
+%tarefa possa ler a mensagem. Entretanto, contrária a copiar toda mensagem para
+%a lista de mensagens, existe também a possibilidade de armazenar-se apenas uma
+%referência da mensagem na lista, economizando assim a memória do sistema.
+%Contudo, a técnica de armazenar apenas a referência da mensagen na lista torna
+%mais complicado um trabalho do projetista, pois deste modo o acesso é mensagem
+%na fila será compartilhado entre as tarefas interessadas, necessitando com
+%isso de uma estrutura para sincronização o acesso da mensagem pelas tarefas.
+%Na maioria das aplicações os projetistas utilizam a troca de mensagens
+%através de cópia.
+
+%Além da lista de mensagens, uma fila de mensagens é composta por mais duas
+%lista, uma para armazenar as tarefas que estão aguardando enviar uma mensagens
+%para a fila e outra para armazenar as tarefas que estão aguardando receber uma
+%mensagem da fila. Assim, quando uma tarefa tenta enviar uma mensagem para uma
+%fila cheia, a tarefa é bloqueada e colocada na lista de tarefa que aguardam
+%para enviar uma mensagem para fila até que um lugar na fila seja liberado. O
+%mesmo acontece quando uma tarefa tenta ler uma mensagem de uma fila vazia,
+%neste caso, a tarefa vai para a lista de tarefas aguardando por uma mensagem
+%da fila.
+
+%No FreeRTOS, é possóveis definir o tempo máximo que uma tarefa pode ficará
+%bloqueada esperado por uma fila (liberação de espaço ou chega de mensagem). E
+%quando existirem mais de uma tarefa bloqueadas aguardando por um evento de uma
+%fila, as tarefas de maior prioridade têm preferência sobre as demais.
+
+\subsection{Semáforo}
+\label{sec:semaforo}
+
+Os semáforos são mecanismos usados para realizar a sincronização entre tarefas.
+Eles funcionam como uma chave de pré-condição para uma tarefa executar uma
+operação sincronizada ou acessar um recurso compartilhado. Assim, antes de
+executar tal ação, a tarefa deve solicitar o semáforo responsável pela guarda da
+ação. Caso o semáforo esteja disponível, a tarefa realiza a ação, caso contrário,
+a tarefa é bloqueada até que o semáforo seja liberado.
+
+O FreeRTOS disponibiliza dois tipos de semáforos para o usuário, o semáforo
+binário e o semáforo com contador. A diferença entre esses dois tipos de semáforo
+está no número de tarefas que podem reter o semáforo ao mesmo tempo. No semáforo
+binário é possível apenas uma tarefa manter o semáforo. Entretanto, no semáforo
+com contador, existe um número fixo de tarefa (maior ou igual a um) que podem
+reter o semáforo. 
+
+Para controlar o acesso de várias tarefas ao semáforo com contador, ele possui
+uma variável denominada contador, cujo valor é definido no momento da criação do
+semáforo. Assim, seu funcionamento ocorre como demonstra a
+figura~\ref{fig:semaforo}, para cada tarefa que retêm o semáforo, o contador é
+decrementado e, para cada tarefa que libera o semáforo, o contador é
+incrementado. Com isso, o semáforo estará indisponível quando o valor do contador
+for igual a zero e seu valor não poderá ultrapassar o número definido
+inicialmente.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=1.2]{figuras/counting_semaphore_pt.jpg}
+\caption{Diagrama de estado do semáforo com contador.}
+%\cite{Li03}
+\label{fig:semaforo}
+\end{figure}
+
+%O funcionamento do semáforo com contador ocorre da seguinte maneira. Primeiro o
+%semáforo é criado com um contador que ira determinar o número de tarefas que
+%podem reter o semáforo ao mesmo tempo. Em seguida, quando um tarefa retem o
+%semáforo essa variáveis é decrementada de uma unidade. Assim ocorre até que o
+%contador fique zerado, indicando que o semáforo está indisponível e o número
+%máximo de tarefas foi atingido. Consequentemente, quando as tarefas liberam o
+%semáforo, o seu contador é incrementado. O semáforo binário trata-se de um
+%semáforo com o contador igual é um.
+
+No FreeRTOS, os semáforos são implementados através de uma fila de mensagens que
+informa o estado do semáforo através da situação da fila. Assim, quando a fila estiver
+vazia, indica que o semáforo não poderá ser retido e, nas demais situações da
+fila, indica que o semáforo está liberado. Com isso, para representar-se um
+semáforo binário, é criada uma fila de capacidade um e, para representar um
+semáforo com contador, é criada uma fila de capacidade igual ao valor inicial do
+contador do semáforo.
+
+\subsection{Mutex}
+\label{sec:mutex}
+
+Mutexes são estruturas parecidas com os semáforos binários. A única diferença
+entre os dois é que o mutex implementa o mecanismo de herança de prioridade, o
+qual impede que uma tarefa, de maior prioridade, fique bloqueada a espera de um
+semáforo ocupado por outra tarefa, de menor prioridade, causando assim uma
+situação de bloqueio por inversão de prioridade.
+
+O mecanismo de herança de prioridade funciona como demonstra a
+figura~\ref{fig:mutex}. Quando uma tarefa solicita o mutex, ele primeiro verifica
+se a tarefa solicitante possui prioridade maior que a tarefa com o semáforo. Caso
+afirmativo, a tarefa que retêm o semáforo tem, momentaneamente, a sua prioridade
+elevada, para que assim ela possa realizar as suas funções sem interrupções e,
+consequentemente, liberar o semáforo mais rapidamente. Um detalhe interessante
+desse elemento é que ele utiliza as mesmas funcionalidades do semáforo para
+reter e liberar o mutex. Essas funcionalidades seráo explicadas na
+seção~\ref{sec:semaforo_api}.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=1]{figuras/Priority_inheritance_pt.jpg}
+\caption{Funcionamento do mecanismo de herança de prioridade.}
+\label{fig:mutex}
+\end{figure}
+
+\subsection{Biblioteca}
+Para disponibilizar as características de comunicação e sincronização entre
+tarefas, o FreeRTOS dispõe de um conjunto de funcionalidades e tipos agrupados em
+duas bibliotecas: gerenciamento de fila de mensagens e semáforo/mutex. Juntas
+essas bibliotecas possuem vinte e quatro funcionalidades, das quais as principais
+serão listadas nas seções seguintes.
+
+\subsubsection{Gerenciamente de fila de Mensagens}
+\label{sec:gerenciamento_fila_api}
+O conjunto de funcionalidades de gerenciamento de uma fila de mensagens é
+responsável pela criação e utilização da entidade fila de mensagens. Nele
+estão presentes funcionalidades responsáveis por instanciar e remover uma fila do
+sistema e funcionalidades que enviam e recebem mensagens de uma fila do sistema.
+A seguir, tem a lista das funcionalidades mais relevantes dessa biblioteca.
+
+
+\begin{itemize}
+  \item \textbf{xQueueCreate}:Cria uma nova fila de mensagens no sistema.
+  \item \textbf{vQueueDelete}: Remove uma fila de mensagens do sistema.
+  \item \textbf{xQueueSend}: Envia uma mensagem para uma fila, sem uma determinada extermidade.
+  \item \textbf{xQueueSendToBack}: Envia uma mensagem para o final de uma fila.
+  \item \textbf{xQueueSendToFront}: Envia uma mensagem para o início de uma fila.
+  \item \textbf{xQueueReceive}:Retira uma mensagem de uma fila.
+  \item \textbf{xQueuePeek}: Lê uma mensagem de uma fila, sem remové-la.
+ \item \textbf{xQueueSendFromISR}: Manda uma mensagem para uma fila, a partir de uma tarefa de tratamento de interrupção.
+  \item \textbf{xQueueSendToBackFromISR}: Manda uma mensagem para o final de
+  uma fila, a partir de uma tarefa de tratamento de interrupção.
+  \item \textbf{xQueueSendToFrontFromISR}: Manda uma mensagem para o início de
+  uma fila, a partir de uma tarefa de tratamento de interrupção.
+  \item \textbf{xQueueReceiveFromISR} : Lê/Retira uma mensagem de uma fila, a partir de uma tarefa de tratamento de interrupção.
+\end{itemize}
+
+\subsubsection{Semáforo/Mutex}
+\label{sec:semaforo_api}
+Na biblioteca de semáforo e mutex estão implementadas, junto com as suas
+funcionalidades, as estruturas de sincronização entre tarefas semáforo e mutex.
+Assim, nesta biblioteca estão presentes funcionalidades que criam e removem
+semáforos e mutex do sistema, como também funcionalidades utilizadas para
+solicitar e liberar um semáforo ou mutex. As principais funcionalidades desta
+biblioteca podem ser vistas a seguir:
+
+
+\begin{itemize}
+  \item \textbf{vSemaphoreCreateBinary}: Cria um  semáforo binário.
+  \item \textbf{vSemaphoreCreateCounting}: Cria um semáforo com contador.
+  \item \textbf{xSemaphoreCreateMutex}: Funcionalidade usada para criar um mutex.
+  \item \textbf{xSemaphoreTake}: Retém um semáforo ou um mutex.
+  \item \textbf{xSemaphoreGive}: Funcionalidade usada para liberar um semáforo ou
+  um mutex retido.
+  \item \textbf{xSemaphoreGiveFromISR}: Libera um semáforo binário
+  ou com contador, a partir de uma tarefa de tratamento de interrupção (não deve ser utilizada para mutex).
+\end{itemize}
+
+%Procurar um melhor nome para essa seção
+\section{Utilização prática dos elementos FreeRTOS}
+
+Para construir uma aplicação de tempo real utilizando o FreeRTOS, o desenvolvedor
+deve seguir determinadas restrições impostas pelo sistema. A maioria destas
+restrições são parâmetros de configuração e modelos para a criação dos elementos
+do sistema. Assim, com o intuito de ajudar o desenvolvedor a criar suas primeiras
+aplicações, o FreeRTOS disponibilizou, junto com seu código fonte, aplicações
+exemplos classificadas por plataformas. Desse modo, essas aplicações exemplos
+podem ser utilizadas como ponto de partida na criação de novos projetos.
+
+Entretanto, a criação e análise de uma nova aplicação no FreeRTOS é uma atividade
+que necessita de maior conhecimento sobre as suas funcionalidades, fugindo assim
+do objetivo geral desse capítulo, que é proporcionar uma breve introdução ao
+FreeRTOS, demonstrando seus principais conceitos, funcionalidades e
+características. Com isso, para um melhor entendimento das explicações
+apresentadas neste capítulo, será demonstrada, nas seções seguintes, de forma
+didática, a utilização das principais entidades aqui discutidas, tarefa,
+co-rotinas, fila de mensagens e semáforos.
+
+\subsection{Utilização da entidade tarefa}
+\label{sec:tarefa_utilizacao}
+
+A tarefa é a parte mais importante de uma aplicação. Nesta são colocadas as
+ações responsáveis pelo funcionamento da aplicação\cite{Li03}. No FreeRTOS, as
+ações realizadas pelas tarefas são colocadas dentro de rotinas, as quais
+devem seguir uma estrutura pré-definida, demonstrada pela
+figura~\ref{fig:estruta_rotina_tarefa}. Nela, tem-se que uma rotina deve ser
+formada inicialmente por um cabeçalho com o seu nome e seguido de uma lista
+de parâmetros utilizados por ela. Em seguida, tem-se o código que realiza as
+finalidades da tarefa, no qual um laço infinito é colocado para abrigar a parte
+repetitiva desse código. Assim, a atividade de uma tarefa nunca termina, ficando
+sob o controle do escalonador.
+ 
+\begin{figure}[!h] \centering
+\begin{small}
+\begin{verbatim}
+void functionName( void *vParameters ) 
+{
+      for( ;; )
+      {
+          -- Task application code here. --
+      }
+}
+\end{verbatim}
+\end{small}
+\caption{Estrutura da rotina de uma tarefa.}
+\label{fig:estruta_rotina_tarefa}
+\end{figure}
+
+Um exemplo concreto da criação de uma tarefa pode ser visto na figura
+\ref{fig:app_tarefa_ciclica}. Nela, tem-se a rotina \textit{cyclicalTasks}, que
+utiliza a funcionalidade \textit{vTaskDelayUntil}
+(seção~\ref{sec:controle_tarefa_api}) para bloquear a execução da tarefa em
+intervalos iguais de tempo. Essa funcionalidade possui como parâmetros,
+respectivamente, o último tempo que a tarefa foi reativada do estado suspensa e o
+período que a tarefa deve permanecer bloqueada. Após isso, a tarefa é criada no
+sistema junto com sua prioridade, pilha de contexto e nome. Essa operação é feita
+através da funcionalidade \textit{xTaskCreate} que possui como parâmetros os
+seguintes argumentos:
+
+\begin{description}
+\item[cyclicalTasks]: Ponteiro para a rotina que deve ser executada
+pela tarefa;
+\item[``cyclicalTasks'']: Nome da tarefa utilizada nos arquivos de log
+do sistema;
+\item[STACK\_SIZE]: Tamanho da pilha de execução da função especificado
+de acordo com o número de variáveis declaradas na rotina da função;
+\item[pvParameters]: Lista de valores dos parâmetros de entrada da rotina da
+função;
+\item[TASK\_PRIORITY]: Prioridade da tarefa;
+\item[cyclicalTasksHandle]: Gancho de retorno da tarefa criada.
+\end{description}
+
+\begin{figure}[!h] \centering
+\begin{small}
+
+\begin{verbatim}
+void cyclicalTasks( void * pvParameters ){
+    portTickType xLastWakeTime;
+    const portTickType xFrequency = 10;
+    // Initialise the xLastWakeTime variable with the current time.
+    xLastWakeTime = xTaskGetTickCount();
+    for( ;; ){
+        // Wait for the next cycle.
+        vTaskDelayUntil( &xLastWakeTime, xFrequency );
+        // Perform action here.
+    }
+}
+
+xTaskHandle cyclicalTasksHandle;
+
+xTaskCreate( cyclicalTask, "cyclicalTasks", STACK_SIZE, 
+                 ( void * ) pvParameters, TASK_PRIORITY, &cyclicalTasksHandle);
+
+vTaskStartScheduler();
+
+\end{verbatim}
+\end{small}
+\caption{Aplicação formada por uma tarefa cíclica.}
+\label{fig:app_tarefa_ciclica}
+\end{figure}
+
+Para finalizar o exemplo da figura~\ref{fig:app_tarefa_ciclica}, após ser criada
+a tarefa,  o escalonador do sistema deve ser iniciado e com ele a aplicação. Essa
+operação é feita pela a funcionalidade \textit{vTaskStartScheduler()}, localizada
+no final do código.
+
+
+\subsection{Utilização da fila de mensagens}
+\label{fila_utilizacao}
+
+A utilização de uma fila de mensagens é resumidamente demonstrada na aplicação da
+figura~\ref{fig:app_fila_de_mensagens}. Nela, inicialmente tem-se a estrutura
+\textit{AMessage}, que define o tipo da mensagem que será utilizada. Em seguida,
+através do método \textit{xQueueCreate}, é criada uma fila de mensagens que será
+referenciada pela variável \textit{xQueue}, do tipo \textit{xQueueHandle}. Para
+isso, o método \textit{xQueueCreate} recebe como parâmetros, respectivamente, a
+quantidade de mensagens que a fila pode armazenar e o tamanho da mensagens
+manuseadas por ela.
+
+
+\begin{figure}[!h] \centering
+\begin{small}
+
+\begin{verbatim}
+struct AMessage { 
+    portCHAR ucMessageID; 
+    portCHAR ucData[ 20 ]; 
+}xMessage;
+
+xQueueHandle xQueue;
+//Create a queue capable of containing 10 pointers to AMessage structures.
+xQueue = xQueueCreate( 10, sizeof( struct AMessage * ) );
+// Task to create a queue and post a value. 
+void sendTask( void *pvParameters ) { 
+struct AMessage *pxMessage;
+	 
+    if( xQueue == 0 ) { 
+        // Failed to create the queue. 
+    }else{
+        // Send a pointer to a struct AMessage object. Don't block if the 
+        // queue is already full. 
+        pxMessage = & xMessage; 
+        xQueueSend( xQueue, ( void * ) &pxMessage, ( portTickType ) 0 );
+    }
+// ... Rest of task code.
+ 
+}
+
+// Task to receive from the queue. 
+void receiveTask( void *pvParameters ) { 
+struct AMessage *pxRxedMessage;
+
+    if( xQueue != 0 ) { 
+        // Receive a message on the created queue. Block for 10 ticks if a 
+        // message is not immediately available. 
+        if( xQueueReceive( xQueue, &( pxRxedMessage ), ( portTickType ) 10 ) ) {
+            // pcRxedMessage now points to the struct AMessage variable posted 
+            // by vATask. 
+        } 
+    }
+    // ... Rest of task code. 
+} 
+
+\end{verbatim}
+\end{small}
+\caption{Aplicação que utiliza uma fila de mensagens.}
+\label{fig:app_fila_de_mensagens}
+\end{figure}
+  
+
+Estabelecida a fila de mensagens, é necessário agora definir as tarefas que irão
+enviar e receber mensagens da mesma. Na figura~\ref{fig:app_fila_de_mensagens},
+estão presentes apenas as rotinas de cada uma dessas tarefas, sendo que a
+explicação completa de como é criada uma tarefa foi demonstrada na
+seção~\ref{sec:tarefa_utilizacao}. A seguir, tem a explanação sobre cada uma dessas rotinas.
+
+Para enviar uma mensagem para a fila \textit{xQueue}, a rotina \textit{sendTask}
+utiliza-se da funcionalidade \textit{xQueueSend}. Essa funcionalidade possui como
+parâmetros a fila para qual a mensagem será enviada, a mensagem que será enviada
+para a fila e o tempo máximo que a tarefa poderá ficar bloqueada aguardando para
+enviar a mensagem. 
+%O código que deve ser executado Após o envio da
+%mensagem é colocado abaixo de uma condição \textit{if}, que recebe a
+%confirmação do envio da mensagem como retorno de \textit{xQueueSend}.
+
+Por último, na rotina \textit{receiveTask}, uma mensagem é retirada da fila
+\textit{xQueue} através da funcionalidade \textit{xQueueReceive}. Para isso, ela
+utiliza como argumentos, respectivamente, a fila onde será retirada a
+mensagem, o endereço onde a mensagem será armazenada, e o tempo
+máximo que a tarefa pode ficar esperando pela fila. Como retorno, essa
+funcionalidade informa se a mensagem foi retirada da fila com sucesso ou não,
+sendo, com isso, utilizada como guarda para o código que deve ser executado após
+a retirada da mensagem.
+
+
+\subsection{Utilização do semáforo}
+\label{sec:semaforo_utilizacao}
+
+%semáforos são estruturas de sincronização entre tarefas. Eles são utilizados
+%para coordenar o uso de recurso compartilhado por uma ou mais tarefas e para
+%coordenar a execução de uma determinada função sicronizada. Assim, o código da
+%tarefa responsável por acessar o recurso compartilhado ou executar uma função
+%sicronizada deve ser protegido de maneira que a sua execução só ocorra quando a
+%tarefa possuir o semáforo.
+
+Para a construção de uma aplicação que se utiliza do semáforo são necessárias
+basicamente três funcionalidades da biblioteca de semáforos,
+\textit{vSemaphoreCreateBinary}, \textit{xSemaphoreTake} e
+\textit{xSemaphoreGive}. A primeira funcionalidade cria o semáforo e as demais
+solicitam e liberam o semáforo, respectivamente.
+
+Um exemplo de uma aplicação que utiliza um semáforo para controlar o acesso de um
+recurso compartilhado pode ser visto na figura~\ref{fig:app_semaforo}. Nela,
+inicialmente é criada a variável \textit{xSemaphore} para armazenar uma
+referência ao novo semáforo. Em seguida, o método \textit{vSemaphoreCreateBinary}
+é usado para criar o novo semáforo e retornar uma referência para o mesmo.
+
+\begin{figure}[!h] \centering
+\begin{small}
+
+\begin{verbatim}
+
+xSemaphoreHandle xSemaphore = NULL;
+
+
+// Create the semaphore to guard a shared resource. As we are using 
+// the semaphore for mutual exclusion we create a mutex semaphore 
+// rather than a binary semaphore. 
+xSemaphore = xvSemaphoreCreateBinary();
+
+// A task that uses the semaphore. 
+void semaphoreTask( void * pvParameters ) { 
+    // ... Do other things.
+    if( xSemaphore != NULL ) {
+        // See if we can obtain the semaphore. If the semaphore is not available 
+        // wait 10 ticks to see if it becomes free. 
+        if( xSemaphoreTake( xSemaphore, ( portTickType ) 10 ) == pdTRUE ) { 
+            // We were able to obtain the semaphore and can now access the 
+            // shared resource.
+            // We have finished accessing the shared resource. Release the 
+            // semaphore. 
+            xSemaphoreGive( xSemaphore ); 
+        } else
+            // We could not obtain the semaphore and can therefore not access 
+            // the shared resource safely 
+       { 
+    } 
+} 
+\end{verbatim}
+\end{small}
+\caption{Aplicação que demonstra a utilização de um semáforo}
+\label{fig:app_semaforo}
+\end{figure}
+
+Após a criação do semáforo, a rotina da tarefa que utilizará o recurso
+compartilhado é desenvolvida. Nela, o código que acessará tal recurso está
+protegido pela segunda condição \textit{if}, a qual recebe o retorno do método
+\textit{xSemaphoreTake}, informando se o semáforo foi retido ou não. Ao final da
+rotina, o semáforo é liberado pelo método \textit{xSemaphoreGive}, permitindo que
+outra tarefa possa retê-lo e usar o recurso compartilhado.
+
+A utilização do mutex é bem parecida com a do semáforo binário. A diferença, para
+o usuário, entre os dois mecanismos está apenas no método de criação da entidade,
+\textit{xSemaphoreCreateMutex}. As formas e os métodos para solicitar e liberar o
+mutex são os mesmos do semáforo, \textit{xSemaphoreTake}  e
+\textit{xSemaphoreGive}. Com isso, para transformar a aplicação da
+figura~\ref{fig:app_semaforo} de semáforo para mutex basta apenas trocar o método
+\textit{vSemaphoreCreateBinary} por \textit{xSemaphoreCreateMutex}.
+
+
+\subsection{Utilização das co-rotinas}
+\label{subsec:corotina_utilizacao}
+
+As co-rotinas, assim como as tarefas, possuem as ações responsáveis pelas
+atividades da aplicação. Essas ações são colocadas dentro das rotinas executadas
+pelas co-rotinas, as quais devem seguir o modelo demonstrado na
+figura~\ref{fig:rotina_corotina}. Nele, a rotina deve possuir um nome, seguido de
+dois parâmetros: \textit{xHandle}, uma referência para a co-rotina que será
+utilizado pelas funcionalidades de controle da co-rotina; e \textit{uxIndex},
+que é usado opcionalmente no desenvolvimento do código da co-rotina. Por último, o
+código de execução da co-rotina deve ser iniciado com a função
+\textit{crSTART(xHandle)} e finalizado pela função \textit{crEND()}.
+
+\begin{figure}[!h] \centering
+\begin{small}
+
+\begin{verbatim}
+
+void vACoRoutineFunction(xCoRoutineHandle xHandle, 
+						unsigned portBASE_TYPE uxIndex ){
+        crSTART( xHandle );
+        for( ;; )
+        {
+            -- Co-routine application code here. --
+        }
+        crEND();
+    }
+
+\end{verbatim}
+\end{small}
+\caption{Modela da rotina de execução de uma co-rotina.}
+\label{fig:rotina_corotina}
+\end{figure}
+
+Um exemplo completo da utilização de uma co-rotina pode ser vito na
+figura~\ref{fig:utilizacao_corotina}. Nesse é criada uma co-rotina que,
+através da rotina \textit{vFlashCoRoutine}, controla o funcionamento de um LED.
+Para isso ela interrompe a sua execução durante um tempo de dez ticks (unidade de
+tempo do FreeRTOS), utilizando a funcionalidade \textit{crDELAY}, que tem como
+argumentos o gancho da co-rotina e o tempo de bloqueio da co-rotina. Após isso, a
+função de controle do LED \textit{vParTestToggleLED} é chamada. Observa-se, nesse
+exemplo, a utilização dos parâmetros da rotina como argumentos para a
+funcionalidade \textit{crDELAY}.
+
+Com a criação da rotina utilizada pela co-rotina, resta apenas criar a co-rotina
+no sistema. Esse trabalho é feito através da funcionalidade
+\textit{xCoRoutineCreate}, que recebe como parâmetros respectivamente a rotina
+que será associada à co-rotina, a prioridade da co-rotina e o valor do parâmetro
+\textit{uxIndex} da rotina associada à co-rotina.
+
+Por fim, devido à política de escalonamento cooperativo das co-rotinas, ao final
+da aplicação da figura~\ref{fig:utilizacao_corotina} é colocada na rotina
+\textit{vApplicationIdleHook} (rotina executada pela tarefa ociosa,
+seção~\ref{subsubsection:tarefa_ociosa}) a funcionalidade
+\textit{vCoRoutineSchedule} que chama o escalonador para realizar a troca da
+co-rotina em execução. Assim, sempre que a co-rotina em execução é bloqueada, a
+tarefa ociosa entra em ação chamando o escalonador para fazer a troca de
+co-rotinas.
+
+
+\begin{figure}[!h] \centering
+\begin{small}
+
+\begin{verbatim}
+...
+void main( void )    {
+	// This time i is passed in as the index.
+	xCoRoutineCreate( vFlashCoRoutine, PRIORITY_0, 10 );
+
+    // NOTE: Tasks can also be created here!
+	// Start the scheduler.
+    vTaskStartScheduler();
+}
+
+void vFlashCoRoutine( xCoRoutineHandle xHandle, 
+							unsigned portBASE_TYPE uxIndex ){
+	// Co-routines must start with a call to crSTART().
+	crSTART( xHandle );
+        for( ;; ){            
+            crDELAY( xHandle, uxIndex);
+            vParTestToggleLED;
+        }
+	// Co-routines must end with a call to crEND().
+	crEND();
+
+}
+
+void vApplicationIdleHook( void ){
+        vCoRoutineSchedule( void );
+}
+
+
+\end{verbatim}
+\end{small}
+\caption{Aplicação que demonstra a utilização de uma co-rotina.}
+\label{fig:utilizacao_corotina}
+\end{figure}
+
+\paragraph{}
+Através desse capítulo, pode-se perceber que o \textit{microkernel} FreeRTOS é formado por abstrações de hardware que dão suporte para a construção de novas aplicações. Essas aplicações utilizam tais abstrações por intermédio das funções das bibliotecas disponibilizadas pelo sistema. Cada função realiza alterações no comportamento interno do núcleo e é através dessa visão que o FreeRTOS será especificado nesse trabalho, dando ênfase nas alterações geradas pela API.
+
+%\section{Comentários conclusivos}
+% Relatar aqui as propriedade que o sistema em execução deve satisfazer. Dar
+% nomes/números para futuras referências no texto.
+

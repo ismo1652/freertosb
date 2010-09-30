@@ -1,0 +1,81 @@
+\mychapter{Escopo da especificação}
+\label{cap:primeiros_passos}
+
+Nos trabalhos discutidos no capítulo~\ref{Cap:trabalhos}, uma das principais técnicas utilizadas foi limitar o escopo da especificação para tornar viável o desenvolvimento do projeto. Seguindo o mesmo raciocínio, na modelagem do FreeRTOS, apenas algumas das suas abstrações de hardware, junto com suas características, foram especificadas nessa dissertação. Com isso, a parte do sistema a ser tratada nesse trabalho será demonstrada a seguir.
+ 
+\section{Escopo da especificação}
+
+Durante o estudo da documentação do FreeRTOS percebeu-se que algumas abstrações de hardware são mais importantes e mais utilizadas em aplicações criadas a partir do FreeRTOS. Devido a isso, decidiu-se que as entidades a serem tratadas nesse trabalho serão: tarefas, fila de mensagens, semáforos e mutex. 
+
+As tarefas foram escolhidas porque são as unidades básicas de execução do sistema, consequentemente, requisito indispensável para o modelo. Do mesmo modo, as filas de mensagens são as estruturas primárias de comunicação entre as tarefas, pois é dela que derivam os semáforos e mutex, sendo esses estruturas básicas de sicronização entre tarefas.
+
+Após a decidir quais abstrações serão tratadas na especificação, foram selecionadas as características de cada entidade a serem modeladas. Como resultado dessa seleção, criou-se as listadas abaixo, nas quais cada característica está organizada de acordo com as entidades que pertencem. 
+
+Ressalta-se, que as características aqui comentadas estão na sua forma mais genérica. Assim, cada requisito abaixo pode ser composto por uma ou mais características específicas, que serão comentadas no decorrer da explicação sobre o modelo criado.
+
+\subsubsection*{Tarefas}
+
+Para a entidade tarefa as características escolhidas nessa especificação foram:
+
+\begin{itemize}
+\item Armazenar todas as tarefas gerenciadas pelo FreeRTOS;
+\item Estados de uma tarefa;
+\item Prioridade de uma tarefa;e
+\item Política de escalonamento (escolha da próxima tarefa a entrar em execução).
+\end{itemize}
+
+Ainda, como funcionalidade que foi colocada junto com o conjunto de tarefas, tem-se o tempo de execução do escalonador, ou seja, o periodo no qual o sistema está em funcionamento.
+
+\subsubsection*{Fila de Mensagens}
+Na fila de mensagens este trabalho preocupou-se em:
+
+\begin{itemize}
+\item Armazenar todas as filas de mensagens gerênciadas pelo FreeRTOS;
+\item Gerenciar as mensagens da fila;
+\item Controlar os estados de uma fila (fila cheia ou fila vazia);e
+\item Gerenciar as tarefas bloqueadas por escrita ou leitura.
+\end{itemize}
+ 
+\subsubsection*{Semáforo}
+A entidade semáforo abrange tantos os semáforos binários, com os semáforos com contador. Os caracteres dessas abstrações tratados foram:
+\begin{itemize}
+\item Armazenar os semáforos manuseados pelo FreeRTOS;
+\item Gerenciar as tarefas que utilizam o semáforo; e
+\item Gerenciar os estados dos semáforos (disponível e ocupado).
+\end{itemize}
+
+  
+\subsubsection*{Mutex}
+Para o mutex, as principais características tratadas foram:
+\begin{itemize}
+\item Armazenar os mutexes pelo FreeRTOS;
+\item Gerenciar as tarefas que utilizam mutex;
+\item Gerenciar os estados dos mutex; e
+\item Controlar o mecanismo de herança de prioridade.
+\end{itemize}
+
+\subsubsection*{Funcionalidades da API}
+
+Vale lembrar que, nesse trabalho, foram tratadas principalmente as funcionalidades da API do FreeRTOS relacionada a esses elementos. Entretanto, na especificação dessas funcionalidades preocupou-se apenas com as características listadas nessa seção. Por exemplo, a funcionalidade \textit{xTaskCreate}, responsável por criar uma nova tarefa, aloca um espaço na memória para a pilha da tarefa, coloca a prioridade da tarefa, escolhe o estado da tarefa, associa um nome a tarefa e realiza outras particularidades do sistema para a criação de uma tarefa. Na especificação, essa funcionalidade preocupa-se apenas com o estado da tarefa e a sua prioridade e outros aspectos podem ser tratados futuramente, através de refinamentos.
+
+Nesse contexto, as funcionalidades da API do FreeRTOS tratadas nesse trabalho foram:
+
+\begin{tabbing}
+\hspace{200}\=\kill
+xTaskCreate, \> vTaskDelete,\\
+uxTaskPriorityGet, \> vTaskSuspend,\\ 
+vTaskResume, \> xTaskGetCurrentTaskHandle,\\
+uxTaskGetNumberOfTasks, \> vTaskDelay,\\ 
+vTaskDelayUntil,\> xTaskGetTickCount,\\ 
+vTaskStartScheduler, \> vTaskEndScheduler,\\
+vTaskSuspendAll, \> xTaskResumeAll,\\ 
+vTaskPrioritySet,\> xQueueSendToBack,\\ 
+xQueueSendToFront, \> xQueueReceive,\\
+xQueuePeek, \> xQueueCreate, \\
+xQueueSend,\> xQueueSendToBack, \\
+xQueueSendToFront, \> xQueueReceive,\\
+xQueuePeek, \> xSemaphoreGive,\\ 
+xSemaphoreTake, \> vSemaphoreCreateBinary,\\ 
+vSemaphoreCreateCounting, \> xSemaphoreCreateMutex,\\
+xSemaphoreTake, \> xSemaphoreGive \\
+\end{tabbing}

@@ -1,0 +1,34 @@
+%
+% ********** Resumo
+%
+
+% Usa-se \chapter*, e não \chapter, porque este "capítulo" não deve
+% ser numerado.
+% Na maioria das vezes, ao invés dos comandos LaTeX \chapter e \chapter*,
+% deve-se usar as nossas versões definidas no arquivo comandos.tex,
+% \mychapter e \mychapterast. Isto porque os comandos LaTeX têm um erro
+% que faz com que eles sempre coloquem o número da página no rodapé na
+% primeira página do capítulo, mesmo que o estilo que estejamos usando
+% para numeração seja outro.
+\mychapterast{Resumo}
+
+Este trabalho apresenta uma contribuição para o esforço internacional do \textit{Verified} \textit{Software} \textit{Repository}, o qual tem como alguns de seus objetivos acelerar o desenvolvimento das tecnologias de verificação de software e colecionar especificações de diversas aplicações como \textit{smart} \textit{card}, bibliotecas padrões de desenvolvimento e sistema operacionais embarcados. Para essa contribuição, será adotada a sugestão do pesquisador britânico Woodcock de especificar formalmente o sistema operacional de tempo real
+FreeRTOS, o qual tem como características a sua simplicidade, portabilidade e popularidade. Com essa especificação será possível verificar o correto funcionamento desse sistema e, consequentemente, garantir uma maior confiabilidade para as aplicações desenvolvidas através dele, cooperando, com isso, também para o desafio da construção de sistemas disponíveis, seguros, escalonáveis e ubíquos, proposto pela Sociedade Brasileira de Computação. O formalismo utilizado nessa especificação é o método B, que, devido as suas semelhanças com as linguagens de programação imperativas e suas técnicas de modularização e refinamento, tornou-se viável para a construção da mesma. O modelo desenvolvido teve como principal foco as funcionalidades e abstrações de hardware do sistema e o seu desenvolvimento foi feito de forma incremental. Para provar a viabilidade desse trabalho, uma especificação abstrata foi inicialmente desenvolvida, na qual algumas propriedades do sistema puderam
+ser tratadas. Ao final, além de validar os requisitos desse sistema, esse trabalho servirá também como uma documentação formal do mesmo, a qual poderá ser usada como entrada para a geração de testes, no nível de código, para o sistema especificado. Em suma, a especificação do FreeRTOS auxiliará na resolução dos desafios anteriormente citados, servindo desse modo como uma contribuição para a sociedade de computação, em especial a sociedade de métodos formais.
+
+\vspace{1.5ex}
+
+{\bf Palavras-chave}: Especificaçõa,FreeRTOS, Método B, Métodos Formais.
+%
+% ********** Abstract
+%
+
+\mychapterast{Abstract}
+
+This work present a contribuition to the international effort of the Verified Software, that as a objective accelerate the development of verification software technologies and collect various applications especification such as smart cards, library development standards and operating systems embeded.
+For this contribution, will be adopted the Woodcock, British researcher, suggestion of make a formal especification of the real time operating system FreeRTOS, a simplicity, portability and popularity operation system. This specification will veryfite the correct operation of this system and thus ensure greater
+reliability for the applications developed through it. This specification, also,  will contribui to the challenge of building systems available, secure, scalable, and ubiquitous, proposed by the Company Brazilian Computer. The formalism used for this specification is the B method, wich look like with the imperative programming languages. Further than this, the b method techniques of modularization and refinement became feasible to build specification through it. The model developed had main focus the features and abstractions of system hardware. The specification was done incrementally. To prove the feasibility of this work, an abstract specification was initially developed, in which some properties of the system could be treated. In the end, fhurther than validate the requirements of this system, this work will also serve as a formal documentation of this system, which can be used as input for the tests generation level code to the system. In short, the specification of FreeRTOS assist in resolving the challenges cited above, thereby serving as a contribution to society of formal methods.
+
+\vspace{1.5ex}
+
+{\bf Keywords}: Especifitacion, FreeRTOS, B Method, Formal Method.
